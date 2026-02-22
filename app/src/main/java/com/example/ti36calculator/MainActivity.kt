@@ -137,16 +137,15 @@ fun CalculatorButton(buttonProperties : CalculatorButtonProperties, modifier: Mo
  */
 @Composable
 fun CalculatorButtons() {
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(5),
-        modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(4.dp)
+    GridLayout(
+        columns = 5,
+        rows = 9,
+        modifier = Modifier.fillMaxSize()
     ) {
-        items(CALCULATOR_BUTTON_LIST) { buttonProperties ->
+        CALCULATOR_BUTTON_LIST.forEach { buttonProperties ->
             if (buttonProperties.text1st.isEmpty()) {
                 Spacer(modifier = Modifier.padding(0.dp))
-            }
-            else {
+            } else {
                 CalculatorButton(
                     buttonProperties = buttonProperties,
                     Modifier.padding(4.dp).fillMaxWidth()
