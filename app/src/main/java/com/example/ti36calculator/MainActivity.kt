@@ -6,18 +6,10 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.ti36calculator.ui.theme.Ti36CalculatorTheme
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 
 class MainActivity : ComponentActivity() {
 
@@ -40,7 +32,10 @@ class MainActivity : ComponentActivity() {
                                 .padding(innerPadding)
                                 .background(CASE_COLOR)
                         ) {
-                            CalculatorButtons()
+                            Column(modifier = Modifier.fillMaxSize()) {
+                                SevenSegmentDisplay(value = "ABCDEF", modifier = Modifier.fillMaxWidth().padding(16.dp))
+                                CalculatorButtons()
+                            }
                         }
                     }
                 }
@@ -48,4 +43,3 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-
