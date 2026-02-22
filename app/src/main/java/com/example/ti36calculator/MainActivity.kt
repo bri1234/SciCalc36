@@ -103,7 +103,7 @@ fun CalculatorButton(buttonProperties : CalculatorButtonProperties, modifier: Mo
         }
         Button(
             onClick = {},
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxSize(),
             shape = RoundedCornerShape(5.dp),
             colors = ButtonDefaults.buttonColors(containerColor = buttonProperties.buttonColor),
             contentPadding = PaddingValues(2.dp)
@@ -140,7 +140,8 @@ fun CalculatorButtons() {
     GridLayout(
         columns = 5,
         rows = 9,
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier.fillMaxSize(),
+        gridCellInfos = CALCULATOR_BUTTON_LIST,
     ) {
         CALCULATOR_BUTTON_LIST.forEach { buttonProperties ->
             if (buttonProperties.text1st.isEmpty()) {
@@ -148,7 +149,7 @@ fun CalculatorButtons() {
             } else {
                 CalculatorButton(
                     buttonProperties = buttonProperties,
-                    Modifier.padding(4.dp).fillMaxWidth()
+                    Modifier.padding(4.dp).fillMaxSize()
                 )
             }
         }
