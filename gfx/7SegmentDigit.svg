@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:lc="https://librecad.org" xmlns:xlink="http://www.w3.org/1999/xlink" width="99.01438337mm" height="180mm" viewBox="0 0 99.01438337 180">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" xmlns:lc="https://librecad.org" xmlns:xlink="http://www.w3.org/1999/xlink" width="99.01438337mm" height="180mm" viewBox="0 0 99.01438337 180">
     <g lc:layername="0" lc:is_locked="false" lc:is_construction="false" fill="none" stroke="black" stroke-width="1">
         <path inkscape:label="SegmentA" d="M26.39794864,2.76472922 L39.63321941,16 L79.41377264,16 L89.63310222,1.40528482 L87.52273246,0.63032185 L85.3246167,0.15878971 L83.19004902,0 L35.19110843,0 L32.86418724,0.19949692 L30.5911223,0.73553458 L28.42029532,1.5967377 L26.39794864,2.76472922 Z "/>
         <path inkscape:label="SegmentB" d="M90.7461231,76.38966883 L98.91954387,18.23275815 L99.01438337,14.59661194 L98.28554443,11.03298385 L96.77064481,7.72606224 L94.54801449,4.84674344 L82.15643112,22.54375853 L74.96013726,73.74804994 L85.29545084,80.20627063 L90.7461231,76.38966883 Z "/>
