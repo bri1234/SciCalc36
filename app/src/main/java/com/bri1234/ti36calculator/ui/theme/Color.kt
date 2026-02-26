@@ -1,4 +1,4 @@
-package com.example.ti36calculator.ui.theme
+package com.bri1234.ti36calculator.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

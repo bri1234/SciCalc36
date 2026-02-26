@@ -1,6 +1,5 @@
-package com.example.ti36calculator.ui.theme
+package com.bri1234.ti36calculator.ui.theme
 
-import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme

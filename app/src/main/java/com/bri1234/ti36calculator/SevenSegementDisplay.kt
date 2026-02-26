@@ -1,4 +1,4 @@
-package com.example.ti36calculator
+package com.bri1234.ti36calculator
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement

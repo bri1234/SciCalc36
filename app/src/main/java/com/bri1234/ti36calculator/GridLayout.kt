@@ -1,9 +1,8 @@
-package com.example.ti36calculator
+package com.bri1234.ti36calculator
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.Layout
-import androidx.compose.ui.layout.Placeable
 
 interface IGridCellInfo {
     val row : Int

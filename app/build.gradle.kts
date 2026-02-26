@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.ti36calculator"
+    namespace = "com.bri1234.ti36calculator"
     compileSdk {
         version = release(36)
     }

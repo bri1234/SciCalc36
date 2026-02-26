@@ -1,4 +1,4 @@
-package com.example.ti36calculator
+package com.bri1234.ti36calculator
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -9,7 +9,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.ti36calculator.ui.theme.Ti36CalculatorTheme
+import com.bri1234.ti36calculator.ui.theme.Ti36CalculatorTheme
 
 class MainActivity : ComponentActivity() {
 
