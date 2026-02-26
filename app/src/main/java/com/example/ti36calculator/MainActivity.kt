@@ -33,7 +33,10 @@ class MainActivity : ComponentActivity() {
                                 .background(CASE_COLOR)
                         ) {
                             Column(modifier = Modifier.fillMaxSize()) {
-                                SevenSegmentDisplay(value = "ABCDEF", modifier = Modifier.fillMaxWidth().padding(16.dp))
+                                // val value = "ABCDEF"
+                                val value = "1234567890"
+
+                                SevenSegmentDisplay(value, false,Modifier.fillMaxWidth().padding(16.dp))
                                 CalculatorButtons()
                             }
                         }
