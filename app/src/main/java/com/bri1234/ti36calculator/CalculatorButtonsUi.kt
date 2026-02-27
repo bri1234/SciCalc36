@@ -30,49 +30,13 @@ import androidx.compose.ui.unit.sp
  * @param modifier The modifier to be applied to the button layout.
  */
 @Composable
-fun CalculatorButton(buttonProperties : CalculatorButtonProperties, modifier: Modifier) {
+private fun CalculatorButton(buttonProperties : CalculatorButtonProperties, modifier: Modifier) {
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        if (buttonProperties.text4th.isEmpty()) {
-            // center text3 if text4 is empty
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = buttonProperties.text3rd,
-                    fontSize = 16.sp,
-                    color = buttonProperties.test3rdColor,
-                    maxLines = 1
-                )
-            }
-        } else {
-            // align text3 left and text4 right
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = buttonProperties.text3rd,
-                    fontSize = 16.sp,
-                    color = buttonProperties.test3rdColor,
-                    modifier = Modifier.weight(1f).padding(start = 5.dp),
-                    maxLines = 1
-                )
-                Spacer(modifier = Modifier.width(3.dp))
-                Text(
-                    text = buttonProperties.text4th,
-                    fontSize = 16.sp,
-                    color = buttonProperties.test4thColor,
-                    modifier = Modifier.weight(1f).padding(end = 5.dp),
-                    maxLines = 1,
-                    textAlign = TextAlign.End
-                )
-            }
-        }
+        CalculatorButtonHeading(buttonProperties)
+
         Button(
             onClick = {},
             modifier = Modifier.fillMaxSize(),
@@ -102,17 +66,70 @@ fun CalculatorButton(buttonProperties : CalculatorButtonProperties, modifier: Mo
     }
 }
 
+@Composable
+private fun CalculatorButtonHeading(buttonProperties: CalculatorButtonProperties) {
+
+//    if (buttonProperties.text3rd.isEmpty() && buttonProperties.text4th.isEmpty()) {
+//        return
+//    }
+
+    if (buttonProperties.text4th.isEmpty()) {
+        // center text3 if text4 is empty
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = buttonProperties.text3rd,
+                fontSize = 16.sp,
+                color = buttonProperties.test3rdColor,
+                maxLines = 1
+            )
+        }
+
+        return
+    }
+
+    // align text3 left and text4 right
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = buttonProperties.text3rd,
+            fontSize = 16.sp,
+            color = buttonProperties.test3rdColor,
+            modifier = Modifier
+                .weight(1f)
+                .padding(start = 5.dp),
+            maxLines = 1
+        )
+        Spacer(modifier = Modifier.width(3.dp))
+        Text(
+            text = buttonProperties.text4th,
+            fontSize = 16.sp,
+            color = buttonProperties.test4thColor,
+            modifier = Modifier
+                .weight(1f)
+                .padding(end = 5.dp),
+            maxLines = 1,
+            textAlign = TextAlign.End
+        )
+    }
+}
+
 /**
  * Displays the calculator buttons in a grid layout.
  * The grid has 5 columns and fills the available space.
  * If a button's text1st is empty, the grid cell is empty.
  */
 @Composable
-fun CalculatorButtons() {
+fun CalculatorButtons(modifier: Modifier = Modifier) {
     GridLayout(
         columns = 5,
         rows = 9,
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier,
         gridCellInfos = CALCULATOR_BUTTON_LIST,
     ) {
         CALCULATOR_BUTTON_LIST.forEach { buttonProperties ->

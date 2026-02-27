@@ -36,8 +36,15 @@ class MainActivity : ComponentActivity() {
                                 // val value = "ABCDEF"
                                 val value = "1234567890"
 
-                                SevenSegmentDisplay(value, false,Modifier.fillMaxWidth().padding(16.dp))
-                                CalculatorButtons()
+                                SevenSegmentDisplay(value, false,
+                                    Modifier.fillMaxWidth()
+                                        .weight(1f)
+                                        .absolutePadding(8.dp, 8.dp, 8.dp, 0.dp))
+
+                                // CalculatorButtons(Modifier.fillMaxSize())
+                                CalculatorButtons(Modifier
+                                    .weight(9f)
+                                    .absolutePadding(8.dp, 0.dp, 8.dp, 8.dp))
                             }
                         }
                     }
