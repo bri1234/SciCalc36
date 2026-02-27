@@ -1,12 +1,16 @@
 package com.bri1234.ti36calculator
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -17,6 +21,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -39,7 +44,7 @@ private fun CalculatorButton(buttonProperties : CalculatorButtonProperties, modi
 
         Button(
             onClick = {},
-            modifier = Modifier.fillMaxSize(),
+            modifier = modifier, // Modifier.fillMaxSize(),
             shape = RoundedCornerShape(5.dp),
             colors = ButtonDefaults.buttonColors(containerColor = buttonProperties.buttonColor),
             contentPadding = PaddingValues(2.dp)
@@ -68,10 +73,6 @@ private fun CalculatorButton(buttonProperties : CalculatorButtonProperties, modi
 
 @Composable
 private fun CalculatorButtonHeading(buttonProperties: CalculatorButtonProperties) {
-
-//    if (buttonProperties.text3rd.isEmpty() && buttonProperties.text4th.isEmpty()) {
-//        return
-//    }
 
     if (buttonProperties.text4th.isEmpty()) {
         // center text3 if text4 is empty
@@ -122,23 +123,62 @@ private fun CalculatorButtonHeading(buttonProperties: CalculatorButtonProperties
 /**
  * Displays the calculator buttons in a grid layout.
  * The grid has 5 columns and fills the available space.
- * If a button's text1st is empty, the grid cell is empty.
  */
 @Composable
 fun CalculatorButtons(modifier: Modifier = Modifier) {
-    GridLayout(
-        columns = 5,
-        rows = 9,
-        modifier = modifier,
-        gridCellInfos = CALCULATOR_BUTTON_LIST,
-    ) {
-        CALCULATOR_BUTTON_LIST.forEach { buttonProperties ->
-            if (buttonProperties.text1st.isEmpty()) {
-                Spacer(modifier = Modifier.padding(0.dp))
-            } else {
+    Column (modifier = modifier) {
+        GridLayout(
+            columns = 5,
+            rows = 1,
+            modifier = Modifier.fillMaxWidth().heightIn(30.dp, 40.dp),
+            gridCellInfos = CALCULATOR_SPECIAL_BUTTON_LIST,
+        ) {
+            CALCULATOR_SPECIAL_BUTTON_LIST.forEach { buttonProperties ->
+                SimpleCalculatorButton(
+                    buttonProperties = buttonProperties,
+                    Modifier.padding(4.dp, 0.dp, 4.dp, 0.dp)
+                )
+            }
+        }
+
+        GridLayout(
+            columns = 5,
+            rows = 8,
+            modifier = Modifier.fillMaxSize(),
+            gridCellInfos = CALCULATOR_BUTTON_LIST,
+        ) {
+            CALCULATOR_BUTTON_LIST.forEach { buttonProperties ->
                 CalculatorButton(
                     buttonProperties = buttonProperties,
                     Modifier.padding(4.dp).fillMaxSize()
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun SimpleCalculatorButton(buttonProperties : CalculatorButtonProperties, modifier: Modifier) {
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Button(
+            onClick = {},
+            modifier = modifier,
+            shape = RoundedCornerShape(5.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = buttonProperties.buttonColor),
+            contentPadding = PaddingValues(2.dp)
+        ) {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = buttonProperties.text1st,
+                    fontSize = 18.sp,
+                    color = buttonProperties.test1stColor,
+                    maxLines = 1
                 )
             }
         }

@@ -38,13 +38,13 @@ class MainActivity : ComponentActivity() {
 
                                 SevenSegmentDisplay(value, false,
                                     Modifier.fillMaxWidth()
-                                        .weight(1f)
-                                        .absolutePadding(8.dp, 8.dp, 8.dp, 0.dp))
+                                        .weight(1.5f)
+                                        .padding(8.dp, 8.dp, 8.dp, 8.dp))
 
-                                // CalculatorButtons(Modifier.fillMaxSize())
                                 CalculatorButtons(Modifier
+                                    .fillMaxWidth()
                                     .weight(9f)
-                                    .absolutePadding(8.dp, 0.dp, 8.dp, 8.dp))
+                                    .padding(8.dp, 0.dp, 8.dp, 8.dp))
                             }
                         }
                     }
