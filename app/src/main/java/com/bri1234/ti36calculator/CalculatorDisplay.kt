@@ -1,21 +1,24 @@
 package com.bri1234.ti36calculator
 
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.vector.PathParser
+import androidx.compose.ui.unit.dp
 
 @Composable
-fun SevenSegmentDisplay(
+fun CalculatorDisplay(
     value: String,
     drawDecimalPoint: Boolean,
     modifier: Modifier = Modifier
 ) {
-    Box(modifier = modifier.background(Color.Yellow)) {
+    Canvas(modifier = modifier) {
+        drawRect(DISPLAY_BACKGROUND_COLOR)
+
+        drawSunkenFrame(5.dp.toPx(), this)
+    }
 //        Row(
 //            modifier = Modifier.matchParentSize(),
 //            horizontalArrangement = Arrangement.spacedBy(6.dp)
@@ -28,10 +31,6 @@ fun SevenSegmentDisplay(
 //                }
 //            }
 //        }
-        //Canvas(modifier = Modifier.matchParentSize()) {
-         //   drawRect(Color.White)
-        //}
-    }
 }
 
 /**
@@ -107,4 +106,47 @@ private fun drawSevenSegmentDigit(char: Char, drawDecimalPoint : Boolean, scope:
     }
 
     scope.drawPath(SEGMENTS_PATH[SEGMENT_DP_IDX], if (drawDecimalPoint) colorOn else colorOff)
+}
+
+private fun drawSunkenFrame(thickness: Float, scope: DrawScope) {
+
+    val w = scope.size.width
+    val h = scope.size.height
+
+    val pathLeft = Path().apply {
+        moveTo(0f, 0f)
+        lineTo(0f, h)
+        lineTo(thickness, h - thickness)
+        lineTo(thickness, thickness)
+        close()
+    }
+
+    val pathRight = Path().apply {
+        moveTo(w, 0f)
+        lineTo(w, h)
+        lineTo(w - thickness, h - thickness)
+        lineTo(w - thickness, thickness)
+        close()
+    }
+
+    val pathTop = Path().apply {
+        moveTo(0f, 0f)
+        lineTo(w, 0f)
+        lineTo(w - thickness, thickness)
+        lineTo(thickness, thickness)
+        close()
+    }
+
+    val pathBottom = Path().apply {
+        moveTo(0f, h)
+        lineTo(w, h)
+        lineTo(w - thickness, h- thickness)
+        lineTo(thickness, h - thickness)
+        close()
+    }
+
+    scope.drawPath(pathLeft, CASE_COLOR_DARK)
+    scope.drawPath(pathRight, CASE_COLOR_LIGHT)
+    scope.drawPath(pathTop, CASE_COLOR_DARK)
+    scope.drawPath(pathBottom, CASE_COLOR_LIGHT)
 }

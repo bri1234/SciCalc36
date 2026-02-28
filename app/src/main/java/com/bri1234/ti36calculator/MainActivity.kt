@@ -36,10 +36,10 @@ class MainActivity : ComponentActivity() {
                                 // val value = "ABCDEF"
                                 val value = "1234567890"
 
-                                SevenSegmentDisplay(value, false,
+                                CalculatorDisplay(value, false,
                                     Modifier.fillMaxWidth()
                                         .weight(1.5f)
-                                        .padding(8.dp, 8.dp, 8.dp, 8.dp))
+                                        .padding(12.dp, 12.dp, 12.dp, 12.dp))
 
                                 CalculatorButtons(Modifier
                                     .fillMaxWidth()
