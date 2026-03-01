@@ -3,10 +3,19 @@ package com.bri1234.ti36calculator
 import androidx.compose.foundation.Canvas
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.vector.PathParser
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.TextMeasurer
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.drawText
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 
 @Composable
 fun CalculatorDisplay(
@@ -14,10 +23,13 @@ fun CalculatorDisplay(
     drawDecimalPoint: Boolean,
     modifier: Modifier = Modifier
 ) {
+    val textMeasurer = rememberTextMeasurer()
+
     Canvas(modifier = modifier) {
         drawRect(DISPLAY_BACKGROUND_COLOR)
 
         drawSunkenFrame(5.dp.toPx(), this)
+        drawDisplayLabels(textMeasurer, 8.dp.toPx(), this)
     }
 //        Row(
 //            modifier = Modifier.matchParentSize(),
@@ -87,6 +99,9 @@ private val SEGMENTS_PATH = SEGMENTS_PATH_STR.map {
     PathParser().parsePathString(it).toPath()
 }
 
+/**
+ * Index of the decimal point segment in the SEGMENTS_PATH list.
+ */
 private const val SEGMENT_DP_IDX = 7
 
 /**
@@ -108,45 +123,122 @@ private fun drawSevenSegmentDigit(char: Char, drawDecimalPoint : Boolean, scope:
     scope.drawPath(SEGMENTS_PATH[SEGMENT_DP_IDX], if (drawDecimalPoint) colorOn else colorOff)
 }
 
-private fun drawSunkenFrame(thickness: Float, scope: DrawScope) {
-
-    val w = scope.size.width
-    val h = scope.size.height
+/**
+ * A class representing the sunken frame effect around the calculator display.
+ * It precomputes the paths for the left, right, top, and bottom parts of the frame based on the provided width, height, and thickness.
+ */
+private class SunkenFrame(val width: Float, val height: Float, val thickness: Float) {
 
     val pathLeft = Path().apply {
         moveTo(0f, 0f)
-        lineTo(0f, h)
-        lineTo(thickness, h - thickness)
+        lineTo(0f, height)
+        lineTo(thickness, height - thickness)
         lineTo(thickness, thickness)
         close()
     }
 
     val pathRight = Path().apply {
-        moveTo(w, 0f)
-        lineTo(w, h)
-        lineTo(w - thickness, h - thickness)
-        lineTo(w - thickness, thickness)
+        moveTo(width, 0f)
+        lineTo(width, height)
+        lineTo(width - thickness, height - thickness)
+        lineTo(width - thickness, thickness)
         close()
     }
 
     val pathTop = Path().apply {
         moveTo(0f, 0f)
-        lineTo(w, 0f)
-        lineTo(w - thickness, thickness)
+        lineTo(width, 0f)
+        lineTo(width - thickness, thickness)
         lineTo(thickness, thickness)
         close()
     }
 
     val pathBottom = Path().apply {
-        moveTo(0f, h)
-        lineTo(w, h)
-        lineTo(w - thickness, h- thickness)
-        lineTo(thickness, h - thickness)
+        moveTo(0f, height)
+        lineTo(width, height)
+        lineTo(width - thickness, height - thickness)
+        lineTo(thickness, height - thickness)
         close()
     }
 
-    scope.drawPath(pathLeft, CASE_COLOR_DARK)
-    scope.drawPath(pathRight, CASE_COLOR_LIGHT)
-    scope.drawPath(pathTop, CASE_COLOR_DARK)
-    scope.drawPath(pathBottom, CASE_COLOR_LIGHT)
+    /** Draws the sunken frame on the provided DrawScope by filling the precomputed paths with the appropriate colors for the light and dark parts of the frame.
+     * @param scope The DrawScope on which to draw the sunken frame.
+     */
+    fun draw(scope: DrawScope) {
+        scope.drawPath(pathLeft, CASE_COLOR_DARK)
+        scope.drawPath(pathRight, CASE_COLOR_LIGHT)
+        scope.drawPath(pathTop, CASE_COLOR_DARK)
+        scope.drawPath(pathBottom, CASE_COLOR_LIGHT)
+    }
+}
+
+/** A cached instance of the SunkenFrame class to avoid recomputing the paths on every draw call.
+ * It is updated only when the width, height, or thickness of the frame changes.
+ */
+private var sunkenFrame: SunkenFrame = SunkenFrame(0f, 0f, 0f)
+
+/** Draws the sunken frame around the calculator display by checking if the dimensions or thickness
+ * have changed and updating the cached SunkenFrame instance accordingly, then calling its draw method.
+ * @param thickness The thickness of the sunken frame.
+ * @param scope The DrawScope on which to draw the sunken frame.
+ */
+private fun drawSunkenFrame(thickness: Float, scope: DrawScope) {
+
+    val w = scope.size.width
+    val h = scope.size.height
+
+    if (sunkenFrame.width != w || sunkenFrame.height != h || sunkenFrame.thickness != thickness) {
+        sunkenFrame = SunkenFrame(w, h, thickness)
+    }
+
+    sunkenFrame.draw(scope)
+}
+
+/**
+ * List of labels to be displayed on the calculator display, such as "2nd", "3rd", "BIN", etc.
+ * These labels are drawn at the bottom of the display and are spaced evenly across the width of the display.
+ */
+private val displayLabels = listOf(
+    "2nd",
+    "3rd",
+    "BIN",
+    "OCT",
+    "HEX",
+    "STAT",
+    "DEG",
+    "RAD",
+    "GRAD",
+    "x",
+    "r",
+    "()",
+)
+
+/**
+ * Draws the display labels at the bottom of the calculator display using the provided TextMeasurer to measure
+ * the text and calculate the appropriate spacing and positioning for each label.
+ * @param textMeasurer The TextMeasurer used to measure the text for each label and calculate the layout.
+ * @param frameThickness The thickness of the sunken frame, used to calculate the starting position for the labels.
+ */
+private fun drawDisplayLabels(textMeasurer: TextMeasurer, frameThickness: Float, scope: DrawScope) {
+    val textStyle = TextStyle(
+        color = Color.Black,
+        fontSize = 16.sp,
+        fontWeight = FontWeight.Bold
+    )
+
+    val textLayoutResultList = displayLabels.map { textMeasurer.measure(AnnotatedString(it), textStyle) }
+    val totalTextWidth = textLayoutResultList.sumOf { it.size.width }
+
+    var x = frameThickness
+    val y = scope.size.height - frameThickness - with(scope) { 2.dp.toPx() }
+    val spaceX = (scope.size.width - 2 * frameThickness - totalTextWidth) / (displayLabels.size - 1)
+
+    for (textLayoutResult in textLayoutResultList) {
+        scope.drawText(
+            textLayoutResult = textLayoutResult,
+            topLeft = Offset(x, y - textLayoutResult.firstBaseline)
+        )
+
+        x += textLayoutResult.size.width + spaceX
+    }
 }
