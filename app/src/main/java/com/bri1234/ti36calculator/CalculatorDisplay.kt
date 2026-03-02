@@ -2,6 +2,7 @@ package com.bri1234.ti36calculator
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
@@ -15,6 +16,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.platform.LocalDensity
 
 @Composable
 fun CalculatorDisplay(
@@ -23,15 +25,31 @@ fun CalculatorDisplay(
     modifier: Modifier = Modifier
 ) {
     val textMeasurer = rememberTextMeasurer()
+    val sevenSegmentSize = with(LocalDensity.current) { 55.dp.toPx() }
+    val sevenSegmentSizeSmall = with(LocalDensity.current) { 35.dp.toPx() }
+    val segmentsPath = remember(sevenSegmentSize) { createSegmentsPathFromStrings(SEGMENTS_PATH_STR, sevenSegmentSize) }
+    val segmentsPathSmall = remember(sevenSegmentSize) { createSegmentsPathFromStrings(SEGMENTS_PATH_STR, sevenSegmentSizeSmall) }
 
     Canvas(modifier = modifier) {
         drawRect(DISPLAY_BACKGROUND_COLOR)
+        drawSunkenFrame(5.dp.toPx())
+        drawDisplayLabels(textMeasurer, 8.dp.toPx())
 
-        drawSunkenFrame(5.dp.toPx(), this)
-        drawDisplayLabels(textMeasurer, 8.dp.toPx(), this)
+        val y = 10.dp.toPx()
 
-        // Test
-        drawSevenSegmentDigit('7', drawDecimalPoint, this)
+        for (idx in 0 ..< 10) {
+            val x = (idx * 32 + 3).dp.toPx()
+
+            when (idx) {
+                0 -> drawSevenSegmentDigit('-', false, segmentsPath, Offset(x, y))
+                1 -> drawSevenSegmentDigit('8', true, segmentsPath, Offset(x, y))
+                else -> drawSevenSegmentDigit('8', false, segmentsPath, Offset(x, y))
+            }
+        }
+
+        drawSevenSegmentDigit('-', false, segmentsPathSmall, Offset(321.dp.toPx(), y))
+        drawSevenSegmentDigit('8', false, segmentsPathSmall, Offset(338.dp.toPx(), y))
+        drawSevenSegmentDigit('8', false, segmentsPathSmall, Offset(359.dp.toPx(), y))
     }
 
 //        Row(
@@ -47,7 +65,6 @@ fun CalculatorDisplay(
 //            }
 //        }
 }
-
 
 /**
  * A class representing the sunken frame effect around the calculator display.
@@ -106,18 +123,17 @@ private var sunkenFrame: SunkenFrame = SunkenFrame(0f, 0f, 0f)
 /** Draws the sunken frame around the calculator display by checking if the dimensions or thickness
  * have changed and updating the cached SunkenFrame instance accordingly, then calling its draw method.
  * @param thickness The thickness of the sunken frame.
- * @param scope The DrawScope on which to draw the sunken frame.
  */
-private fun drawSunkenFrame(thickness: Float, scope: DrawScope) {
+private fun DrawScope.drawSunkenFrame(thickness: Float) {
 
-    val w = scope.size.width
-    val h = scope.size.height
+    val w = size.width
+    val h = size.height
 
     if (sunkenFrame.width != w || sunkenFrame.height != h || sunkenFrame.thickness != thickness) {
         sunkenFrame = SunkenFrame(w, h, thickness)
     }
 
-    sunkenFrame.draw(scope)
+    sunkenFrame.draw(this)
 }
 
 /**
@@ -145,10 +161,10 @@ private val displayLabels = listOf(
  * @param textMeasurer The TextMeasurer used to measure the text for each label and calculate the layout.
  * @param frameThickness The thickness of the sunken frame, used to calculate the starting position for the labels.
  */
-private fun drawDisplayLabels(textMeasurer: TextMeasurer, frameThickness: Float, scope: DrawScope) {
+private fun DrawScope.drawDisplayLabels(textMeasurer: TextMeasurer, frameThickness: Float) {
     val textStyle = TextStyle(
         color = Color.Black,
-        fontSize = 15.sp,
+        fontSize = 16.sp,
         fontWeight = FontWeight.Bold
     )
 
@@ -156,15 +172,21 @@ private fun drawDisplayLabels(textMeasurer: TextMeasurer, frameThickness: Float,
     val totalTextWidth = textLayoutResultList.sumOf { it.size.width }
 
     var x = frameThickness
-    val y = scope.size.height - frameThickness - with(scope) { 2.dp.toPx() }
-    val spaceX = (scope.size.width - 2 * frameThickness - totalTextWidth) / (displayLabels.size - 1)
+    val y = size.height - frameThickness - 2.dp.toPx()
+    val spaceX = (size.width - 2 * frameThickness - totalTextWidth) / (displayLabels.size - 1)
 
     for (textLayoutResult in textLayoutResultList) {
-        scope.drawText(
+        drawText(
             textLayoutResult = textLayoutResult,
             topLeft = Offset(x, y - textLayoutResult.firstBaseline)
         )
 
         x += textLayoutResult.size.width + spaceX
     }
+
+    val textLayoutResult = textMeasurer.measure(AnnotatedString("M"), textStyle)
+    drawText(
+        textLayoutResult = textLayoutResult,
+        topLeft = Offset(10.dp.toPx(), 45.dp.toPx())
+    )
 }

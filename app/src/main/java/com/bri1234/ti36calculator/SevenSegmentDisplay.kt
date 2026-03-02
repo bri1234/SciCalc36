@@ -1,6 +1,10 @@
 package com.bri1234.ti36calculator
 
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.drawscope.translate
+import androidx.compose.ui.graphics.vector.PathNode
 import androidx.compose.ui.graphics.vector.PathParser
 
 /**
@@ -10,6 +14,7 @@ import androidx.compose.ui.graphics.vector.PathParser
  */
 private val SEGMENTS = mapOf(
     ' ' to listOf(false, false, false, false, false, false, false),
+    '-' to listOf(false, false, false, false, false, false, true),
     '0' to listOf(true, true, true, true, true, true, false),
     '1' to listOf(false, true, true, false, false, false, false),
     '2' to listOf(true, true, false, true, true, false, true),
@@ -25,13 +30,15 @@ private val SEGMENTS = mapOf(
     'C' to listOf(true,false,false,true,true,true,false),
     'D' to listOf(false,true,true,true,true,false,true),
     'E' to listOf(true,false,false,true,true,true,true),
-    'F' to listOf(true,false,false,false,true,true,true)
+    'F' to listOf(true,false,false,false,true,true,true),
+    'o' to listOf(false, false, true, true, true, false, true),
+    'r' to listOf(false, false, false, false, true, false, true),
 )
 
 /**
  * Path data for each of the 7 segments (A-G) and the decimal point (DP) of the display.
  */
-private val SEGMENTS_PATH_STR = listOf(
+val SEGMENTS_PATH_STR = listOf(
     // Segment A
     "M26.39794864,2.76472922 L39.63321941,16 L79.41377264,16 L89.63310222,1.40528482 L87.52273246,0.63032185 L85.3246167,0.15878971 L83.19004902,0 L35.19110843,0 L32.86418724,0.19949692 L30.5911223,0.73553458 L28.42029532,1.5967377 L26.39794864,2.76472922 Z ",
     // Segment B
@@ -51,14 +58,6 @@ private val SEGMENTS_PATH_STR = listOf(
 )
 
 /**
- * List of paths for each of the 7 segments (A-G) of the display.
- * Each path is parsed from a string representation and converted to a Path object.
- */
-private val SEGMENTS_PATH = SEGMENTS_PATH_STR.map {
-    PathParser().parsePathString(it).toPath()
-}
-
-/**
  * Index of the decimal point segment in the SEGMENTS_PATH list.
  */
 private const val SEGMENT_DP_IDX = 7
@@ -68,17 +67,150 @@ private const val SEGMENT_DP_IDX = 7
  * It determines which segments to light up based on the character and draws them with the appropriate colors.
  * @param char The character to be displayed (0-9, A-F, or space).
  * @param drawDecimalPoint Whether to draw the decimal point segment.
- * @param scope The DrawScope on which to draw the segments.
  */
-fun drawSevenSegmentDigit(char: Char, drawDecimalPoint : Boolean, scope: DrawScope) {
-    val colorOn = DISPLAY_DIGIT_ON_COLOR
-    val colorOff = DISPLAY_DIGIT_OFF_COLOR
+fun DrawScope.drawSevenSegmentDigit(
+    char: Char,
+    drawDecimalPoint: Boolean,
+    segmentsPath: List<Path>,
+    offset: Offset = Offset.Zero
+) {
     val segments = SEGMENTS.getValue(char)
 
-    for (segmentIdx in 0 ..< 7) {
-        scope.drawPath(SEGMENTS_PATH[segmentIdx], if (segments[segmentIdx]) colorOn else colorOff)
-    }
+    this.translate(offset.x, offset.y) {
+        for (segmentIdx in 0 ..< 7) {
+            if (segments[segmentIdx])
+                drawPath(segmentsPath[segmentIdx], DISPLAY_DIGIT_COLOR)
+        }
 
-    scope.drawPath(SEGMENTS_PATH[SEGMENT_DP_IDX], if (drawDecimalPoint) colorOn else colorOff)
+        if (drawDecimalPoint)
+            drawPath(segmentsPath[SEGMENT_DP_IDX],  DISPLAY_DIGIT_COLOR)
+    }
 }
 
+data class PathBounds(val minX: Float, val maxX: Float, val minY: Float, val maxY: Float)
+
+/**
+ * Computes the minimum and maximum X and Y coordinates from a list of lists of PathNode objects.
+ * This is useful for determining the bounding box of the paths, which can be used for scaling and positioning.
+ * @param pathNodesList A list of lists of PathNode objects representing the paths to be analyzed.
+ * @return PathBounds containing the minimum and maximum X and Y coordinates.
+ */
+private fun getPathBounds(pathNodesList: List<List<PathNode>>): PathBounds {
+    var minX = Float.MAX_VALUE
+    var maxX = Float.MIN_VALUE
+    var minY = Float.MAX_VALUE
+    var maxY = Float.MIN_VALUE
+
+    for (pathNodes in pathNodesList) {
+        for (node in pathNodes) {
+            when (node) {
+                is PathNode.MoveTo -> {
+                    if (node.x < minX) minX = node.x
+                    if (node.x > maxX) maxX = node.x
+                    if (node.y < minY) minY = node.y
+                    if (node.y > maxY) maxY = node.y
+                }
+
+                is PathNode.LineTo -> {
+                    if (node.x < minX) minX = node.x
+                    if (node.x > maxX) maxX = node.x
+                    if (node.y < minY) minY = node.y
+                    if (node.y > maxY) maxY = node.y
+                }
+
+                is PathNode.Close -> {
+                    // ignored
+                }
+
+                else -> {
+                    throw Exception("PathNode Typ (${node::class.simpleName}) is not supported!")
+                }
+            }
+        }
+    }
+
+    return PathBounds(minX, maxX, minY, maxY)
+}
+
+/**
+ * Removes the offset from a list of PathNode objects based on the provided PathBounds.
+ * @param pathNodes The list of PathNode objects to be adjusted.
+ * @param bounds The PathBounds containing the minimum X and Y coordinates to be subtracted from the PathNode coordinates.
+ * @return A new list of PathNode objects with the offset removed.
+ */
+private fun removePathOffsetAndScale(pathNodes: List<PathNode>, bounds: PathBounds, scaleToSize: Float): List<PathNode> {
+    val offsetX = bounds.minX
+    val offsetY = bounds.minY
+    val scaleX = scaleToSize / (bounds.maxX - bounds.minX)
+    val scaleY = scaleToSize / (bounds.maxY - bounds.minY)
+    val scale = minOf(scaleX, scaleY)
+    val newList = mutableListOf<PathNode>()
+
+    for (node in pathNodes) {
+        when (node) {
+            is PathNode.MoveTo -> {
+                newList.add(PathNode.MoveTo((node.x - offsetX) * scale, (node.y - offsetY) * scale))
+            }
+
+            is PathNode.LineTo -> {
+                newList.add(PathNode.LineTo((node.x - offsetX) * scale, (node.y - offsetY) * scale))
+            }
+
+            is PathNode.Close -> {
+                newList.add(PathNode.Close)
+            }
+
+            else -> {
+                throw Exception("PathNode Typ (${node::class.simpleName}) is not supported!")
+            }
+        }
+    }
+
+    return newList
+}
+
+/**
+ * Converts a list of PathNode objects into a Path object that can be drawn on the canvas.
+ * @param pathNodes The list of PathNode objects to be converted.
+ * @return A Path object representing the same path as the input PathNode list.
+ */
+private fun pathNodesToPath(pathNodes: List<PathNode>): Path {
+    val path = Path()
+
+    for (node in pathNodes) {
+        when (node) {
+            is PathNode.MoveTo -> {
+                path.moveTo(node.x, node.y)
+            }
+
+            is PathNode.LineTo -> {
+                path.lineTo(node.x, node.y)
+            }
+
+            is PathNode.Close -> {
+                path.close()
+            }
+
+            else -> {
+                throw Exception("PathNode Typ (${node::class.simpleName}) is not supported!")
+            }
+        }
+    }
+
+    return path
+}
+
+/**
+ * Creates a list of Path objects from a list of string representations of paths.
+ * @param pathStrList A list of strings, each representing a path in SVG format.
+ * @param scaleToSize The size to which the paths should be scaled after removing the offset.
+ * @return A list of Path objects corresponding to the input string representations.
+ */
+fun createSegmentsPathFromStrings(pathStrList: List<String>, scaleToSize: Float): List<Path> {
+
+    val nodes = pathStrList.map { PathParser().parsePathString(it).toNodes() }
+    val bounds = getPathBounds(nodes)
+    val nodesWithoutOffset = nodes.map { removePathOffsetAndScale(it, bounds, scaleToSize) }
+
+    return nodesWithoutOffset.map { pathNodesToPath(it) }
+}

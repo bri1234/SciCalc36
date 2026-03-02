@@ -1,7 +1,6 @@
 package com.bri1234.ti36calculator
 
 import androidx.compose.ui.graphics.Color
-import kotlin.times
 
 val CASE_COLOR = Color(0xFF4B565A)
 val CASE_COLOR_LIGHT = Color(0xFF4B565A).lighten(0.2f)
@@ -28,8 +27,7 @@ val TEXT_4TH_COLOR = Color(0xFF55ADD5)
 //val DISPLAY_BACKGROUND_COLOR = Color(0xFFBBC0A9)
 val DISPLAY_BACKGROUND_COLOR = Color(0xFFD4DCC5)
 
-val DISPLAY_DIGIT_ON_COLOR = Color(0xFF132326)
-val DISPLAY_DIGIT_OFF_COLOR = DISPLAY_BACKGROUND_COLOR.darken(0.02f)
+val DISPLAY_DIGIT_COLOR = Color(0xFF132326)
 
 fun Color.lighten(factor: Float): Color =
     Color(
