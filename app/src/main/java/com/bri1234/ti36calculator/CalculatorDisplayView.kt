@@ -17,6 +17,7 @@ import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.platform.LocalDensity
+import java.util.EnumSet
 
 @Composable
 fun CalculatorDisplayView(
@@ -25,11 +26,13 @@ fun CalculatorDisplayView(
 ) {
     val textMeasurer = rememberTextMeasurer()
 
+    val largeSmallDigitsRatio = 1.618f
     val xyRatio = 0.5f
-    val segmentsLargeSizeX = with(LocalDensity.current) { (55 * xyRatio).dp.toPx() }
+
     val segmentsLargeSizeY = with(LocalDensity.current) { 55.dp.toPx() }
-    val segmentsSmallSizeSmallX = with(LocalDensity.current) { (35 * xyRatio).dp.toPx() }
-    val segmentsSmallSizeSmallY = with(LocalDensity.current) { 35.dp.toPx() }
+    val segmentsLargeSizeX = segmentsLargeSizeY * xyRatio
+    val segmentsSmallSizeSmallY = segmentsLargeSizeY / largeSmallDigitsRatio
+    val segmentsSmallSizeSmallX = segmentsSmallSizeSmallY * xyRatio
 
     val segmentsLargePath = remember(segmentsLargeSizeX, segmentsLargeSizeY) {
         createSegmentsPathFromStrings(SEGMENTS_PATH_STR, segmentsLargeSizeX, segmentsLargeSizeY ) }
@@ -42,7 +45,7 @@ fun CalculatorDisplayView(
 
         drawSunkenFrame(5.dp.toPx())
 
-        drawDisplayLabels(textMeasurer, 8.dp.toPx())
+        drawDisplayLabels(calculatorDisplayData.displayLabels, textMeasurer, 8.dp.toPx())
 
         drawDigits(calculatorDisplayData,
             segmentsLargePath, segmentsSmallPath, segmentsLargeSizeX, segmentsSmallSizeSmallX, 8.dp.toPx())
@@ -124,19 +127,19 @@ private fun DrawScope.drawSunkenFrame(thickness: Float) {
  * List of labels to be displayed on the calculator display, such as "2nd", "3rd", "BIN", etc.
  * These labels are drawn at the bottom of the display and are spaced evenly across the width of the display.
  */
-private val displayLabels = listOf(
-    "2nd",
-    "3rd",
-    "BIN",
-    "OCT",
-    "HEX",
-    "STAT",
-    "DEG",
-    "RAD",
-    "GRAD",
-    "x",
-    "r",
-    "()",
+private val displayLabelsBottom = listOf(
+    DisplayLabel.SECOND,
+    DisplayLabel.THIRD,
+    DisplayLabel.BIN,
+    DisplayLabel.OCT,
+    DisplayLabel.HEX,
+    DisplayLabel.STAT,
+    DisplayLabel.DEG,
+    DisplayLabel.RAD,
+    DisplayLabel.GRAD,
+    DisplayLabel.X,
+    DisplayLabel.R,
+    DisplayLabel.BRACKETS
 )
 
 /**
@@ -145,34 +148,43 @@ private val displayLabels = listOf(
  * @param textMeasurer The TextMeasurer used to measure the text for each label and calculate the layout.
  * @param frameThickness The thickness of the sunken frame, used to calculate the starting position for the labels.
  */
-private fun DrawScope.drawDisplayLabels(textMeasurer: TextMeasurer, frameThickness: Float) {
+private fun DrawScope.drawDisplayLabels(displayLabels: EnumSet<DisplayLabel>,
+                                        textMeasurer: TextMeasurer, frameThickness: Float) {
     val textStyle = TextStyle(
         color = Color.Black,
         fontSize = 16.sp,
         fontWeight = FontWeight.Bold
     )
 
-    val textLayoutResultList = displayLabels.map { textMeasurer.measure(AnnotatedString(it), textStyle) }
+    val textLayoutResultList = displayLabelsBottom.map { textMeasurer.measure(AnnotatedString(it.caption), textStyle) }
     val totalTextWidth = textLayoutResultList.sumOf { it.size.width }
 
     var x = frameThickness
     val y = size.height - frameThickness - 2.dp.toPx()
-    val spaceX = (size.width - 2 * frameThickness - totalTextWidth) / (displayLabels.size - 1)
+    val spaceX = (size.width - 2 * frameThickness - totalTextWidth) / (displayLabelsBottom.size - 1)
 
-    for (textLayoutResult in textLayoutResultList) {
-        drawText(
-            textLayoutResult = textLayoutResult,
-            topLeft = Offset(x, y - textLayoutResult.firstBaseline)
-        )
+    // display labels bottom
+    for (idx in displayLabelsBottom.indices) {
+        val textLayoutResult = textLayoutResultList[idx]
+
+        if (displayLabelsBottom[idx] in displayLabels) {
+            drawText(
+                textLayoutResult = textLayoutResult,
+                topLeft = Offset(x, y - textLayoutResult.firstBaseline)
+            )
+        }
 
         x += textLayoutResult.size.width + spaceX
     }
 
-    val textLayoutResult = textMeasurer.measure(AnnotatedString("M"), textStyle)
-    drawText(
-        textLayoutResult = textLayoutResult,
-        topLeft = Offset(10.dp.toPx(), 45.dp.toPx())
-    )
+    // display label left (M)
+    if (DisplayLabel.M in displayLabels) {
+        val textLayoutResult = textMeasurer.measure(AnnotatedString(DisplayLabel.M.caption), textStyle)
+        drawText(
+            textLayoutResult = textLayoutResult,
+            topLeft = Offset(10.dp.toPx(), 45.dp.toPx())
+        )
+    }
 }
 
 /**
@@ -189,15 +201,15 @@ private fun DrawScope.drawDigits(calculatorDisplayData: CalculatorDisplayData,
                                  segmentsLargePath: List<Path>, segmentsSmallPath: List<Path>,
                                  segmentsLargeSizeX: Float, segmentsSmallSizeSmallX: Float,
                                  frameWidth: Float) {
-    val numLargeSpaces = 11
-    val numSmallSpaces = 2
-    val space = size.width - 2 * frameWidth - 11 * segmentsLargeSizeX - 3 * segmentsSmallSizeSmallX
-    val spaceRatioLargeSmall = 1f
-    val smallSpace = space / (numLargeSpaces + numSmallSpaces * spaceRatioLargeSmall)
+    val numLargeDigits = 11
+    val numSmallDigits = 3
+    val totalSpace = size.width - 2 * frameWidth - numLargeDigits * segmentsLargeSizeX - numSmallDigits * segmentsSmallSizeSmallX
+    val spaceRatioLargeSmall = 2f
+    val smallSpace = totalSpace / ((numLargeDigits + 1) * spaceRatioLargeSmall + numSmallDigits)
     val largeSpace = smallSpace * spaceRatioLargeSmall
     val y = 10.dp.toPx()
 
-    var x = 5.dp.toPx()
+    var x = frameWidth + largeSpace
 
     for (idx in 0 ..< 11) {
         drawSevenSegmentDigit(calculatorDisplayData.digitsLarge[idx],

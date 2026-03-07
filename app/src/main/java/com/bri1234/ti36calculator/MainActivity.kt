@@ -22,8 +22,12 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        calculatorDisplayData.digitsLarge = charArrayOf('-', '9', '8', '7', '6', '5', '4', '3', '2', '1', '0')
-        calculatorDisplayData.digitsSmall = charArrayOf('-', '8', '9')
+        System.arraycopy(charArrayOf('-', '9', '8', '7', '6', '5', '4', '3', '2', '1', '0'), 0,
+            calculatorDisplayData.digitsLarge, 0, 11)
+
+        System.arraycopy(charArrayOf('-', '8', '9'), 0,
+            calculatorDisplayData.digitsSmall, 0, 3)
+
         calculatorDisplayData.decimalPointIndex = 1
 
         enableEdgeToEdge()

@@ -1,22 +1,28 @@
 package com.bri1234.ti36calculator
 
+import java.util.EnumSet
+
+enum class DisplayLabel(val caption: String) {
+    M("M"),
+    SECOND("2nd"),
+    THIRD("3rd"),
+    BIN("BIN"),
+    OCT("OCT"),
+    HEX("HEX"),
+    STAT("STAT"),
+    DEG("DEG"),
+    RAD("RAD"),
+    GRAD("GRAD"),
+    X("x"),
+    R("r"),
+    BRACKETS("()")
+}
+
 class CalculatorDisplayData {
-    var digitsLarge = CharArray(11) { ' ' }
+    val digitsLarge = CharArray(11) { ' ' }
     var decimalPointIndex = -1
 
-    var digitsSmall = CharArray(3) { ' ' }
+    val digitsSmall = CharArray(3) { ' ' }
 
-    var labelM = false
-    var label2nd = false
-    var label3rd = false
-    var labelBin = false
-    var labelOct = false
-    var labelHex = false
-    var labelStat = false
-    var labelDeg = false
-    var labelRad = false
-    var labelGrad = false
-    var labelX = false
-    var labelR = false
-    var LabelBracket = false
+    val displayLabels = EnumSet.of(DisplayLabel.DEG)
 }
