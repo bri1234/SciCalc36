@@ -136,24 +136,29 @@ private fun getPathBounds(pathNodesList: List<List<PathNode>>): PathBounds {
  * Removes the offset from a list of PathNode objects based on the provided PathBounds.
  * @param pathNodes The list of PathNode objects to be adjusted.
  * @param bounds The PathBounds containing the minimum X and Y coordinates to be subtracted from the PathNode coordinates.
+ * @param scaleToSizeX The size to which the paths should be scaled after removing the offset. (X direction)
+ * @param scaleToSizeY The size to which the paths should be scaled after removing the offset. (Y direction)
  * @return A new list of PathNode objects with the offset removed.
  */
-private fun removePathOffsetAndScale(pathNodes: List<PathNode>, bounds: PathBounds, scaleToSize: Float): List<PathNode> {
+private fun removePathOffsetAndScale(pathNodes: List<PathNode>, bounds: PathBounds,
+                                     scaleToSizeX: Float, scaleToSizeY: Float): List<PathNode> {
     val offsetX = bounds.minX
     val offsetY = bounds.minY
-    val scaleX = scaleToSize / (bounds.maxX - bounds.minX)
-    val scaleY = scaleToSize / (bounds.maxY - bounds.minY)
-    val scale = minOf(scaleX, scaleY)
+    val scaleX = scaleToSizeX / (bounds.maxX - bounds.minX)
+    val scaleY = scaleToSizeY / (bounds.maxY - bounds.minY)
     val newList = mutableListOf<PathNode>()
+
+    // val aspectRatio = (bounds.maxX - bounds.minX) / (bounds.maxY - bounds.minY)
+    // aspectRatio = 0.55
 
     for (node in pathNodes) {
         when (node) {
             is PathNode.MoveTo -> {
-                newList.add(PathNode.MoveTo((node.x - offsetX) * scale, (node.y - offsetY) * scale))
+                newList.add(PathNode.MoveTo((node.x - offsetX) * scaleX, (node.y - offsetY) * scaleY))
             }
 
             is PathNode.LineTo -> {
-                newList.add(PathNode.LineTo((node.x - offsetX) * scale, (node.y - offsetY) * scale))
+                newList.add(PathNode.LineTo((node.x - offsetX) * scaleX, (node.y - offsetY) * scaleY))
             }
 
             is PathNode.Close -> {
@@ -203,14 +208,16 @@ private fun pathNodesToPath(pathNodes: List<PathNode>): Path {
 /**
  * Creates a list of Path objects from a list of string representations of paths.
  * @param pathStrList A list of strings, each representing a path in SVG format.
- * @param scaleToSize The size to which the paths should be scaled after removing the offset.
+ * @param scaleToSizeX The size to which the paths should be scaled after removing the offset. (X direction)
+ * @param scaleToSizeY The size to which the paths should be scaled after removing the offset. (Y direction)
  * @return A list of Path objects corresponding to the input string representations.
  */
-fun createSegmentsPathFromStrings(pathStrList: List<String>, scaleToSize: Float): List<Path> {
+fun createSegmentsPathFromStrings(pathStrList: List<String>,
+                                  scaleToSizeX: Float, scaleToSizeY: Float): List<Path> {
 
     val nodes = pathStrList.map { PathParser().parsePathString(it).toNodes() }
     val bounds = getPathBounds(nodes)
-    val nodesWithoutOffset = nodes.map { removePathOffsetAndScale(it, bounds, scaleToSize) }
+    val nodesWithoutOffset = nodes.map { removePathOffsetAndScale(it, bounds, scaleToSizeX, scaleToSizeY) }
 
     return nodesWithoutOffset.map { pathNodesToPath(it) }
 }

@@ -13,12 +13,18 @@ import com.bri1234.ti36calculator.ui.theme.Ti36CalculatorTheme
 
 class MainActivity : ComponentActivity() {
 
+    val calculatorDisplayData = CalculatorDisplayData()
+
     /**
      * The main activity of the TI-36 calculator app.
      * It sets up the UI using Jetpack Compose and displays the calculator buttons in a grid layout.
      */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        calculatorDisplayData.digitsLarge = charArrayOf('-', '9', '8', '7', '6', '5', '4', '3', '2', '1', '0')
+        calculatorDisplayData.digitsSmall = charArrayOf('-', '8', '9')
+        calculatorDisplayData.decimalPointIndex = 1
 
         enableEdgeToEdge()
         setContent {
@@ -34,10 +40,8 @@ class MainActivity : ComponentActivity() {
                                 .background(CASE_COLOR)
                         ) {
                             Column(modifier = Modifier.fillMaxSize()) {
-                                // val value = "ABCDEF"
-                                val value = "1234567890"
 
-                                CalculatorDisplay(value, false,
+                                CalculatorDisplayView(calculatorDisplayData,
                                     Modifier.fillMaxWidth()
                                         .weight(1.5f)
                                         .padding(12.dp, 12.dp, 12.dp, 12.dp))

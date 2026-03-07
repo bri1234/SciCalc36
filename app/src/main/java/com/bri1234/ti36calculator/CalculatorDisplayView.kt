@@ -19,51 +19,35 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.platform.LocalDensity
 
 @Composable
-fun CalculatorDisplay(
-    value: String,
-    drawDecimalPoint: Boolean,
+fun CalculatorDisplayView(
+    calculatorDisplayData: CalculatorDisplayData,
     modifier: Modifier = Modifier
 ) {
     val textMeasurer = rememberTextMeasurer()
-    val sevenSegmentSize = with(LocalDensity.current) { 55.dp.toPx() }
-    val sevenSegmentSizeSmall = with(LocalDensity.current) { 35.dp.toPx() }
-    val segmentsPath = remember(sevenSegmentSize) { createSegmentsPathFromStrings(SEGMENTS_PATH_STR, sevenSegmentSize) }
-    val segmentsPathSmall = remember(sevenSegmentSize) { createSegmentsPathFromStrings(SEGMENTS_PATH_STR, sevenSegmentSizeSmall) }
+
+    val xyRatio = 0.5f
+    val segmentsLargeSizeX = with(LocalDensity.current) { (55 * xyRatio).dp.toPx() }
+    val segmentsLargeSizeY = with(LocalDensity.current) { 55.dp.toPx() }
+    val segmentsSmallSizeSmallX = with(LocalDensity.current) { (35 * xyRatio).dp.toPx() }
+    val segmentsSmallSizeSmallY = with(LocalDensity.current) { 35.dp.toPx() }
+
+    val segmentsLargePath = remember(segmentsLargeSizeX, segmentsLargeSizeY) {
+        createSegmentsPathFromStrings(SEGMENTS_PATH_STR, segmentsLargeSizeX, segmentsLargeSizeY ) }
+
+    val segmentsSmallPath = remember(segmentsSmallSizeSmallX, segmentsSmallSizeSmallY) {
+        createSegmentsPathFromStrings(SEGMENTS_PATH_STR, segmentsSmallSizeSmallX, segmentsSmallSizeSmallY) }
 
     Canvas(modifier = modifier) {
         drawRect(DISPLAY_BACKGROUND_COLOR)
+
         drawSunkenFrame(5.dp.toPx())
+
         drawDisplayLabels(textMeasurer, 8.dp.toPx())
 
-        val y = 10.dp.toPx()
-
-        for (idx in 0 ..< 10) {
-            val x = (idx * 32 + 3).dp.toPx()
-
-            when (idx) {
-                0 -> drawSevenSegmentDigit('-', false, segmentsPath, Offset(x, y))
-                1 -> drawSevenSegmentDigit('8', true, segmentsPath, Offset(x, y))
-                else -> drawSevenSegmentDigit('8', false, segmentsPath, Offset(x, y))
-            }
-        }
-
-        drawSevenSegmentDigit('-', false, segmentsPathSmall, Offset(321.dp.toPx(), y))
-        drawSevenSegmentDigit('8', false, segmentsPathSmall, Offset(338.dp.toPx(), y))
-        drawSevenSegmentDigit('8', false, segmentsPathSmall, Offset(359.dp.toPx(), y))
+        drawDigits(calculatorDisplayData,
+            segmentsLargePath, segmentsSmallPath, segmentsLargeSizeX, segmentsSmallSizeSmallX, 8.dp.toPx())
     }
 
-//        Row(
-//            modifier = Modifier.matchParentSize(),
-//            horizontalArrangement = Arrangement.spacedBy(6.dp)
-//        ) {
-//            val digits = value.padStart(10, ' ') // Pad to 10 digits, fill left with spaces
-//            for (char in digits) {
-//                Canvas(modifier = modifier) {
-//                    // Draw light gray background
-//                    drawSevenSegmentDigit(char, drawDecimalPoint, this)
-//                }
-//            }
-//        }
 }
 
 /**
@@ -189,4 +173,43 @@ private fun DrawScope.drawDisplayLabels(textMeasurer: TextMeasurer, frameThickne
         textLayoutResult = textLayoutResult,
         topLeft = Offset(10.dp.toPx(), 45.dp.toPx())
     )
+}
+
+/**
+ * Draws the digits on the calculator display using the provided CalculatorDisplayData to determine
+ * which digits to display and whether to draw the decimal point.
+ * @param calculatorDisplayData The data containing the digits to be displayed and their formatting information.
+ * @param segmentsLargePath The precomputed paths for the large segments of the digits.
+ * @param segmentsSmallPath The precomputed paths for the small segments of the digits.
+ * @param segmentsLargeSizeX The width of the large segments, used to calculate spacing between digits.
+ * @param segmentsSmallSizeSmallX The width of the small segments, used to calculate spacing between digits.
+ * @param frameWidth The thickness of the sunken frame, used to calculate the starting position for drawing the digits.
+ */
+private fun DrawScope.drawDigits(calculatorDisplayData: CalculatorDisplayData,
+                                 segmentsLargePath: List<Path>, segmentsSmallPath: List<Path>,
+                                 segmentsLargeSizeX: Float, segmentsSmallSizeSmallX: Float,
+                                 frameWidth: Float) {
+    val numLargeSpaces = 11
+    val numSmallSpaces = 2
+    val space = size.width - 2 * frameWidth - 11 * segmentsLargeSizeX - 3 * segmentsSmallSizeSmallX
+    val spaceRatioLargeSmall = 1f
+    val smallSpace = space / (numLargeSpaces + numSmallSpaces * spaceRatioLargeSmall)
+    val largeSpace = smallSpace * spaceRatioLargeSmall
+    val y = 10.dp.toPx()
+
+    var x = 5.dp.toPx()
+
+    for (idx in 0 ..< 11) {
+        drawSevenSegmentDigit(calculatorDisplayData.digitsLarge[idx],
+            idx == calculatorDisplayData.decimalPointIndex, segmentsLargePath, Offset(x, y))
+
+        x += segmentsLargeSizeX + largeSpace
+    }
+
+    for (idx in 0 ..< 3) {
+        drawSevenSegmentDigit(calculatorDisplayData.digitsSmall[idx],
+            false, segmentsSmallPath, Offset(x, y))
+
+        x += segmentsSmallSizeSmallX + smallSpace
+    }
 }
