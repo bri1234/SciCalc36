@@ -31,7 +31,11 @@ import androidx.compose.ui.unit.sp
  * @param modifier The modifier to be applied to the button layout.
  */
 @Composable
-private fun CalculatorButton(buttonProperties : CalculatorButtonProperties, modifier: Modifier) {
+private fun CalculatorButton(
+    buttonProperties : CalculatorButtonProperties,
+    modifier: Modifier,
+    onButtonPressed: (CalculatorButton) -> Unit
+) {
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally
@@ -39,7 +43,7 @@ private fun CalculatorButton(buttonProperties : CalculatorButtonProperties, modi
         CalculatorButtonHeading(buttonProperties)
 
         Button(
-            onClick = {},
+            onClick = { onButtonPressed(buttonProperties.button) },
             modifier = modifier, // Modifier.fillMaxSize(),
             shape = RoundedCornerShape(5.dp),
             colors = ButtonDefaults.buttonColors(containerColor = buttonProperties.buttonColor),
@@ -121,7 +125,10 @@ private fun CalculatorButtonHeading(buttonProperties: CalculatorButtonProperties
  * The grid has 5 columns and fills the available space.
  */
 @Composable
-fun CalculatorButtons(modifier: Modifier = Modifier) {
+fun CalculatorButtonsView(
+    modifier: Modifier = Modifier,
+    onButtonPressed: (CalculatorButton) -> Unit
+) {
     Column (modifier = modifier) {
         GridLayout(
             columns = 5,
@@ -132,7 +139,8 @@ fun CalculatorButtons(modifier: Modifier = Modifier) {
             CALCULATOR_SPECIAL_BUTTON_LIST.forEach { buttonProperties ->
                 SimpleCalculatorButton(
                     buttonProperties = buttonProperties,
-                    Modifier.padding(4.dp, 0.dp, 4.dp, 0.dp)
+                    Modifier.padding(4.dp, 0.dp, 4.dp, 0.dp),
+                    onButtonPressed = onButtonPressed
                 )
             }
         }
@@ -146,7 +154,8 @@ fun CalculatorButtons(modifier: Modifier = Modifier) {
             CALCULATOR_BUTTON_LIST.forEach { buttonProperties ->
                 CalculatorButton(
                     buttonProperties = buttonProperties,
-                    Modifier.padding(4.dp).fillMaxSize()
+                    Modifier.padding(4.dp).fillMaxSize(),
+                    onButtonPressed = onButtonPressed
                 )
             }
         }
@@ -154,13 +163,17 @@ fun CalculatorButtons(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun SimpleCalculatorButton(buttonProperties : CalculatorButtonProperties, modifier: Modifier) {
+private fun SimpleCalculatorButton(
+    buttonProperties : CalculatorButtonProperties,
+    modifier: Modifier,
+    onButtonPressed: (CalculatorButton) -> Unit
+) {
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Button(
-            onClick = {},
+            onClick = { onButtonPressed(buttonProperties.button) },
             modifier = modifier,
             shape = RoundedCornerShape(5.dp),
             colors = ButtonDefaults.buttonColors(containerColor = buttonProperties.buttonColor),

@@ -8,12 +8,11 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import com.bri1234.ti36calculator.ui.theme.Ti36CalculatorTheme
 
 class MainActivity : ComponentActivity() {
 
-    val calculatorDisplayData = CalculatorDisplayData()
+    val calculatorViewModel = CalculatorViewModel()
 
     /**
      * The main activity of the TI-36 calculator app.
@@ -23,12 +22,12 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         System.arraycopy(charArrayOf('-', '9', '8', '7', '6', '5', '4', '3', '2', '1', '0'), 0,
-            calculatorDisplayData.digitsLarge, 0, 11)
+            calculatorViewModel.displayState.digitsLarge, 0, 11)
 
         System.arraycopy(charArrayOf('-', '8', '9'), 0,
-            calculatorDisplayData.digitsSmall, 0, 3)
+            calculatorViewModel.displayState.digitsSmall, 0, 3)
 
-        calculatorDisplayData.decimalPointIndex = 1
+        calculatorViewModel.displayState.decimalPointIndex = 1
 
         enableEdgeToEdge()
         setContent {
@@ -43,18 +42,7 @@ class MainActivity : ComponentActivity() {
                                 .padding(innerPadding)
                                 .background(CASE_COLOR)
                         ) {
-                            Column(modifier = Modifier.fillMaxSize()) {
-
-                                CalculatorDisplayView(calculatorDisplayData,
-                                    Modifier.fillMaxWidth()
-                                        .weight(1.5f)
-                                        .padding(12.dp, 12.dp, 12.dp, 12.dp))
-
-                                CalculatorButtons(Modifier
-                                    .fillMaxWidth()
-                                    .weight(9f)
-                                    .padding(8.dp, 0.dp, 8.dp, 8.dp))
-                            }
+                            CalculatorView(calculatorViewModel)
                         }
                     }
                 }

@@ -1,7 +1,5 @@
 package com.bri1234.ti36calculator
 
-import java.util.EnumSet
-
 enum class DisplayLabel(val caption: String) {
     M("M"),
     SECOND("2nd"),
@@ -15,14 +13,6 @@ enum class DisplayLabel(val caption: String) {
     GRAD("GRAD"),
     X("x"),
     R("r"),
-    BRACKETS("()")
+    PARENTHESES("()")
 }
 
-class CalculatorDisplayData {
-    val digitsLarge = CharArray(11) { ' ' }
-    var decimalPointIndex = -1
-
-    val digitsSmall = CharArray(3) { ' ' }
-
-    val displayLabels = EnumSet.of(DisplayLabel.DEG)
-}

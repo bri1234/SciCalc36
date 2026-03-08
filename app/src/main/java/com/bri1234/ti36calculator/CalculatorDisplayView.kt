@@ -17,11 +17,10 @@ import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.platform.LocalDensity
-import java.util.EnumSet
 
 @Composable
 fun CalculatorDisplayView(
-    calculatorDisplayData: CalculatorDisplayData,
+    calculatorDisplayState: CalculatorDisplayState,
     modifier: Modifier = Modifier
 ) {
     val textMeasurer = rememberTextMeasurer()
@@ -45,9 +44,9 @@ fun CalculatorDisplayView(
 
         drawSunkenFrame(5.dp.toPx())
 
-        drawDisplayLabels(calculatorDisplayData.displayLabels, textMeasurer, 8.dp.toPx())
+        drawDisplayLabels(calculatorDisplayState.displayLabels, textMeasurer, 8.dp.toPx())
 
-        drawDigits(calculatorDisplayData,
+        drawDigits(calculatorDisplayState,
             segmentsLargePath, segmentsSmallPath, segmentsLargeSizeX, segmentsSmallSizeSmallX, 8.dp.toPx())
     }
 
@@ -139,7 +138,7 @@ private val displayLabelsBottom = listOf(
     DisplayLabel.GRAD,
     DisplayLabel.X,
     DisplayLabel.R,
-    DisplayLabel.BRACKETS
+    DisplayLabel.PARENTHESES
 )
 
 /**
@@ -148,7 +147,7 @@ private val displayLabelsBottom = listOf(
  * @param textMeasurer The TextMeasurer used to measure the text for each label and calculate the layout.
  * @param frameThickness The thickness of the sunken frame, used to calculate the starting position for the labels.
  */
-private fun DrawScope.drawDisplayLabels(displayLabels: EnumSet<DisplayLabel>,
+private fun DrawScope.drawDisplayLabels(displayLabels: Set<DisplayLabel>,
                                         textMeasurer: TextMeasurer, frameThickness: Float) {
     val textStyle = TextStyle(
         color = Color.Black,
@@ -197,7 +196,7 @@ private fun DrawScope.drawDisplayLabels(displayLabels: EnumSet<DisplayLabel>,
  * @param segmentsSmallSizeSmallX The width of the small segments, used to calculate spacing between digits.
  * @param frameWidth The thickness of the sunken frame, used to calculate the starting position for drawing the digits.
  */
-private fun DrawScope.drawDigits(calculatorDisplayData: CalculatorDisplayData,
+private fun DrawScope.drawDigits(calculatorDisplayData: CalculatorDisplayState,
                                  segmentsLargePath: List<Path>, segmentsSmallPath: List<Path>,
                                  segmentsLargeSizeX: Float, segmentsSmallSizeSmallX: Float,
                                  frameWidth: Float) {
