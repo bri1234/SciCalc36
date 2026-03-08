@@ -1,6 +1,11 @@
 package com.bri1234.ti36calculator
 
-enum class DisplayLabel(val caption: String) {
+/**
+ * Enum class representing the various labels that can be displayed on the calculator screen.
+ *
+ * @property caption The text caption for the label as it should appear on the display.
+ */
+enum class DisplayLabels(val caption: String) {
     M("M"),
     SECOND("2nd"),
     THIRD("3rd"),

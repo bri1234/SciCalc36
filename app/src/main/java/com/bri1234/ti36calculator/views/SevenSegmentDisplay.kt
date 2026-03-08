@@ -1,4 +1,4 @@
-package com.bri1234.ti36calculator
+package com.bri1234.ti36calculator.views
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Path
@@ -83,7 +83,7 @@ fun DrawScope.drawSevenSegmentDigit(
         }
 
         if (drawDecimalPoint)
-            drawPath(segmentsPath[SEGMENT_DP_IDX],  DISPLAY_DIGIT_COLOR)
+            drawPath(segmentsPath[SEGMENT_DP_IDX], DISPLAY_DIGIT_COLOR)
     }
 }
 

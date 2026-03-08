@@ -1,4 +1,4 @@
-package com.bri1234.ti36calculator
+package com.bri1234.ti36calculator.views
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -32,9 +32,9 @@ import androidx.compose.ui.unit.sp
  */
 @Composable
 private fun CalculatorButton(
-    buttonProperties : CalculatorButtonProperties,
+    buttonProperties : com.bri1234.ti36calculator.CalculatorButtonProperties,
     modifier: Modifier,
-    onButtonPressed: (CalculatorButton) -> Unit
+    onButtonPressed: (com.bri1234.ti36calculator.CalculatorButton) -> Unit
 ) {
     Column(
         modifier = modifier,
@@ -72,7 +72,7 @@ private fun CalculatorButton(
 }
 
 @Composable
-private fun CalculatorButtonHeading(buttonProperties: CalculatorButtonProperties) {
+private fun CalculatorButtonHeading(buttonProperties: com.bri1234.ti36calculator.CalculatorButtonProperties) {
 
     if (buttonProperties.text4th.isEmpty()) {
         // center text3 if text4 is empty
@@ -127,16 +127,16 @@ private fun CalculatorButtonHeading(buttonProperties: CalculatorButtonProperties
 @Composable
 fun CalculatorButtonsView(
     modifier: Modifier = Modifier,
-    onButtonPressed: (CalculatorButton) -> Unit
+    onButtonPressed: (com.bri1234.ti36calculator.CalculatorButton) -> Unit
 ) {
     Column (modifier = modifier) {
         GridLayout(
             columns = 5,
             rows = 1,
             modifier = Modifier.fillMaxWidth().heightIn(30.dp, 40.dp),
-            gridCellInfos = CALCULATOR_SPECIAL_BUTTON_LIST,
+            gridCellInfos = _root_ide_package_.com.bri1234.ti36calculator.CALCULATOR_SPECIAL_BUTTON_LIST,
         ) {
-            CALCULATOR_SPECIAL_BUTTON_LIST.forEach { buttonProperties ->
+            _root_ide_package_.com.bri1234.ti36calculator.CALCULATOR_SPECIAL_BUTTON_LIST.forEach { buttonProperties ->
                 SimpleCalculatorButton(
                     buttonProperties = buttonProperties,
                     Modifier.padding(4.dp, 0.dp, 4.dp, 0.dp),
@@ -149,9 +149,9 @@ fun CalculatorButtonsView(
             columns = 5,
             rows = 8,
             modifier = Modifier.fillMaxSize(),
-            gridCellInfos = CALCULATOR_BUTTON_LIST,
+            gridCellInfos = _root_ide_package_.com.bri1234.ti36calculator.CALCULATOR_BUTTON_LIST,
         ) {
-            CALCULATOR_BUTTON_LIST.forEach { buttonProperties ->
+            _root_ide_package_.com.bri1234.ti36calculator.CALCULATOR_BUTTON_LIST.forEach { buttonProperties ->
                 CalculatorButton(
                     buttonProperties = buttonProperties,
                     Modifier.padding(4.dp).fillMaxSize(),
@@ -164,9 +164,9 @@ fun CalculatorButtonsView(
 
 @Composable
 private fun SimpleCalculatorButton(
-    buttonProperties : CalculatorButtonProperties,
+    buttonProperties : com.bri1234.ti36calculator.CalculatorButtonProperties,
     modifier: Modifier,
-    onButtonPressed: (CalculatorButton) -> Unit
+    onButtonPressed: (com.bri1234.ti36calculator.CalculatorButton) -> Unit
 ) {
     Column(
         modifier = modifier,

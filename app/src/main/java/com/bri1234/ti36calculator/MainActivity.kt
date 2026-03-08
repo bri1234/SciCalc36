@@ -9,6 +9,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.ui.Modifier
 import com.bri1234.ti36calculator.ui.theme.Ti36CalculatorTheme
+import com.bri1234.ti36calculator.viewModels.CalculatorViewModel
+import com.bri1234.ti36calculator.views.CASE_COLOR
+import com.bri1234.ti36calculator.views.CalculatorView
 
 class MainActivity : ComponentActivity() {
 
@@ -20,14 +23,6 @@ class MainActivity : ComponentActivity() {
      */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        System.arraycopy(charArrayOf('-', '9', '8', '7', '6', '5', '4', '3', '2', '1', '0'), 0,
-            calculatorViewModel.displayState.digitsLarge, 0, 11)
-
-        System.arraycopy(charArrayOf('-', '8', '9'), 0,
-            calculatorViewModel.displayState.digitsSmall, 0, 3)
-
-        calculatorViewModel.displayState.decimalPointIndex = 1
 
         enableEdgeToEdge()
         setContent {

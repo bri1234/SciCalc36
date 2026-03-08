@@ -1,4 +1,4 @@
-package com.bri1234.ti36calculator
+package com.bri1234.ti36calculator.views
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.runtime.Composable
@@ -17,6 +17,8 @@ import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.platform.LocalDensity
+import com.bri1234.ti36calculator.CalculatorDisplayState
+import com.bri1234.ti36calculator.DisplayLabels
 
 @Composable
 fun CalculatorDisplayView(
@@ -34,10 +36,16 @@ fun CalculatorDisplayView(
     val segmentsSmallSizeSmallX = segmentsSmallSizeSmallY * xyRatio
 
     val segmentsLargePath = remember(segmentsLargeSizeX, segmentsLargeSizeY) {
-        createSegmentsPathFromStrings(SEGMENTS_PATH_STR, segmentsLargeSizeX, segmentsLargeSizeY ) }
+        createSegmentsPathFromStrings(SEGMENTS_PATH_STR, segmentsLargeSizeX, segmentsLargeSizeY)
+    }
 
     val segmentsSmallPath = remember(segmentsSmallSizeSmallX, segmentsSmallSizeSmallY) {
-        createSegmentsPathFromStrings(SEGMENTS_PATH_STR, segmentsSmallSizeSmallX, segmentsSmallSizeSmallY) }
+        createSegmentsPathFromStrings(
+            SEGMENTS_PATH_STR,
+            segmentsSmallSizeSmallX,
+            segmentsSmallSizeSmallY
+        )
+    }
 
     Canvas(modifier = modifier) {
         drawRect(DISPLAY_BACKGROUND_COLOR)
@@ -127,18 +135,18 @@ private fun DrawScope.drawSunkenFrame(thickness: Float) {
  * These labels are drawn at the bottom of the display and are spaced evenly across the width of the display.
  */
 private val displayLabelsBottom = listOf(
-    DisplayLabel.SECOND,
-    DisplayLabel.THIRD,
-    DisplayLabel.BIN,
-    DisplayLabel.OCT,
-    DisplayLabel.HEX,
-    DisplayLabel.STAT,
-    DisplayLabel.DEG,
-    DisplayLabel.RAD,
-    DisplayLabel.GRAD,
-    DisplayLabel.X,
-    DisplayLabel.R,
-    DisplayLabel.PARENTHESES
+    DisplayLabels.SECOND,
+    DisplayLabels.THIRD,
+    DisplayLabels.BIN,
+    DisplayLabels.OCT,
+    DisplayLabels.HEX,
+    DisplayLabels.STAT,
+    DisplayLabels.DEG,
+    DisplayLabels.RAD,
+    DisplayLabels.GRAD,
+    DisplayLabels.X,
+    DisplayLabels.R,
+    DisplayLabels.PARENTHESES
 )
 
 /**
@@ -147,7 +155,7 @@ private val displayLabelsBottom = listOf(
  * @param textMeasurer The TextMeasurer used to measure the text for each label and calculate the layout.
  * @param frameThickness The thickness of the sunken frame, used to calculate the starting position for the labels.
  */
-private fun DrawScope.drawDisplayLabels(displayLabels: Set<DisplayLabel>,
+private fun DrawScope.drawDisplayLabels(displayLabels: Set<DisplayLabels>,
                                         textMeasurer: TextMeasurer, frameThickness: Float) {
     val textStyle = TextStyle(
         color = Color.Black,
@@ -177,8 +185,8 @@ private fun DrawScope.drawDisplayLabels(displayLabels: Set<DisplayLabel>,
     }
 
     // display label left (M)
-    if (DisplayLabel.M in displayLabels) {
-        val textLayoutResult = textMeasurer.measure(AnnotatedString(DisplayLabel.M.caption), textStyle)
+    if (DisplayLabels.M in displayLabels) {
+        val textLayoutResult = textMeasurer.measure(AnnotatedString(DisplayLabels.M.caption), textStyle)
         drawText(
             textLayoutResult = textLayoutResult,
             topLeft = Offset(10.dp.toPx(), 45.dp.toPx())

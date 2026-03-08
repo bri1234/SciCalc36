@@ -1,4 +1,4 @@
-package com.bri1234.ti36calculator
+package com.bri1234.ti36calculator.views
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier

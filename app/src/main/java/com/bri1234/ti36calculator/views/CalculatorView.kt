@@ -1,4 +1,4 @@
-package com.bri1234.ti36calculator
+package com.bri1234.ti36calculator.views
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -7,21 +7,26 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.bri1234.ti36calculator.viewModels.CalculatorViewModel
 
 @Composable
 fun CalculatorView(calculatorViewModel: CalculatorViewModel) {
 
     Column(modifier = Modifier.fillMaxSize()) {
 
-        CalculatorDisplayView(calculatorViewModel.displayState,
+        CalculatorDisplayView(
+            calculatorViewModel.displayState.value,
             Modifier.fillMaxWidth()
                 .weight(1.5f)
-                .padding(12.dp, 12.dp, 12.dp, 12.dp))
+                .padding(12.dp, 12.dp, 12.dp, 12.dp)
+        )
 
-        CalculatorButtonsView(Modifier
-            .fillMaxWidth()
-            .weight(9f)
-            .padding(8.dp, 0.dp, 8.dp, 8.dp),
-            calculatorViewModel::onButtonPressed)
+        CalculatorButtonsView(
+            Modifier
+                .fillMaxWidth()
+                .weight(9f)
+                .padding(8.dp, 0.dp, 8.dp, 8.dp),
+            calculatorViewModel::onButtonPressed
+        )
     }
 }
