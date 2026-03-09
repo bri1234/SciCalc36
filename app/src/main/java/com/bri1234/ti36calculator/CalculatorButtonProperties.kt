@@ -88,7 +88,7 @@ val CALCULATOR_BUTTON_LIST = listOf(
         TEXT_4TH_COLOR,),
 
     // Row 2
-    CalculatorButtonProperties(1, 0, CalculatorButton.SECOND, "2nd", "", " ", "", BUTTON_COLOR_1,),
+    CalculatorButtonProperties(1, 0, CalculatorButton.SECOND, "2nd", "", " ", "", BUTTON_COLOR_1, test1stColor = TEXT_2ND_COLOR),
     CalculatorButtonProperties(1, 1, CalculatorButton.SIN, "SIN", "SIN\u207B\u00B9", "D", "C",
         BUTTON_COLOR_1,),
     CalculatorButtonProperties(1, 2, CalculatorButton.COS, "COS", "COS\u207B\u00B9", "E", "g",

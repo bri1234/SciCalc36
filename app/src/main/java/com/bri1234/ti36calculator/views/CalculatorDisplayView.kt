@@ -137,6 +137,7 @@ private fun DrawScope.drawSunkenFrame(thickness: Float) {
 private val displayLabelsBottom = listOf(
     DisplayLabels.SECOND,
     DisplayLabels.THIRD,
+    DisplayLabels.HYP,
     DisplayLabels.BIN,
     DisplayLabels.OCT,
     DisplayLabels.HEX,

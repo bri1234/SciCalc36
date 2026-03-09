@@ -9,6 +9,7 @@ enum class DisplayLabels(val caption: String) {
     M("M"),
     SECOND("2nd"),
     THIRD("3rd"),
+    HYP("HYP"),
     BIN("BIN"),
     OCT("OCT"),
     HEX("HEX"),

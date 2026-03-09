@@ -27,12 +27,26 @@ class Ti36Simulator {
     private val stack: ArrayDeque<Double> = ArrayDeque()
 
     init {
+        // viewAll()
         buttonPressedAcOn()
     }
 
+    fun viewAll() {
+        stackClear()
+        stackPush(0.0)
+
+        charArrayOf('-', '8', '8', '8', '8', '8', '8', '8', '8', '8', '8').copyInto(digitsLarge)
+        decimalPointIndex = 1
+
+        charArrayOf('-', '8', '8').copyInto(digitsSmall)
+
+        displayLabels.clear()
+        displayLabels.addAll(DisplayLabels.entries)
+    }
+
     fun buttonPressedAcOn() {
-        stack.clear()
-        stack.add(0.0)
+        stackClear()
+        stackPush(0.0)
 
         charArrayOf(' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '0').copyInto(digitsLarge)
         decimalPointIndex = 10
@@ -53,7 +67,33 @@ class Ti36Simulator {
         }
     }
 
-    fun buttonPressedHyp() {}
+    fun buttonPressedHyp() {
+        when {
+            DisplayLabels.SECOND in displayLabels -> {
+                // DRG
+                displayLabels.remove(DisplayLabels.SECOND)
+                cycleAngleUnit(false)
+            }
+            DisplayLabels.THIRD in displayLabels -> {
+                // DRG▶
+                displayLabels.remove(DisplayLabels.THIRD)
+                cycleAngleUnit(true)
+            }
+            else -> {
+                // HYP
+                if (DisplayLabels.HYP in displayLabels)
+                    displayLabels.remove(DisplayLabels.HYP)
+                else if (
+                    DisplayLabels.BIN !in displayLabels &&
+                    DisplayLabels.OCT !in displayLabels &&
+                    DisplayLabels.HEX !in displayLabels
+                ) {
+                    displayLabels.add(DisplayLabels.HYP)
+                }
+            }
+        }
+    }
+
     fun buttonPressedLog() {}
     fun buttonPressedLn() {}
     fun buttonPressedCeC() {}
@@ -101,4 +141,49 @@ class Ti36Simulator {
     fun buttonPressedZero() {}
     fun buttonPressedDot() {}
     fun buttonPressedPlusMinus() {}
+
+    private fun stackClear() {
+        stack.clear()
+        stack.add(0.0)
+    }
+
+    private fun stackPush(value: Double) {
+        stack.addFirst(value)
+    }
+
+    private fun stackPop(): Double {
+        return stack.removeFirst()
+    }
+
+    private fun cycleAngleUnit(convert: Boolean) {
+        when {
+            DisplayLabels.DEG in displayLabels -> {
+                displayLabels.remove(DisplayLabels.DEG)
+                displayLabels.add(DisplayLabels.RAD)
+
+                if (convert) {
+                    val value = stack.removeLast()
+                    stack.add(value * Math.PI / 180)
+                }
+            }
+            DisplayLabels.RAD in displayLabels -> {
+                displayLabels.remove(DisplayLabels.RAD)
+                displayLabels.add(DisplayLabels.GRAD)
+
+                if (convert) {
+                    val value = stack.removeLast()
+                    stack.add(value * 200 / Math.PI)
+                }
+            }
+            DisplayLabels.GRAD in displayLabels -> {
+                displayLabels.remove(DisplayLabels.GRAD)
+                displayLabels.add(DisplayLabels.DEG)
+
+                if (convert) {
+                    val value = stack.removeLast()
+                    stack.add(value * 180 / 200)
+                }
+            }
+        }
+    }
 }

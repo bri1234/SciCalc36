@@ -17,6 +17,10 @@ class CalculatorViewModel(
     private val _displayState = mutableStateOf(CalculatorDisplayState())
     val displayState: State<CalculatorDisplayState> = _displayState
 
+    init {
+        updateDisplayState()
+    }
+
     fun onButtonPressed(button: CalculatorButton) {
         when (button) {
             CalculatorButton.AC_ON -> simulator.buttonPressedAcOn()
