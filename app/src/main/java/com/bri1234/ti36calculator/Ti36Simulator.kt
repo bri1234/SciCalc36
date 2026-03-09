@@ -24,11 +24,16 @@ class Ti36Simulator {
 
     private val displayLabels: MutableSet<DisplayLabels> = mutableSetOf()
 
+    private val stack: ArrayDeque<Double> = ArrayDeque()
+
     init {
         buttonPressedAcOn()
     }
 
     fun buttonPressedAcOn() {
+        stack.clear()
+        stack.add(0.0)
+
         charArrayOf(' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '0').copyInto(digitsLarge)
         decimalPointIndex = 10
 
