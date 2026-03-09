@@ -11,9 +11,9 @@ import com.bri1234.ti36calculator.Ti36Simulator
  * ViewModel for the TI-36 calculator app.
  * Manages the state of the calculator display and handles button presses.
  */
-class CalculatorViewModel : ViewModel() {
-    val simulator = Ti36Simulator()
-
+class CalculatorViewModel(
+    val simulator: Ti36Simulator = Ti36Simulator()
+) : ViewModel() {
     private val _displayState = mutableStateOf(CalculatorDisplayState())
     val displayState: State<CalculatorDisplayState> = _displayState
 
@@ -61,6 +61,10 @@ class CalculatorViewModel : ViewModel() {
             CalculatorButton.PLUS_MINUS -> simulator.buttonPressedPlusMinus()
         }
 
+        updateDisplayState()
+    }
+
+    private fun updateDisplayState() {
         _displayState.value = simulator.getDisplayState()
     }
 }

@@ -11,10 +11,8 @@ package com.bri1234.ti36calculator
 data class CalculatorDisplayState (
     val digitsLarge: CharArray = charArrayOf(' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '0'),
     val decimalPointIndex: Int = 10,
-
     val digitsSmall: CharArray = charArrayOf(' ', ' ', ' '),
-
-    val displayLabels: MutableSet<DisplayLabels> = mutableSetOf(DisplayLabels.DEG),
+    val displayLabels: Set<DisplayLabels> = setOf(DisplayLabels.DEG),
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

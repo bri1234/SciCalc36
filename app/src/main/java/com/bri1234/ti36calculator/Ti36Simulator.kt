@@ -11,20 +11,58 @@ class Ti36Simulator {
     fun getDisplayState(): CalculatorDisplayState {
         // Return a dummy display state for now
         return CalculatorDisplayState(
-            digitsLarge = charArrayOf(' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '0'),
-            decimalPointIndex = 10,
-            digitsSmall = charArrayOf(' ', ' ', ' '),
-            displayLabels = mutableSetOf(DisplayLabels.DEG),
+            digitsLarge = digitsLarge.copyOf(),
+            decimalPointIndex = decimalPointIndex,
+            digitsSmall = digitsSmall.copyOf(),
+            displayLabels = displayLabels.toSet(),
         )
     }
 
-    fun buttonPressedAcOn() {}
-    fun buttonPressedThird() {}
+    private val digitsLarge = CharArray(11) { ' ' }
+    private var decimalPointIndex: Int = -1
+    private val digitsSmall =  CharArray(3) { ' ' }
+
+    private val displayLabels: MutableSet<DisplayLabels> = mutableSetOf()
+
+    init {
+        buttonPressedAcOn()
+    }
+
+    fun buttonPressedAcOn() {
+        charArrayOf(' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '0').copyInto(digitsLarge)
+        decimalPointIndex = 10
+
+        charArrayOf(' ', ' ', ' ').copyInto(digitsSmall)
+
+        displayLabels.clear()
+        displayLabels.add(DisplayLabels.DEG)
+    }
+
+    fun buttonPressedThird() {
+        displayLabels.remove(DisplayLabels.SECOND)
+
+        if (DisplayLabels.THIRD in displayLabels) {
+            displayLabels.remove(DisplayLabels.THIRD)
+        } else {
+            displayLabels.add(DisplayLabels.THIRD)
+        }
+    }
+
     fun buttonPressedHyp() {}
     fun buttonPressedLog() {}
     fun buttonPressedLn() {}
     fun buttonPressedCeC() {}
-    fun buttonPressedSecond() {}
+
+    fun buttonPressedSecond() {
+        displayLabels.remove(DisplayLabels.THIRD)
+
+        if (DisplayLabels.SECOND in displayLabels) {
+            displayLabels.remove(DisplayLabels.SECOND)
+        } else {
+            displayLabels.add(DisplayLabels.SECOND)
+        }
+    }
+
     fun buttonPressedSin() {}
     fun buttonPressedCos() {}
     fun buttonPressedTan() {}
