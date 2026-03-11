@@ -12,21 +12,6 @@ import com.bri1234.ti36calculator.views.TEXT_3RD_COLOR
 import com.bri1234.ti36calculator.views.TEXT_4TH_COLOR
 
 /**
- * Enum class representing the different buttons on the calculator.
- */
-enum class CalculatorButton {
-    AC_ON,
-    THIRD, HYP, LOG, LN, CE_C,
-    SECOND, SIN, COS, TAN, Y_POW,
-    X_SWAP_Y, ONE_DIV_X, X_SQUARED, SQRT_X, DIVIDE,
-    SUM_PLUS, EE, LEFT_PARENTHESES, RIGHT_PARENTHESES, MULTIPLY,
-    STORE, SEVEN, EIGHT, NINE, MINUS,
-    RECALL, FOUR, FIVE, SIX, PLUS,
-    A_B_C, ONE, TWO, THREE, EQUAL,
-    BACK, ZERO, DOT, PLUS_MINUS,
-}
-
-/**
  * Data class representing the properties of a calculator button, including its position in the grid,
  * the button type, text for different modes, colors, and span information.
  *
@@ -95,7 +80,7 @@ val CALCULATOR_BUTTON_LIST = listOf(
         BUTTON_COLOR_1,),
     CalculatorButtonProperties(1, 3, CalculatorButton.TAN, "TAN", "TAN\u207B\u00B9", "F", "me",
         BUTTON_COLOR_1,),
-    CalculatorButtonProperties(1, 4, CalculatorButton.Y_POW, "y\u02E3", "\u02E3\u221Ay", "%", "e",
+    CalculatorButtonProperties(1, 4, CalculatorButton.Y_POW_X, "y\u02E3", "\u02E3\u221Ay", "%", "e",
         BUTTON_COLOR_1,),
 
     // Row 3
