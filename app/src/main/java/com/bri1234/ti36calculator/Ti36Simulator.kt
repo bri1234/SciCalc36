@@ -1,5 +1,7 @@
 package com.bri1234.ti36calculator
 
+import android.util.Log
+
 /**
  * A simulator class for the TI-36 calculator.
  */
@@ -10,6 +12,8 @@ class Ti36Simulator {
     private val output = Ti36Output(display)
     private val computation = Ti36Computation()
     private val functions = Ti36Functions(display, computation)
+
+    private var isErrorState: Boolean = false
 
     fun getDisplayState(): CalculatorDisplayState = display.getDisplayState()
 
@@ -23,20 +27,35 @@ class Ti36Simulator {
     }
 
     fun buttonPressed(button: CalculatorButton) {
-        when (button) {
-            CalculatorButton.AC_ON -> buttonPressedAcOn()
-            CalculatorButton.SECOND -> buttonPressedSecond()
-            CalculatorButton.THIRD -> buttonPressedThird()
 
-            else -> {
-                when {
-                    display.isSecondFunctionActive() -> buttonSecondFunction(button)
-                    display.isThirdFunctionActive() -> buttonThirdFunction(button)
-                    else -> buttonFirstFunction(button)
-                }
+        if (isErrorState) {
+            if (button == CalculatorButton.AC_ON) {
+                buttonPressedAcOn()
             }
-
+            return
         }
+
+        try {
+            when (button) {
+                CalculatorButton.AC_ON -> buttonPressedAcOn()
+                CalculatorButton.SECOND -> buttonPressedSecond()
+                CalculatorButton.THIRD -> buttonPressedThird()
+
+                else -> {
+                    when {
+                        display.isSecondFunctionActive() -> buttonSecondFunction(button)
+                        display.isThirdFunctionActive() -> buttonThirdFunction(button)
+                        else -> buttonFirstFunction(button)
+                    }
+                }
+
+            }
+        } catch (e: Exception) {
+            Log.e("Ti36Simulator", "Error during button press", e)
+            isErrorState = true
+            output.printError()
+        }
+
     }
 
     private fun buttonFirstFunction(button : CalculatorButton) {
@@ -89,6 +108,42 @@ class Ti36Simulator {
 
         when (button) {
             CalculatorButton.HYP -> functions.cycleAngleUnit(false)
+            CalculatorButton.LOG -> functions.tenPowX()
+            CalculatorButton.LN -> functions.exp()
+            CalculatorButton.CE_C -> functions.notImplemented()
+            CalculatorButton.SIN -> functions.notImplemented()
+            CalculatorButton.COS -> functions.notImplemented()
+            CalculatorButton.TAN -> functions.notImplemented()
+            CalculatorButton.Y_POW_X -> functions.notImplemented()
+            CalculatorButton.X_SWAP_Y -> functions.notImplemented()
+            CalculatorButton.ONE_DIV_X -> functions.notImplemented()
+            CalculatorButton.X_SQUARED -> functions.notImplemented()
+            CalculatorButton.SQRT_X -> functions.notImplemented()
+            CalculatorButton.DIVIDE -> functions.notImplemented()
+            CalculatorButton.SUM_PLUS -> functions.notImplemented()
+            CalculatorButton.EE -> functions.notImplemented()
+            CalculatorButton.LEFT_PARENTHESES -> functions.notImplemented()
+            CalculatorButton.RIGHT_PARENTHESES -> functions.notImplemented()
+            CalculatorButton.MULTIPLY -> functions.notImplemented()
+            CalculatorButton.STORE -> functions.notImplemented()
+            CalculatorButton.SEVEN -> functions.notImplemented()
+            CalculatorButton.EIGHT -> functions.notImplemented()
+            CalculatorButton.NINE -> functions.notImplemented()
+            CalculatorButton.MINUS -> functions.notImplemented()
+            CalculatorButton.RECALL -> functions.notImplemented()
+            CalculatorButton.FOUR -> functions.notImplemented()
+            CalculatorButton.FIVE -> functions.notImplemented()
+            CalculatorButton.SIX -> functions.notImplemented()
+            CalculatorButton.PLUS -> functions.notImplemented()
+            CalculatorButton.A_B_C -> functions.notImplemented()
+            CalculatorButton.ONE -> functions.notImplemented()
+            CalculatorButton.TWO -> functions.notImplemented()
+            CalculatorButton.THREE -> functions.notImplemented()
+            CalculatorButton.EQUAL -> functions.notImplemented()
+            CalculatorButton.BACK -> functions.notImplemented()
+            CalculatorButton.ZERO -> functions.notImplemented()
+            CalculatorButton.DOT -> functions.notImplemented()
+            CalculatorButton.PLUS_MINUS -> functions.notImplemented()
             else -> {
                 // do nothing
             }
@@ -99,7 +154,43 @@ class Ti36Simulator {
         display.removeLabel(DisplayLabels.THIRD)
 
         when (button) {
-            CalculatorButton.HYP -> functions.cycleAngleUnit(true)
+            CalculatorButton.HYP -> functions.notImplemented()
+            CalculatorButton.LOG -> functions.notImplemented()
+            CalculatorButton.LN -> functions.notImplemented()
+            CalculatorButton.CE_C -> functions.notImplemented()
+            CalculatorButton.SIN -> functions.notImplemented()
+            CalculatorButton.COS -> functions.notImplemented()
+            CalculatorButton.TAN -> functions.notImplemented()
+            CalculatorButton.Y_POW_X -> functions.notImplemented()
+            CalculatorButton.X_SWAP_Y -> functions.notImplemented()
+            CalculatorButton.ONE_DIV_X -> functions.notImplemented()
+            CalculatorButton.X_SQUARED -> functions.notImplemented()
+            CalculatorButton.SQRT_X -> functions.notImplemented()
+            CalculatorButton.DIVIDE -> functions.pi()
+            CalculatorButton.SUM_PLUS -> functions.notImplemented()
+            CalculatorButton.EE -> functions.notImplemented()
+            CalculatorButton.LEFT_PARENTHESES -> functions.notImplemented()
+            CalculatorButton.RIGHT_PARENTHESES -> functions.notImplemented()
+            CalculatorButton.MULTIPLY -> functions.notImplemented()
+            CalculatorButton.STORE -> functions.notImplemented()
+            CalculatorButton.SEVEN -> functions.notImplemented()
+            CalculatorButton.EIGHT -> functions.notImplemented()
+            CalculatorButton.NINE -> functions.notImplemented()
+            CalculatorButton.MINUS -> functions.notImplemented()
+            CalculatorButton.RECALL -> functions.notImplemented()
+            CalculatorButton.FOUR -> functions.notImplemented()
+            CalculatorButton.FIVE -> functions.notImplemented()
+            CalculatorButton.SIX -> functions.notImplemented()
+            CalculatorButton.PLUS -> functions.notImplemented()
+            CalculatorButton.A_B_C -> functions.notImplemented()
+            CalculatorButton.ONE -> functions.notImplemented()
+            CalculatorButton.TWO -> functions.notImplemented()
+            CalculatorButton.THREE -> functions.notImplemented()
+            CalculatorButton.EQUAL -> functions.notImplemented()
+            CalculatorButton.BACK -> functions.notImplemented()
+            CalculatorButton.ZERO -> functions.notImplemented()
+            CalculatorButton.DOT -> functions.notImplemented()
+            CalculatorButton.PLUS_MINUS -> functions.notImplemented()
             else -> {
                 // do nothing
             }
@@ -107,6 +198,8 @@ class Ti36Simulator {
     }
 
     private fun buttonPressedAcOn() {
+        isErrorState = false
+
         computation.reset()
         display.reset()
         input.reset()

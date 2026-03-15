@@ -9,9 +9,10 @@ enum class DisplayNumberFormat {
     FLOAT,
     SCIENTIFIC,
     ENGINEERING,
+    FIX,
     OCTAL,
     HEXADECIMAL,
-    BINARY
+    BINARY,
 }
 
 class Ti36Output(val display: Ti36Display) {
@@ -41,10 +42,14 @@ class Ti36Output(val display: Ti36Display) {
             return
         }
 
+        if ((abs(value) >= 1e100) || ((abs(value) <= 1e-100) && (value != 0.0)))
+            throw IllegalArgumentException("Value is out of range for display")
+
         when (displayNumberFormat) {
             DisplayNumberFormat.FLOAT -> printValueFloat(value)
             DisplayNumberFormat.SCIENTIFIC -> printValueScientific(value)
             DisplayNumberFormat.ENGINEERING -> printValueEngineering(value)
+            DisplayNumberFormat.FIX -> printValueFix(value)
             DisplayNumberFormat.OCTAL -> printValueOct(value)
             DisplayNumberFormat.HEXADECIMAL -> printValueHex(value)
             DisplayNumberFormat.BINARY -> printValueBin(value)
@@ -68,6 +73,9 @@ class Ti36Output(val display: Ti36Display) {
     private fun printValueEngineering(value: Double) {
     }
 
+    private fun printValueFix(value: Double) {
+    }
+
     private fun printValueFloat(value: Double) {
         val exponent = if (value != 0.0) floor(log10(abs(value))) else 1.0
 
@@ -77,6 +85,9 @@ class Ti36Output(val display: Ti36Display) {
         }
 
         var valueStr = value.toBigDecimal().stripTrailingZeros().toPlainString()
+        if (value >= 0.0)
+            valueStr = " $valueStr"
+
         val decimalPointPos = valueStr.indexOf('.')
 
         if (decimalPointPos != -1) {

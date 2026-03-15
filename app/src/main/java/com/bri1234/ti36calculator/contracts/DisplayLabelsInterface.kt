@@ -38,4 +38,5 @@ interface DisplayLabelsInterface {
     */
     fun removeLabel(label: DisplayLabels)
 
+    fun printNotImplemented()
 }

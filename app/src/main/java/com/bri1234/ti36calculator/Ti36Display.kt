@@ -96,5 +96,10 @@ class Ti36Display : DisplayLabelsInterface {
         labels.remove(label)
     }
 
+    override fun printNotImplemented() {
+        "  not IPL  ".toCharArray().copyInto(mantissa)
+        decimalPointPos = -1
+        exponent.fill(' ')
+    }
 }
 
