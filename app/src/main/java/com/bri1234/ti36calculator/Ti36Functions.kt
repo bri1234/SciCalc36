@@ -2,6 +2,10 @@ package com.bri1234.ti36calculator
 
 import com.bri1234.ti36calculator.contracts.DisplayLabelsInterface
 
+/**
+ * A class representing the functions of the TI-36 calculator.
+ * Each function corresponds to a button on the calculator and manipulates the display labels accordingly.
+ */
 class Ti36Functions(val labels: DisplayLabelsInterface) {
 
     fun hyp() {
@@ -62,27 +66,13 @@ class Ti36Functions(val labels: DisplayLabelsInterface) {
     fun sqrtX() {}
     fun divide() {}
     fun sumPlus() {}
-    fun eE() {}
     fun leftParentheses() {}
     fun rightParentheses() {}
     fun multiply() {}
     fun store() {}
-    fun seven() {}
-    fun eight() {}
-    fun nine() {}
     fun minus() {}
     fun recall() {}
-    fun four() {}
-    fun five() {}
-    fun six() {}
     fun plus() {}
     fun aBC() {}
-    fun one() {}
-    fun two() {}
-    fun three() {}
     fun equal() {}
-    fun back() {}
-    fun zero() {}
-    fun dot() {}
-    fun plusMinus() {}
 }

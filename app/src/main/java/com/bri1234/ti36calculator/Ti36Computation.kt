@@ -4,6 +4,7 @@ import kotlin.text.get
 import kotlin.text.set
 
 private const val REGISTER_COUNT = 32
+private const val OPERATION_COUNT = 256
 
 private enum class Operation {
     NONE,
@@ -20,7 +21,7 @@ class Ti36Computation {
 
     private val registerArray: Array<Double> = Array(REGISTER_COUNT) { 0.0 }
     private var registerIndex: Int = 0
-    private val operationArray: Array<Operation> = Array(REGISTER_COUNT) { Operation.NONE }
+    private val operationArray: Array<Operation> = Array(OPERATION_COUNT) { Operation.NONE }
     private var operationIndex: Int = 0
 
     fun reset() {

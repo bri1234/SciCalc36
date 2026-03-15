@@ -5,15 +5,20 @@ package com.bri1234.ti36calculator
  */
 class Ti36Simulator {
 
-    private val inputOutput = Ti36InputOutput()
-    private val functions = Ti36Functions(inputOutput)
+    private val display = Ti36Display()
+    private val input = Ti36Input(display)
+    private val output = Ti36Output(display)
+    private val functions = Ti36Functions(display)
     private val computation = Ti36Computation()
 
-    fun getDisplayState(): CalculatorDisplayState = inputOutput.getDisplayState()
+    fun getDisplayState(): CalculatorDisplayState = display.getDisplayState()
 
     init {
         buttonPressedAcOn()
         // viewAll()
+
+        input.onEditInputChanged += { onEditInputChanged() }
+        output.onPrint += { onPrint() }
     }
 
     fun buttonPressed(button: CalculatorButton) {
@@ -24,8 +29,8 @@ class Ti36Simulator {
 
             else -> {
                 when {
-                    inputOutput.isSecondFunctionActive() -> buttonSecondFunction(button)
-                    inputOutput.isThirdFunctionActive() -> buttonThirdFunction(button)
+                    display.isSecondFunctionActive() -> buttonSecondFunction(button)
+                    display.isThirdFunctionActive() -> buttonThirdFunction(button)
                     else -> buttonFirstFunction(button)
                 }
             }
@@ -49,29 +54,29 @@ class Ti36Simulator {
             CalculatorButton.SQRT_X -> functions.sqrtX()
             CalculatorButton.DIVIDE -> functions.divide()
             CalculatorButton.SUM_PLUS -> functions.sumPlus()
-            CalculatorButton.EE -> functions.eE()
+            CalculatorButton.EE -> input.enterExponentEditMode()
             CalculatorButton.LEFT_PARENTHESES -> functions.leftParentheses()
             CalculatorButton.RIGHT_PARENTHESES -> functions.rightParentheses()
             CalculatorButton.MULTIPLY -> functions.multiply()
             CalculatorButton.STORE -> functions.store()
-            CalculatorButton.SEVEN -> functions.seven()
-            CalculatorButton.EIGHT -> functions.eight()
-            CalculatorButton.NINE -> functions.nine()
+            CalculatorButton.SEVEN -> input.inputDigit(7)
+            CalculatorButton.EIGHT -> input.inputDigit(8)
+            CalculatorButton.NINE -> input.inputDigit(9)
             CalculatorButton.MINUS -> functions.minus()
             CalculatorButton.RECALL -> functions.recall()
-            CalculatorButton.FOUR -> functions.four()
-            CalculatorButton.FIVE -> functions.five()
-            CalculatorButton.SIX -> functions.six()
+            CalculatorButton.FOUR -> input.inputDigit(4)
+            CalculatorButton.FIVE -> input.inputDigit(5)
+            CalculatorButton.SIX -> input.inputDigit(6)
             CalculatorButton.PLUS -> functions.plus()
             CalculatorButton.A_B_C -> functions.aBC()
-            CalculatorButton.ONE -> functions.one()
-            CalculatorButton.TWO -> functions.two()
-            CalculatorButton.THREE -> functions.three()
+            CalculatorButton.ONE -> input.inputDigit(1)
+            CalculatorButton.TWO -> input.inputDigit(2)
+            CalculatorButton.THREE -> input.inputDigit(3)
             CalculatorButton.EQUAL -> functions.equal()
-            CalculatorButton.BACK -> functions.back()
-            CalculatorButton.ZERO -> functions.zero()
-            CalculatorButton.DOT -> functions.dot()
-            CalculatorButton.PLUS_MINUS -> functions.plusMinus()
+            CalculatorButton.BACK -> input.inputBack()
+            CalculatorButton.ZERO -> input.inputDigit(0)
+            CalculatorButton.DOT -> input.inputDecimalPoint()
+            CalculatorButton.PLUS_MINUS -> input.inputPlusMinus()
             else -> {
                 // do nothing
             }
@@ -79,7 +84,7 @@ class Ti36Simulator {
     }
 
     private fun buttonSecondFunction(button : CalculatorButton) {
-        inputOutput.removeLabel(DisplayLabels.SECOND)
+        display.removeLabel(DisplayLabels.SECOND)
 
         when (button) {
             CalculatorButton.HYP -> functions.cycleAngleUnit(false)
@@ -90,7 +95,7 @@ class Ti36Simulator {
     }
 
     private fun buttonThirdFunction(button : CalculatorButton) {
-        inputOutput.removeLabel(DisplayLabels.THIRD)
+        display.removeLabel(DisplayLabels.THIRD)
 
         when (button) {
             CalculatorButton.HYP -> functions.cycleAngleUnit(true)
@@ -102,30 +107,41 @@ class Ti36Simulator {
 
     fun buttonPressedAcOn() {
         computation.reset()
-        inputOutput.reset()
-        inputOutput.printValue(computation.getValue())
+        display.reset()
+        input.reset()
+        output.reset()
+
+        output.printValue(computation.getValue())
     }
 
     fun buttonPressedThird() {
-        inputOutput.removeLabel(DisplayLabels.SECOND)
+        display.removeLabel(DisplayLabels.SECOND)
 
-        if (inputOutput.hasLabel(DisplayLabels.THIRD)) {
-            inputOutput.removeLabel(DisplayLabels.THIRD)
+        if (display.hasLabel(DisplayLabels.THIRD)) {
+            display.removeLabel(DisplayLabels.THIRD)
         } else {
-            inputOutput.addLabel(DisplayLabels.THIRD)
+            display.addLabel(DisplayLabels.THIRD)
         }
     }
 
     fun buttonPressedSecond() {
-        inputOutput.removeLabel(DisplayLabels.THIRD)
+        display.removeLabel(DisplayLabels.THIRD)
 
-        if (inputOutput.hasLabel(DisplayLabels.SECOND)) {
-            inputOutput.removeLabel(DisplayLabels.SECOND)
+        if (display.hasLabel(DisplayLabels.SECOND)) {
+            display.removeLabel(DisplayLabels.SECOND)
         } else {
-            inputOutput.addLabel(DisplayLabels.SECOND)
+            display.addLabel(DisplayLabels.SECOND)
         }
     }
 
+    private fun onEditInputChanged() {
+        val inputValue = display.convertDisplayValueToNumeric()
+        computation.setValue(inputValue)
+    }
+
+    private fun onPrint() {
+        input.endEditMode()
+    }
 
 }
 
