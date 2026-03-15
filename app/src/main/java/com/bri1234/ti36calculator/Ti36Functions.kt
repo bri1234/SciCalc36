@@ -6,7 +6,12 @@ import com.bri1234.ti36calculator.contracts.DisplayLabelsInterface
  * A class representing the functions of the TI-36 calculator.
  * Each function corresponds to a button on the calculator and manipulates the display labels accordingly.
  */
-class Ti36Functions(val labels: DisplayLabelsInterface) {
+class Ti36Functions(val labels: DisplayLabelsInterface,
+    val computation: Ti36Computation) {
+
+    private fun setError() {
+
+    }
 
     fun hyp() {
         if (labels.hasLabel(DisplayLabels.HYP))
@@ -52,12 +57,38 @@ class Ti36Functions(val labels: DisplayLabelsInterface) {
         }
     }
 
+    fun pi() {
+        computation.setResult(Math.PI)
+    }
+
     fun log() {}
     fun ln() {}
     fun ceC() {}
 
-    fun sin() {}
-    fun cos() {}
+    fun sin() {
+        val value = computation.getValue()
+        val result = when {
+            labels.hasLabel(DisplayLabels.HYP) -> Math.sinh(value)
+            labels.hasLabel(DisplayLabels.DEG) -> Math.sin(Math.toRadians(value))
+            labels.hasLabel(DisplayLabels.RAD) -> Math.sin(value)
+            labels.hasLabel(DisplayLabels.GRAD) -> Math.sin(Math.toRadians(value * 0.9))
+            else -> throw IllegalStateException("sin(): No angle unit label found")
+        }
+        computation.setResult(result)
+    }
+
+    fun cos() {
+        val value = computation.getValue()
+        val result = when {
+            labels.hasLabel(DisplayLabels.HYP) -> Math.cosh(value)
+            labels.hasLabel(DisplayLabels.DEG) -> Math.cos(Math.toRadians(value))
+            labels.hasLabel(DisplayLabels.RAD) -> Math.cos(value)
+            labels.hasLabel(DisplayLabels.GRAD) -> Math.cos(Math.toRadians(value * 0.9))
+            else -> throw IllegalStateException("cos(): No angle unit label found")
+        }
+        computation.setResult(result)
+    }
+
     fun tan() {}
     fun yPowX() {}
     fun xSwapY() {}

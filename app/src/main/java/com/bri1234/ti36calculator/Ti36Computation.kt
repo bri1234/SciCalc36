@@ -1,5 +1,6 @@
 package com.bri1234.ti36calculator
 
+import com.bri1234.ti36calculator.utils.ObserverSubject
 import kotlin.text.get
 import kotlin.text.set
 
@@ -18,6 +19,8 @@ private enum class Operation {
 }
 
 class Ti36Computation {
+
+    val onResultChanged: ObserverSubject<Double> = ObserverSubject()
 
     private val registerArray: Array<Double> = Array(REGISTER_COUNT) { 0.0 }
     private var registerIndex: Int = 0
@@ -39,6 +42,9 @@ class Ti36Computation {
         registerArray[registerIndex] = newValue
     }
 
-
+    fun setResult(newValue: Double) {
+        setValue(newValue)
+        onResultChanged(newValue)
+    }
 
 }

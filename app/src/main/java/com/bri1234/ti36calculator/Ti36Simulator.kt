@@ -8,8 +8,8 @@ class Ti36Simulator {
     private val display = Ti36Display()
     private val input = Ti36Input(display)
     private val output = Ti36Output(display)
-    private val functions = Ti36Functions(display)
     private val computation = Ti36Computation()
+    private val functions = Ti36Functions(display, computation)
 
     fun getDisplayState(): CalculatorDisplayState = display.getDisplayState()
 
@@ -19,6 +19,7 @@ class Ti36Simulator {
 
         input.onEditInputChanged += { onEditInputChanged() }
         output.onPrint += { onPrint() }
+        computation.onResultChanged += { value -> onResultChanged(value) }
     }
 
     fun buttonPressed(button: CalculatorButton) {
@@ -105,7 +106,7 @@ class Ti36Simulator {
         }
     }
 
-    fun buttonPressedAcOn() {
+    private fun buttonPressedAcOn() {
         computation.reset()
         display.reset()
         input.reset()
@@ -114,7 +115,7 @@ class Ti36Simulator {
         output.printValue(computation.getValue())
     }
 
-    fun buttonPressedThird() {
+    private fun buttonPressedThird() {
         display.removeLabel(DisplayLabels.SECOND)
 
         if (display.hasLabel(DisplayLabels.THIRD)) {
@@ -124,7 +125,7 @@ class Ti36Simulator {
         }
     }
 
-    fun buttonPressedSecond() {
+    private fun buttonPressedSecond() {
         display.removeLabel(DisplayLabels.THIRD)
 
         if (display.hasLabel(DisplayLabels.SECOND)) {
@@ -141,6 +142,10 @@ class Ti36Simulator {
 
     private fun onPrint() {
         input.endEditMode()
+    }
+
+    private fun onResultChanged(value : Double) {
+        output.printValue(value)
     }
 
 }
