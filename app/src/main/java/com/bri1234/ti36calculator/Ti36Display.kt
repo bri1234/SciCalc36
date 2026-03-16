@@ -1,21 +1,21 @@
 package com.bri1234.ti36calculator
 
-import com.bri1234.ti36calculator.contracts.DisplayLabelsInterface
+import com.bri1234.ti36calculator.contracts.CalculatorStateInterface
 
 const val NUM_MANTISSA_DIGITS = 11
 const val NUM_EXPONENT_DIGITS = 3
 
-class Ti36Display : DisplayLabelsInterface {
+class Ti36Display : CalculatorStateInterface {
 
     val mantissa = CharArray(NUM_MANTISSA_DIGITS) { ' ' }
     var decimalPointPos: Int = -1
     val exponent = CharArray(NUM_EXPONENT_DIGITS) { ' ' }
 
-    private val labels: MutableSet<DisplayLabels> = mutableSetOf()
+    private val labels: MutableSet<CalculatorState> = mutableSetOf()
 
-    fun getDisplayState(): CalculatorDisplayState {
+    fun getDisplayState(): CalculatorDisplayData {
         // Return a dummy display state for now
-        return CalculatorDisplayState(
+        return CalculatorDisplayData(
             digitsLarge = mantissa.copyOf(),
             decimalPointIndex = decimalPointPos,
             digitsSmall = exponent.copyOf(),
@@ -29,7 +29,7 @@ class Ti36Display : DisplayLabelsInterface {
      */
     fun reset() {
         labels.clear()
-        labels.add(DisplayLabels.DEG)
+        labels.add(CalculatorState.DEG)
 
         mantissa.fill(' ')
         decimalPointPos = -1
@@ -65,35 +65,35 @@ class Ti36Display : DisplayLabelsInterface {
      * Checks if the second function is active.
      * @return true if the second function is active, false otherwise.
      */
-    override fun isSecondFunctionActive() = DisplayLabels.SECOND in labels
+    override fun isSecondFunctionActive() = CalculatorState.SECOND in labels
 
     /**
      * Checks if the third function is active.
      * @return true if the third function is active, false otherwise.
      */
-    override fun isThirdFunctionActive() = DisplayLabels.THIRD in labels
+    override fun isThirdFunctionActive() = CalculatorState.THIRD in labels
 
     /**
      * Checks if a specific label is active on the display.
-     * @param label The label to check for.
+     * @param state The label to check for.
      * @return true if the label is active, false otherwise.
      */
-    override fun hasLabel(label: DisplayLabels) = label in labels
+    override fun hasState(state: CalculatorState) = state in labels
 
     /**
      * Adds a label to the display.
-     * @param label The label to add.
+     * @param state The label to add.
      */
-    override fun addLabel(label: DisplayLabels) {
-        labels.add(label)
+    override fun addState(state: CalculatorState) {
+        labels.add(state)
     }
 
     /**
      * Removes a label from the display.
-     * @param label The label to remove.
+     * @param state The label to remove.
      */
-    override fun removeLabel(label: DisplayLabels) {
-        labels.remove(label)
+    override fun removeState(state: CalculatorState) {
+        labels.remove(state)
     }
 
     override fun printNotImplemented() {

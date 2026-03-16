@@ -1,11 +1,11 @@
 package com.bri1234.ti36calculator.contracts
 
-import com.bri1234.ti36calculator.DisplayLabels
+import com.bri1234.ti36calculator.CalculatorState
 
 /**
  * An interface for managing display labels on the calculator.
  */
-interface DisplayLabelsInterface {
+interface CalculatorStateInterface {
 
     /**
      * Checks if the second function is active.
@@ -21,22 +21,22 @@ interface DisplayLabelsInterface {
 
     /**
      * Checks if a specific label is active on the display.
-     * @param label The label to check for.
+     * @param state The label to check for.
      * @return true if the label is active, false otherwise.
      */
-    fun hasLabel(label: DisplayLabels) : Boolean
+    fun hasState(state: CalculatorState) : Boolean
 
     /**
      * Adds a label to the display.
-     * @param label The label to add.
+     * @param state The label to add.
      */
-    fun addLabel(label: DisplayLabels)
+    fun addState(state: CalculatorState)
 
     /**
     * Removes a label from the display.
-    * @param label The label to remove.
+    * @param state The label to remove.
     */
-    fun removeLabel(label: DisplayLabels)
+    fun removeState(state: CalculatorState)
 
     fun printNotImplemented()
 }

@@ -1,6 +1,6 @@
 package com.bri1234.ti36calculator
 
-import com.bri1234.ti36calculator.contracts.DisplayLabelsInterface
+import com.bri1234.ti36calculator.contracts.CalculatorStateInterface
 import kotlin.math.*
 import kotlin.math.pow
 
@@ -8,44 +8,44 @@ import kotlin.math.pow
  * A class representing the functions of the TI-36 calculator.
  * Each function corresponds to a button on the calculator and manipulates the display labels accordingly.
  */
-class Ti36Functions(val labels: DisplayLabelsInterface,
-    val computation: Ti36Computation) {
+class Ti36Functions(val labels: CalculatorStateInterface,
+                    val computation: Ti36Computation) {
 
     fun hyp() {
-        if (labels.hasLabel(DisplayLabels.HYP))
-            labels.removeLabel(DisplayLabels.HYP)
+        if (labels.hasState(CalculatorState.HYP))
+            labels.removeState(CalculatorState.HYP)
         else if (
-            !labels.hasLabel(DisplayLabels.BIN) &&
-            !labels.hasLabel(DisplayLabels.OCT) &&
-            !labels.hasLabel(DisplayLabels.HEX)
+            !labels.hasState(CalculatorState.BIN) &&
+            !labels.hasState(CalculatorState.OCT) &&
+            !labels.hasState(CalculatorState.HEX)
         ) {
-            labels.addLabel(DisplayLabels.HYP)
+            labels.addState(CalculatorState.HYP)
         }
     }
 
     fun cycleAngleUnit(convert: Boolean) {
         when {
-            labels.hasLabel(DisplayLabels.DEG) -> {
-                labels.removeLabel(DisplayLabels.DEG)
-                labels.addLabel(DisplayLabels.RAD)
+            labels.hasState(CalculatorState.DEG) -> {
+                labels.removeState(CalculatorState.DEG)
+                labels.addState(CalculatorState.RAD)
 
                 if (convert) {
                     val value = computation.getValue()
                     computation.setResult(value * Math.PI / 180)
                 }
             }
-            labels.hasLabel(DisplayLabels.RAD) -> {
-                labels.removeLabel(DisplayLabels.RAD)
-                labels.addLabel(DisplayLabels.GRAD)
+            labels.hasState(CalculatorState.RAD) -> {
+                labels.removeState(CalculatorState.RAD)
+                labels.addState(CalculatorState.GRAD)
 
                 if (convert) {
                     val value = computation.getValue()
                     computation.setResult(value * 200 / Math.PI)
                 }
             }
-            labels.hasLabel(DisplayLabels.GRAD) -> {
-                labels.removeLabel(DisplayLabels.GRAD)
-                labels.addLabel(DisplayLabels.DEG)
+            labels.hasState(CalculatorState.GRAD) -> {
+                labels.removeState(CalculatorState.GRAD)
+                labels.addState(CalculatorState.DEG)
 
                 if (convert) {
                     val value = computation.getValue()
@@ -84,10 +84,10 @@ class Ti36Functions(val labels: DisplayLabelsInterface,
     fun sin() {
         val value = computation.getValue()
         val result = when {
-            labels.hasLabel(DisplayLabels.HYP) -> sinh(value)
-            labels.hasLabel(DisplayLabels.DEG) -> sin(Math.toRadians(value))
-            labels.hasLabel(DisplayLabels.RAD) -> sin(value)
-            labels.hasLabel(DisplayLabels.GRAD) -> sin(Math.toRadians(value * 0.9))
+            labels.hasState(CalculatorState.HYP) -> sinh(value)
+            labels.hasState(CalculatorState.DEG) -> sin(Math.toRadians(value))
+            labels.hasState(CalculatorState.RAD) -> sin(value)
+            labels.hasState(CalculatorState.GRAD) -> sin(Math.toRadians(value * 0.9))
             else -> throw IllegalStateException("sin(): No angle unit label found")
         }
         computation.setResult(result)
@@ -96,10 +96,10 @@ class Ti36Functions(val labels: DisplayLabelsInterface,
     fun cos() {
         val value = computation.getValue()
         val result = when {
-            labels.hasLabel(DisplayLabels.HYP) -> cosh(value)
-            labels.hasLabel(DisplayLabels.DEG) -> cos(Math.toRadians(value))
-            labels.hasLabel(DisplayLabels.RAD) -> cos(value)
-            labels.hasLabel(DisplayLabels.GRAD) -> cos(Math.toRadians(value * 0.9))
+            labels.hasState(CalculatorState.HYP) -> cosh(value)
+            labels.hasState(CalculatorState.DEG) -> cos(Math.toRadians(value))
+            labels.hasState(CalculatorState.RAD) -> cos(value)
+            labels.hasState(CalculatorState.GRAD) -> cos(Math.toRadians(value * 0.9))
             else -> throw IllegalStateException("cos(): No angle unit label found")
         }
         computation.setResult(result)
@@ -108,10 +108,10 @@ class Ti36Functions(val labels: DisplayLabelsInterface,
     fun tan() {
         val value = computation.getValue()
         val result = when {
-            labels.hasLabel(DisplayLabels.HYP) -> tanh(value)
-            labels.hasLabel(DisplayLabels.DEG) -> tan(Math.toRadians(value))
-            labels.hasLabel(DisplayLabels.RAD) -> tan(value)
-            labels.hasLabel(DisplayLabels.GRAD) -> tan(Math.toRadians(value * 0.9))
+            labels.hasState(CalculatorState.HYP) -> tanh(value)
+            labels.hasState(CalculatorState.DEG) -> tan(Math.toRadians(value))
+            labels.hasState(CalculatorState.RAD) -> tan(value)
+            labels.hasState(CalculatorState.GRAD) -> tan(Math.toRadians(value * 0.9))
             else -> throw IllegalStateException("tan(): No angle unit label found")
         }
         computation.setResult(result)

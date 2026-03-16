@@ -17,12 +17,12 @@ import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.platform.LocalDensity
-import com.bri1234.ti36calculator.CalculatorDisplayState
-import com.bri1234.ti36calculator.DisplayLabels
+import com.bri1234.ti36calculator.CalculatorDisplayData
+import com.bri1234.ti36calculator.CalculatorState
 
 @Composable
 fun CalculatorDisplayView(
-    calculatorDisplayState: CalculatorDisplayState,
+    calculatorDisplayData: CalculatorDisplayData,
     modifier: Modifier = Modifier
 ) {
     val textMeasurer = rememberTextMeasurer()
@@ -52,9 +52,9 @@ fun CalculatorDisplayView(
 
         drawSunkenFrame(5.dp.toPx())
 
-        drawDisplayLabels(calculatorDisplayState.displayLabels, textMeasurer, 8.dp.toPx())
+        drawDisplayLabels(calculatorDisplayData.displayLabels, textMeasurer, 8.dp.toPx())
 
-        drawDigits(calculatorDisplayState,
+        drawDigits(calculatorDisplayData,
             segmentsLargePath, segmentsSmallPath, segmentsLargeSizeX, segmentsSmallSizeSmallX, 8.dp.toPx())
     }
 
@@ -131,23 +131,39 @@ private fun DrawScope.drawSunkenFrame(thickness: Float) {
 }
 
 /**
- * List of labels to be displayed on the calculator display, such as "2nd", "3rd", "BIN", etc.
+ * List of labels to be displayed on the calculator display at the bottom, such as "2nd", "3rd", "BIN", etc.
+ * These labels are drawn at the bottom of the display and are spaced evenly across the width of the display.
+ */
+private val displayLabelsTop = listOf(
+    CalculatorState.CONST,
+    CalculatorState.STORE,
+    CalculatorState.RECALL,
+    CalculatorState.MEM_SUM,
+    CalculatorState.MEM_EXCHANGE,
+    CalculatorState.FLO,
+    CalculatorState.SCI,
+    CalculatorState.ENG,
+    CalculatorState.FIX,
+)
+
+/**
+ * List of labels to be displayed on the calculator display at the bottom, such as "2nd", "3rd", "BIN", etc.
  * These labels are drawn at the bottom of the display and are spaced evenly across the width of the display.
  */
 private val displayLabelsBottom = listOf(
-    DisplayLabels.SECOND,
-    DisplayLabels.THIRD,
-    DisplayLabels.HYP,
-    DisplayLabels.BIN,
-    DisplayLabels.OCT,
-    DisplayLabels.HEX,
-    DisplayLabels.STAT,
-    DisplayLabels.DEG,
-    DisplayLabels.RAD,
-    DisplayLabels.GRAD,
-    DisplayLabels.X,
-    DisplayLabels.R,
-    DisplayLabels.PARENTHESES
+    CalculatorState.SECOND,
+    CalculatorState.THIRD,
+    CalculatorState.HYP,
+    CalculatorState.BIN,
+    CalculatorState.OCT,
+    CalculatorState.HEX,
+    CalculatorState.STAT1,
+    CalculatorState.DEG,
+    CalculatorState.RAD,
+    CalculatorState.GRAD,
+    CalculatorState.X,
+    CalculatorState.R,
+    CalculatorState.PARENTHESES
 )
 
 /**
@@ -156,7 +172,7 @@ private val displayLabelsBottom = listOf(
  * @param textMeasurer The TextMeasurer used to measure the text for each label and calculate the layout.
  * @param frameThickness The thickness of the sunken frame, used to calculate the starting position for the labels.
  */
-private fun DrawScope.drawDisplayLabels(displayLabels: Set<DisplayLabels>,
+private fun DrawScope.drawDisplayLabels(displayLabels: Set<CalculatorState>,
                                         textMeasurer: TextMeasurer, frameThickness: Float) {
     val textStyle = TextStyle(
         color = Color.Black,
@@ -186,8 +202,8 @@ private fun DrawScope.drawDisplayLabels(displayLabels: Set<DisplayLabels>,
     }
 
     // display label left (M)
-    if (DisplayLabels.M in displayLabels) {
-        val textLayoutResult = textMeasurer.measure(AnnotatedString(DisplayLabels.M.caption), textStyle)
+    if (CalculatorState.M in displayLabels) {
+        val textLayoutResult = textMeasurer.measure(AnnotatedString(CalculatorState.M.caption), textStyle)
         drawText(
             textLayoutResult = textLayoutResult,
             topLeft = Offset(10.dp.toPx(), 45.dp.toPx())
@@ -205,7 +221,7 @@ private fun DrawScope.drawDisplayLabels(displayLabels: Set<DisplayLabels>,
  * @param segmentsSmallSizeSmallX The width of the small segments, used to calculate spacing between digits.
  * @param frameWidth The thickness of the sunken frame, used to calculate the starting position for drawing the digits.
  */
-private fun DrawScope.drawDigits(calculatorDisplayData: CalculatorDisplayState,
+private fun DrawScope.drawDigits(calculatorDisplayData: CalculatorDisplayData,
                                  segmentsLargePath: List<Path>, segmentsSmallPath: List<Path>,
                                  segmentsLargeSizeX: Float, segmentsSmallSizeSmallX: Float,
                                  frameWidth: Float) {

@@ -4,7 +4,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.bri1234.ti36calculator.CalculatorButton
-import com.bri1234.ti36calculator.CalculatorDisplayState
+import com.bri1234.ti36calculator.CalculatorDisplayData
 import com.bri1234.ti36calculator.Ti36Simulator
 
 /**
@@ -14,8 +14,8 @@ import com.bri1234.ti36calculator.Ti36Simulator
 class CalculatorViewModel(
     val simulator: Ti36Simulator = Ti36Simulator()
 ) : ViewModel() {
-    private val _displayState = mutableStateOf(CalculatorDisplayState())
-    val displayState: State<CalculatorDisplayState> = _displayState
+    private val _displayState = mutableStateOf(CalculatorDisplayData())
+    val displayState: State<CalculatorDisplayData> = _displayState
 
     init {
         updateDisplayState()

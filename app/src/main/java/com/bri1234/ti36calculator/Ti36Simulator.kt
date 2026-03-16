@@ -15,7 +15,9 @@ class Ti36Simulator {
 
     private var isErrorState: Boolean = false
 
-    fun getDisplayState(): CalculatorDisplayState = display.getDisplayState()
+    private var constModeWasSet: Boolean = false
+
+    fun getDisplayState(): CalculatorDisplayData = display.getDisplayState()
 
     init {
         buttonPressedAcOn()
@@ -35,6 +37,8 @@ class Ti36Simulator {
             return
         }
 
+        constModeWasSet = false
+
         try {
             when (button) {
                 CalculatorButton.AC_ON -> buttonPressedAcOn()
@@ -50,6 +54,11 @@ class Ti36Simulator {
                 }
 
             }
+
+            if (!constModeWasSet) {
+                display.removeState(CalculatorState.CONST)
+            }
+
         } catch (e: Exception) {
             Log.e("Ti36Simulator", "Error during button press", e)
             isErrorState = true
@@ -59,6 +68,12 @@ class Ti36Simulator {
     }
 
     private fun buttonFirstFunction(button : CalculatorButton) {
+
+        if (display.hasState(CalculatorState.CONST)) {
+            if (constantSet(button))
+                return
+        }
+
         when (button) {
             CalculatorButton.HYP -> functions.hyp()
             CalculatorButton.LOG -> functions.log()
@@ -104,7 +119,7 @@ class Ti36Simulator {
     }
 
     private fun buttonSecondFunction(button : CalculatorButton) {
-        display.removeLabel(DisplayLabels.SECOND)
+        display.removeState(CalculatorState.SECOND)
 
         when (button) {
             CalculatorButton.HYP -> functions.cycleAngleUnit(false)
@@ -150,14 +165,14 @@ class Ti36Simulator {
         }
     }
 
-    private fun buttonThirdFunction(button : CalculatorButton) {
-        display.removeLabel(DisplayLabels.THIRD)
+    private fun buttonThirdFunction(button : CalculatorButton)  {
+        display.removeState(CalculatorState.THIRD)
 
         when (button) {
             CalculatorButton.HYP -> functions.notImplemented()
             CalculatorButton.LOG -> functions.notImplemented()
             CalculatorButton.LN -> functions.notImplemented()
-            CalculatorButton.CE_C -> functions.notImplemented()
+            CalculatorButton.CE_C -> buttonPressedConst()
             CalculatorButton.SIN -> functions.notImplemented()
             CalculatorButton.COS -> functions.notImplemented()
             CalculatorButton.TAN -> functions.notImplemented()
@@ -199,6 +214,7 @@ class Ti36Simulator {
 
     private fun buttonPressedAcOn() {
         isErrorState = false
+        constModeWasSet = false
 
         computation.reset()
         display.reset()
@@ -209,22 +225,50 @@ class Ti36Simulator {
     }
 
     private fun buttonPressedThird() {
-        display.removeLabel(DisplayLabels.SECOND)
+        display.removeState(CalculatorState.SECOND)
 
-        if (display.hasLabel(DisplayLabels.THIRD)) {
-            display.removeLabel(DisplayLabels.THIRD)
+        if (display.hasState(CalculatorState.THIRD)) {
+            display.removeState(CalculatorState.THIRD)
         } else {
-            display.addLabel(DisplayLabels.THIRD)
+            display.addState(CalculatorState.THIRD)
         }
     }
 
     private fun buttonPressedSecond() {
-        display.removeLabel(DisplayLabels.THIRD)
+        display.removeState(CalculatorState.THIRD)
 
-        if (display.hasLabel(DisplayLabels.SECOND)) {
-            display.removeLabel(DisplayLabels.SECOND)
+        if (display.hasState(CalculatorState.SECOND)) {
+            display.removeState(CalculatorState.SECOND)
         } else {
-            display.addLabel(DisplayLabels.SECOND)
+            display.addState(CalculatorState.SECOND)
+        }
+    }
+
+    private fun buttonPressedConst() {
+        display.addState(CalculatorState.CONST)
+        constModeWasSet = true
+    }
+
+    private fun constantSet(button : CalculatorButton): Boolean {
+
+        try {
+
+            val constant = when (button) {
+                CalculatorButton.SIN -> 299792458.0 // speed of light in m/s
+                CalculatorButton.COS -> 9.80665 // standard gravity in m/s^2
+                CalculatorButton.TAN -> 9.1093837139E-31 // electron mass in kg
+                CalculatorButton.Y_POW_X -> 1.602176634E-19 // electron charge in coulombs
+                CalculatorButton.ONE_DIV_X -> 6.62607015E-34 // Planck constant in J * s
+                CalculatorButton.X_SQUARED -> 6.02214076E23 // Avogadro's number in mol^-1
+                CalculatorButton.SQRT_X -> 8.31446261815324 // gas constant in J/(mol*K)
+                CalculatorButton.DIVIDE -> 6.6743015E-11 // gravitational constant in m^3/(kg*s^2)
+                else -> throw IllegalArgumentException("Invalid button for constant mode")
+            }
+            computation.setResult(constant)
+            return true
+
+        } catch (_: Exception) {
+            return false
         }
     }
 

@@ -8,17 +8,17 @@ package com.bri1234.ti36calculator
  * @property digitsSmall An array of characters representing the small digits on the display.
  * @property displayLabels A set of labels that are currently displayed (e.g., "M", "E", "A", etc.).
  */
-data class CalculatorDisplayState (
+data class CalculatorDisplayData (
     val digitsLarge: CharArray = charArrayOf(' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '0'),
     val decimalPointIndex: Int = 10,
     val digitsSmall: CharArray = charArrayOf(' ', ' ', ' '),
-    val displayLabels: Set<DisplayLabels> = setOf(DisplayLabels.DEG),
+    val displayLabels: Set<CalculatorState> = setOf(CalculatorState.DEG),
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
 
-        other as CalculatorDisplayState
+        other as CalculatorDisplayData
 
         if (decimalPointIndex != other.decimalPointIndex) return false
         if (!digitsLarge.contentEquals(other.digitsLarge)) return false
