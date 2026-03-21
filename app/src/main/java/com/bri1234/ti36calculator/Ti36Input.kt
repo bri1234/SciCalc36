@@ -87,6 +87,9 @@ class Ti36Input(val display: Ti36Display) {
         if (isEditExponent || (display.decimalPointPos != -1))
             return
 
+        if (inputPositionMantissa == NUM_MANTISSA_DIGITS - 1)
+            inputDigit(0)
+
         display.decimalPointPos = NUM_MANTISSA_DIGITS - 1
 
         onEditInputChanged(Unit)

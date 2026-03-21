@@ -70,7 +70,7 @@ class Ti36Simulator {
     private fun buttonFirstFunction(button : CalculatorButton) {
 
         if (display.hasState(CalculatorState.CONST)) {
-            if (constantSet(button))
+            if (insertConstant(button))
                 return
         }
 
@@ -125,7 +125,7 @@ class Ti36Simulator {
             CalculatorButton.HYP -> functions.cycleAngleUnit(false)
             CalculatorButton.LOG -> functions.tenPowX()
             CalculatorButton.LN -> functions.exp()
-            CalculatorButton.CE_C -> functions.notImplemented()
+            CalculatorButton.CE_C -> selectNumberFormat(DisplayNumberFormat.FIX)
             CalculatorButton.SIN -> functions.notImplemented()
             CalculatorButton.COS -> functions.notImplemented()
             CalculatorButton.TAN -> functions.notImplemented()
@@ -183,10 +183,10 @@ class Ti36Simulator {
             CalculatorButton.SQRT_X -> functions.notImplemented()
             CalculatorButton.DIVIDE -> functions.pi()
             CalculatorButton.SUM_PLUS -> functions.notImplemented()
-            CalculatorButton.EE -> functions.notImplemented()
-            CalculatorButton.LEFT_PARENTHESES -> functions.notImplemented()
-            CalculatorButton.RIGHT_PARENTHESES -> functions.notImplemented()
-            CalculatorButton.MULTIPLY -> functions.notImplemented()
+            CalculatorButton.EE -> selectNumberFormat(DisplayNumberFormat.DECIMAL)
+            CalculatorButton.LEFT_PARENTHESES -> selectNumberFormat(DisplayNumberFormat.HEXADECIMAL)
+            CalculatorButton.RIGHT_PARENTHESES -> selectNumberFormat(DisplayNumberFormat.OCTAL)
+            CalculatorButton.MULTIPLY -> selectNumberFormat(DisplayNumberFormat.BINARY)
             CalculatorButton.STORE -> functions.notImplemented()
             CalculatorButton.SEVEN -> functions.notImplemented()
             CalculatorButton.EIGHT -> functions.notImplemented()
@@ -194,9 +194,9 @@ class Ti36Simulator {
             CalculatorButton.MINUS -> functions.notImplemented()
             CalculatorButton.RECALL -> functions.notImplemented()
             CalculatorButton.FOUR -> functions.notImplemented()
-            CalculatorButton.FIVE -> functions.notImplemented()
-            CalculatorButton.SIX -> functions.notImplemented()
-            CalculatorButton.PLUS -> functions.notImplemented()
+            CalculatorButton.FIVE -> selectNumberFormat(DisplayNumberFormat.FLOAT)
+            CalculatorButton.SIX -> selectNumberFormat(DisplayNumberFormat.SCIENTIFIC)
+            CalculatorButton.PLUS -> selectNumberFormat(DisplayNumberFormat.ENGINEERING)
             CalculatorButton.A_B_C -> functions.notImplemented()
             CalculatorButton.ONE -> functions.notImplemented()
             CalculatorButton.TWO -> functions.notImplemented()
@@ -249,14 +249,14 @@ class Ti36Simulator {
         constModeWasSet = true
     }
 
-    private fun constantSet(button : CalculatorButton): Boolean {
+    private fun insertConstant(button : CalculatorButton): Boolean {
 
         try {
 
             val constant = when (button) {
                 CalculatorButton.SIN -> 299792458.0 // speed of light in m/s
                 CalculatorButton.COS -> 9.80665 // standard gravity in m/s^2
-                CalculatorButton.TAN -> 9.1093837139E-31 // electron mass in kg
+                CalculatorButton.TAN -> 9.109383713928E-31 // electron mass in kg
                 CalculatorButton.Y_POW_X -> 1.602176634E-19 // electron charge in coulombs
                 CalculatorButton.ONE_DIV_X -> 6.62607015E-34 // Planck constant in J * s
                 CalculatorButton.X_SQUARED -> 6.02214076E23 // Avogadro's number in mol^-1
@@ -270,6 +270,11 @@ class Ti36Simulator {
         } catch (_: Exception) {
             return false
         }
+    }
+
+    private fun selectNumberFormat(numberFormat: DisplayNumberFormat) {
+        output.setNumberFormat(numberFormat)
+        output.printValue(computation.getValue())
     }
 
     private fun onEditInputChanged() {
