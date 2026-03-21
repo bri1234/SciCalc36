@@ -105,7 +105,7 @@ class Ti36Simulator {
             CalculatorButton.X_SWAP_Y -> functions.xSwapY()
             CalculatorButton.ONE_DIV_X -> functions.oneDivX()
             CalculatorButton.X_SQUARED -> functions.xSquared()
-            CalculatorButton.SQRT_X -> functions.sqrtX()
+            CalculatorButton.SQRT_X -> functions.squareRootX()
             CalculatorButton.DIVIDE -> functions.divide()
             CalculatorButton.SUM_PLUS -> functions.sumPlus()
             CalculatorButton.EE -> input.enterExponentEditMode()
@@ -130,7 +130,7 @@ class Ti36Simulator {
             CalculatorButton.BACK -> input.inputBack()
             CalculatorButton.ZERO -> input.inputDigit(0)
             CalculatorButton.DOT -> input.inputDecimalPoint()
-            CalculatorButton.PLUS_MINUS -> input.inputPlusMinus()
+            CalculatorButton.PLUS_MINUS -> functionPlusMinus()
             else -> {
                 // do nothing
             }
@@ -189,8 +189,8 @@ class Ti36Simulator {
 
         when (button) {
             CalculatorButton.HYP -> functions.cycleAngleUnit(true)
-            CalculatorButton.LOG -> functions.notImplemented()
-            CalculatorButton.LN -> functions.notImplemented()
+            CalculatorButton.LOG -> functions.factorial()
+            CalculatorButton.LN -> functions.thirdRootX()
             CalculatorButton.CE_C -> buttonPressedConst()
             CalculatorButton.SIN -> functions.notImplemented()
             CalculatorButton.COS -> functions.notImplemented()
@@ -322,6 +322,13 @@ class Ti36Simulator {
         output.printValue(computation.getValue())
     }
 
+    private fun functionPlusMinus() {
+        if (input.isEditMode) {
+            input.inputPlusMinus()
+        } else {
+            functions.negate()
+        }
+    }
     private fun onEditInputChanged() {
         val inputValue = display.convertDisplayValueToNumeric()
         computation.setValue(inputValue)

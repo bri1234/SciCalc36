@@ -6,7 +6,9 @@ class Ti36Input(val display: Ti36Display) {
 
     val onEditInputChanged: ObserverSubject<Unit> = ObserverSubject()
 
-    private var isEditMode: Boolean = false
+    var isEditMode: Boolean = false
+        private set
+
     private var isEditExponent: Boolean = false
     private var inputPositionMantissa: Int = 0
 

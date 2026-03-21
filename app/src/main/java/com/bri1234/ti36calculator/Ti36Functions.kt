@@ -213,12 +213,45 @@ class Ti36Functions(val labels: CalculatorStateInterface,
         computation.setResult(result)
     }
 
-    fun sqrtX() {
+    fun squareRootX() {
         val value = computation.getValue()
         if (value <= 0.0)
             throw IllegalArgumentException("sqrt(): Input value must be greater than 0")
 
         val result = sqrt(value)
+        computation.setResult(result)
+    }
+
+    fun negate() {
+        val value = computation.getValue()
+        val result = -value
+        computation.setResult(result)
+    }
+
+    fun thirdRootX() {
+        val value = computation.getValue()
+        val result = cbrt(value)
+        computation.setResult(result)
+    }
+
+    fun factorial() {
+        val value = computation.getValue()
+        val intValue = round(value).toInt()
+
+        if (abs(value - intValue) > 1E-12)
+            throw IllegalArgumentException("factorial(): Input value must be an integer")
+
+        if ((intValue < 0) || (intValue > 69))
+            throw IllegalArgumentException("factorial(): Input value must be in the range [0, 69]")
+
+        val result = if (intValue == 0) 1.0 else {
+            var res = 1.0
+            for (i in 1..intValue) {
+                res *= i
+            }
+            res
+        }
+
         computation.setResult(result)
     }
 
