@@ -6,7 +6,7 @@ package com.bri1234.ti36calculator
  * @property caption The text caption for the label as it should appear on the display.
  */
 enum class CalculatorState(val caption: String) {
-    M("M"),
+    MEMORY("M"),
     SECOND("2nd"),
     THIRD("3rd"),
     HYP("HYP"),
@@ -21,11 +21,6 @@ enum class CalculatorState(val caption: String) {
     X("x"),
     R("r"),
     PARENTHESES("()"),
-    CONST("CONST"),
-    STORE("STO"),
-    RECALL("RCL"),
-    MEM_EXCHANGE("EXC"),
-    MEM_SUM("SUM"),
     FLO("FLO"),
     SCI("SCI"),
     ENG("ENG"),

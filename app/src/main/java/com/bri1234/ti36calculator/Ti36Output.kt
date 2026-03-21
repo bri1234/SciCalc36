@@ -54,8 +54,8 @@ class Ti36Output(val display: Ti36Display) {
             DisplayNumberFormat.FLOAT,
             DisplayNumberFormat.SCIENTIFIC,
             DisplayNumberFormat.ENGINEERING,
+            DisplayNumberFormat.FIX,
             DisplayNumberFormat.DECIMAL -> printValueFloat(value)
-            DisplayNumberFormat.FIX -> printValueFix(value)
             DisplayNumberFormat.OCTAL -> printValueOct(value)
             DisplayNumberFormat.HEXADECIMAL -> printValueHex(value)
             DisplayNumberFormat.BINARY -> printValueBin(value)
@@ -71,9 +71,6 @@ class Ti36Output(val display: Ti36Display) {
     }
 
     private fun printValueBin(value: Double) {
-    }
-
-    private fun printValueFix(value: Double) {
     }
 
     private fun printValueFloat(value: Double) {

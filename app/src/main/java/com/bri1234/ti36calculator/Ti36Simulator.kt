@@ -13,9 +13,14 @@ class Ti36Simulator {
     private val computation = Ti36Computation()
     private val functions = Ti36Functions(display, computation)
 
+    private val memory = Ti36Memory(computation)
+
     private var isErrorState: Boolean = false
 
-    private var constModeWasSet: Boolean = false
+    private var modeConst: Boolean = false
+    private var modeConstWasSet: Boolean = false
+    private var modeMemory: MemoryOperation = MemoryOperation.NONE
+    private var modeMemoryWasSet: Boolean = false
 
     fun getDisplayState(): CalculatorDisplayData = display.getDisplayState()
 
@@ -26,6 +31,21 @@ class Ti36Simulator {
         input.onEditInputChanged += { onEditInputChanged() }
         output.onPrint += { onPrint() }
         computation.onResultChanged += { value -> onResultChanged(value) }
+        memory.onContentChanged += { hasContent -> onMemoryContentChanged(hasContent) }
+    }
+
+    fun reset() {
+        isErrorState = false
+        modeConst = false
+        modeConstWasSet = false
+        modeMemory = MemoryOperation.NONE
+        modeMemoryWasSet = false
+
+        computation.reset()
+        display.reset()
+        input.reset()
+        output.reset()
+        memory.reset()
     }
 
     fun buttonPressed(button: CalculatorButton) {
@@ -37,7 +57,8 @@ class Ti36Simulator {
             return
         }
 
-        constModeWasSet = false
+        modeConstWasSet = false
+        modeMemoryWasSet = false
 
         try {
             when (button) {
@@ -47,17 +68,21 @@ class Ti36Simulator {
 
                 else -> {
                     when {
-                        display.isSecondFunctionActive() -> buttonSecondFunction(button)
-                        display.isThirdFunctionActive() -> buttonThirdFunction(button)
-                        else -> buttonFirstFunction(button)
+                        modeConst -> modeConstant(button)
+                        modeMemory != MemoryOperation.NONE -> modeMemory(button)
+                        display.isSecondFunctionActive() -> modeSecondFunction(button)
+                        display.isThirdFunctionActive() -> modeThirdFunction(button)
+                        else -> modeFirstFunction(button)
                     }
                 }
 
             }
 
-            if (!constModeWasSet) {
-                display.removeState(CalculatorState.CONST)
-            }
+            if (!modeConstWasSet)
+                modeConst = false
+
+            if (!modeMemoryWasSet)
+                modeMemory = MemoryOperation.NONE
 
         } catch (e: Exception) {
             Log.e("Ti36Simulator", "Error during button press", e)
@@ -67,13 +92,7 @@ class Ti36Simulator {
 
     }
 
-    private fun buttonFirstFunction(button : CalculatorButton) {
-
-        if (display.hasState(CalculatorState.CONST)) {
-            if (insertConstant(button))
-                return
-        }
-
+    private fun modeFirstFunction(button : CalculatorButton) {
         when (button) {
             CalculatorButton.HYP -> functions.hyp()
             CalculatorButton.LOG -> functions.log()
@@ -93,12 +112,12 @@ class Ti36Simulator {
             CalculatorButton.LEFT_PARENTHESES -> functions.leftParentheses()
             CalculatorButton.RIGHT_PARENTHESES -> functions.rightParentheses()
             CalculatorButton.MULTIPLY -> functions.multiply()
-            CalculatorButton.STORE -> functions.store()
+            CalculatorButton.STORE -> buttonPressedMemory(MemoryOperation.STORE)
             CalculatorButton.SEVEN -> input.inputDigit(7)
             CalculatorButton.EIGHT -> input.inputDigit(8)
             CalculatorButton.NINE -> input.inputDigit(9)
             CalculatorButton.MINUS -> functions.minus()
-            CalculatorButton.RECALL -> functions.recall()
+            CalculatorButton.RECALL -> buttonPressedMemory(MemoryOperation.RECALL)
             CalculatorButton.FOUR -> input.inputDigit(4)
             CalculatorButton.FIVE -> input.inputDigit(5)
             CalculatorButton.SIX -> input.inputDigit(6)
@@ -118,7 +137,7 @@ class Ti36Simulator {
         }
     }
 
-    private fun buttonSecondFunction(button : CalculatorButton) {
+    private fun modeSecondFunction(button : CalculatorButton) {
         display.removeState(CalculatorState.SECOND)
 
         when (button) {
@@ -126,10 +145,10 @@ class Ti36Simulator {
             CalculatorButton.LOG -> functions.tenPowX()
             CalculatorButton.LN -> functions.exp()
             CalculatorButton.CE_C -> selectNumberFormat(DisplayNumberFormat.FIX)
-            CalculatorButton.SIN -> functions.notImplemented()
-            CalculatorButton.COS -> functions.notImplemented()
-            CalculatorButton.TAN -> functions.notImplemented()
-            CalculatorButton.Y_POW_X -> functions.notImplemented()
+            CalculatorButton.SIN -> functions.asin()
+            CalculatorButton.COS -> functions.acos()
+            CalculatorButton.TAN -> functions.atan()
+            CalculatorButton.Y_POW_X -> functions.yRootX()
             CalculatorButton.X_SWAP_Y -> functions.notImplemented()
             CalculatorButton.ONE_DIV_X -> functions.notImplemented()
             CalculatorButton.X_SQUARED -> functions.notImplemented()
@@ -145,7 +164,7 @@ class Ti36Simulator {
             CalculatorButton.EIGHT -> functions.notImplemented()
             CalculatorButton.NINE -> functions.notImplemented()
             CalculatorButton.MINUS -> functions.notImplemented()
-            CalculatorButton.RECALL -> functions.notImplemented()
+            CalculatorButton.RECALL -> buttonPressedMemory(MemoryOperation.SUM)
             CalculatorButton.FOUR -> functions.notImplemented()
             CalculatorButton.FIVE -> functions.notImplemented()
             CalculatorButton.SIX -> functions.notImplemented()
@@ -165,11 +184,11 @@ class Ti36Simulator {
         }
     }
 
-    private fun buttonThirdFunction(button : CalculatorButton)  {
+    private fun modeThirdFunction(button : CalculatorButton)  {
         display.removeState(CalculatorState.THIRD)
 
         when (button) {
-            CalculatorButton.HYP -> functions.notImplemented()
+            CalculatorButton.HYP -> functions.cycleAngleUnit(true)
             CalculatorButton.LOG -> functions.notImplemented()
             CalculatorButton.LN -> functions.notImplemented()
             CalculatorButton.CE_C -> buttonPressedConst()
@@ -192,7 +211,7 @@ class Ti36Simulator {
             CalculatorButton.EIGHT -> functions.notImplemented()
             CalculatorButton.NINE -> functions.notImplemented()
             CalculatorButton.MINUS -> functions.notImplemented()
-            CalculatorButton.RECALL -> functions.notImplemented()
+            CalculatorButton.RECALL -> buttonPressedMemory(MemoryOperation.EXCHANGE)
             CalculatorButton.FOUR -> functions.notImplemented()
             CalculatorButton.FIVE -> selectNumberFormat(DisplayNumberFormat.FLOAT)
             CalculatorButton.SIX -> selectNumberFormat(DisplayNumberFormat.SCIENTIFIC)
@@ -213,14 +232,7 @@ class Ti36Simulator {
     }
 
     private fun buttonPressedAcOn() {
-        isErrorState = false
-        constModeWasSet = false
-
-        computation.reset()
-        display.reset()
-        input.reset()
-        output.reset()
-
+        reset()
         output.printValue(computation.getValue())
     }
 
@@ -245,11 +257,17 @@ class Ti36Simulator {
     }
 
     private fun buttonPressedConst() {
-        display.addState(CalculatorState.CONST)
-        constModeWasSet = true
+        modeConst = true
+        modeConstWasSet = true
     }
 
-    private fun insertConstant(button : CalculatorButton): Boolean {
+    private fun buttonPressedMemory(memoryOperation: MemoryOperation) {
+        modeMemory = memoryOperation
+        modeMemoryWasSet = true
+        output.printValue(computation.getValue())
+    }
+
+    private fun modeConstant(button : CalculatorButton): Boolean {
 
         try {
 
@@ -265,6 +283,33 @@ class Ti36Simulator {
                 else -> throw IllegalArgumentException("Invalid button for constant mode")
             }
             computation.setResult(constant)
+            return true
+
+        } catch (_: Exception) {
+            return false
+        }
+    }
+
+    private fun modeMemory(button : CalculatorButton): Boolean {
+
+        try {
+
+            val memoryCell = when (button) {
+                CalculatorButton.ZERO -> 0
+                CalculatorButton.ONE -> 1
+                CalculatorButton.TWO -> 2
+                CalculatorButton.THREE -> 3
+                CalculatorButton.FOUR -> 4
+                CalculatorButton.FIVE -> 5
+                CalculatorButton.SIX -> 6
+                CalculatorButton.SEVEN -> 7
+                CalculatorButton.EIGHT -> 8
+                CalculatorButton.NINE -> 9
+                else -> throw IllegalArgumentException("Invalid button for memory mode")
+            }
+
+            memory.performOperation(modeMemory, memoryCell)
+
             return true
 
         } catch (_: Exception) {
@@ -288,6 +333,14 @@ class Ti36Simulator {
 
     private fun onResultChanged(value : Double) {
         output.printValue(value)
+    }
+
+    private fun onMemoryContentChanged(hasContent : Boolean) {
+        if (hasContent) {
+            display.addState(CalculatorState.MEMORY)
+        } else {
+            display.removeState(CalculatorState.MEMORY)
+        }
     }
 
 }

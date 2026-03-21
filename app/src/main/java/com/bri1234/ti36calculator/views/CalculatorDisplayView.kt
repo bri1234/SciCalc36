@@ -135,11 +135,6 @@ private fun DrawScope.drawSunkenFrame(thickness: Float) {
  * These labels are drawn at the bottom of the display and are spaced evenly across the width of the display.
  */
 private val displayLabelsTop = listOf(
-    CalculatorState.CONST,
-    CalculatorState.STORE,
-    CalculatorState.RECALL,
-    CalculatorState.MEM_SUM,
-    CalculatorState.MEM_EXCHANGE,
     CalculatorState.FLO,
     CalculatorState.SCI,
     CalculatorState.ENG,
@@ -202,8 +197,8 @@ private fun DrawScope.drawDisplayLabels(displayLabels: Set<CalculatorState>,
     }
 
     // display label left (M)
-    if (CalculatorState.M in displayLabels) {
-        val textLayoutResult = textMeasurer.measure(AnnotatedString(CalculatorState.M.caption), textStyle)
+    if (CalculatorState.MEMORY in displayLabels) {
+        val textLayoutResult = textMeasurer.measure(AnnotatedString(CalculatorState.MEMORY.caption), textStyle)
         drawText(
             textLayoutResult = textLayoutResult,
             topLeft = Offset(10.dp.toPx(), 45.dp.toPx())
