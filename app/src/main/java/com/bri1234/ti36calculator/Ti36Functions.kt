@@ -77,10 +77,6 @@ class Ti36Functions(val labels: CalculatorStateInterface,
         computation.setResult(result)
     }
 
-    fun ceC() {
-        notImplemented()
-    }
-
     fun sin() {
         val value = computation.getValue()
         val result = when {
@@ -186,18 +182,6 @@ class Ti36Functions(val labels: CalculatorStateInterface,
         computation.setResult(result)
     }
 
-    fun yPowX() {
-        notImplemented()
-    }
-
-    fun yRootX() {
-        notImplemented()
-    }
-
-    fun xSwapY() {
-        notImplemented()
-    }
-
     fun oneDivX() {
         val value = computation.getValue()
         if (value == 0.0)
@@ -255,42 +239,6 @@ class Ti36Functions(val labels: CalculatorStateInterface,
         computation.setResult(result)
     }
 
-    fun divide() {
-        notImplemented()
-    }
-
-    fun sumPlus() {
-        notImplemented()
-    }
-
-    fun leftParentheses() {
-        notImplemented()
-    }
-
-    fun rightParentheses() {
-        notImplemented()
-    }
-
-    fun multiply() {
-        notImplemented()
-    }
-
-    fun minus() {
-        notImplemented()
-    }
-
-    fun plus() {
-        notImplemented()
-    }
-
-    fun aBC() {
-        notImplemented()
-    }
-
-    fun equal() {
-        notImplemented()
-    }
-
     fun exp() {
         val value = computation.getValue()
         val result = exp(value)
@@ -303,7 +251,70 @@ class Ti36Functions(val labels: CalculatorStateInterface,
         computation.setResult(result)
     }
 
-    fun notImplemented() {
-        labels.printNotImplemented()
+    fun bitwiseNot() {
+        val value = computation.getValue()
+        val result = round(value).toLong().inv()
+        computation.setResult(result.toDouble())
     }
+
+    fun convertCmToInch() {
+        val value = computation.getValue()
+        val result = value / 2.54
+        computation.setResult(result)
+    }
+
+    fun convertLiterToGallon() {
+        val value = computation.getValue()
+        val result = value / 3.785411784
+        computation.setResult(result)
+    }
+
+    fun convertKgToPound() {
+        val value = computation.getValue()
+        val result = value / 0.45359237
+        computation.setResult(result)
+    }
+
+    fun convertGramToOunce() {
+        val value = computation.getValue()
+        val result = value / 28.349523125
+        computation.setResult(result)
+    }
+
+    fun convertCelsiusToFahrenheit() {
+        val value = computation.getValue()
+        val result = value * 9.0 / 5.0 + 32.0
+        computation.setResult(result)
+    }
+
+    fun convertInchToCm() {
+        val value = computation.getValue()
+        val result = value * 2.54
+        computation.setResult(result)
+    }
+
+    fun convertGallonToLiter() {
+        val value = computation.getValue()
+        val result = value * 3.785411784
+        computation.setResult(result)
+    }
+
+    fun convertPoundToKg() {
+        val value = computation.getValue()
+        val result = value * 0.45359237
+        computation.setResult(result)
+    }
+
+    fun convertFahrenheitToCelsius() {
+        val value = computation.getValue()
+        val result = (value - 32.0) * 5.0 / 9.0
+        computation.setResult(result)
+    }
+
+    fun convertOunceToGram() {
+        val value = computation.getValue()
+        val result = value * 28.349523125
+        computation.setResult(result)
+    }
+
 }
