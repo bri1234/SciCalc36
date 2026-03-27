@@ -5,6 +5,8 @@ import com.bri1234.ti36calculator.utils.ObserverSubject
 class Ti36Input(val display: Ti36Display) {
 
     val onEditInputChanged: ObserverSubject<Unit> = ObserverSubject()
+    val onEditModeBegin: ObserverSubject<Unit> = ObserverSubject()
+    val onEditModeEnd: ObserverSubject<Unit> = ObserverSubject()
 
     var isEditMode: Boolean = false
         private set
@@ -32,6 +34,8 @@ class Ti36Input(val display: Ti36Display) {
         "          0".toCharArray().copyInto(display.mantissa)
         display.decimalPointPos = -1
         display.exponent.fill(' ')
+
+        onEditModeBegin(Unit)
     }
 
     /**
@@ -41,6 +45,8 @@ class Ti36Input(val display: Ti36Display) {
         isEditMode = false
         isEditExponent = false
         inputPositionMantissa = -1
+
+        onEditModeEnd(Unit)
     }
 
     /**

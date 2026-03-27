@@ -74,15 +74,18 @@ class Ti36Output(val display: Ti36Display) {
     }
 
     private fun printValueFloat(value: Double) {
+        // TODO: rounding error because of output string is longer than the number of
+        //  digits in the mantissa.
+
         // convert the number to a string depending on the display format
         val formatStr = when (displayNumberFormat) {
             DisplayNumberFormat.FLOAT, DisplayNumberFormat.DECIMAL -> {
                 if (abs(value) >= 1E10 || (value != 0.0 && abs(value) <= 1E-7))
-                    "% .14e"
+                    "% .10e"
                 else
-                    "% .14f"
+                    "% .9f"
             }
-            DisplayNumberFormat.SCIENTIFIC, DisplayNumberFormat.ENGINEERING -> "% .14e"
+            DisplayNumberFormat.SCIENTIFIC, DisplayNumberFormat.ENGINEERING -> "% .10e"
             DisplayNumberFormat.FIX -> "% .3f"
             else -> throw IllegalStateException("Invalid number format for float display")
         }

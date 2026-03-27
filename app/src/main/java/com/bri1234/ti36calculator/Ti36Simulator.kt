@@ -29,6 +29,7 @@ class Ti36Simulator {
         // viewAll()
 
         input.onEditInputChanged += { onEditInputChanged() }
+        input.onEditModeBegin += { onEditModeBegin() }
         output.onPrint += { onPrint() }
         computation.onResultChanged += { value -> onResultChanged(value) }
         memory.onContentChanged += { hasContent -> onMemoryContentChanged(hasContent) }
@@ -126,7 +127,7 @@ class Ti36Simulator {
             CalculatorButton.ONE -> input.inputDigit(1)
             CalculatorButton.TWO -> input.inputDigit(2)
             CalculatorButton.THREE -> input.inputDigit(3)
-            CalculatorButton.EQUAL -> computation.operation(Operation.EVALUATE)
+            CalculatorButton.EQUAL -> computation.evaluateAll()
             CalculatorButton.BACK -> input.inputBack()
             CalculatorButton.ZERO -> input.inputDigit(0)
             CalculatorButton.DOT -> input.inputDecimalPoint()
@@ -333,9 +334,14 @@ class Ti36Simulator {
             functions.negate()
         }
     }
+
     private fun onEditInputChanged() {
         val inputValue = display.convertDisplayValueToNumeric()
         computation.setValue(inputValue)
+    }
+
+    private fun onEditModeBegin() {
+        computation.enterNewNumber()
     }
 
     private fun onPrint() {
