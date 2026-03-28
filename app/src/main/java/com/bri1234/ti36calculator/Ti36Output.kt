@@ -65,12 +65,32 @@ class Ti36Output(val display: Ti36Display) {
     }
 
     private fun printValueOct(value: Double) {
+        printInteger(value, 8)
     }
 
     private fun printValueHex(value: Double) {
+        printInteger(value, 16)
     }
 
     private fun printValueBin(value: Double) {
+        printInteger(value, 2)
+    }
+
+    private fun printInteger(value: Double, radix: Int) {
+        // TODO: handle negative numbers two's complement representation
+
+        var valueStr = value.toLong().toString(radix).uppercase(Locale.ROOT)
+        if (valueStr.length >= NUM_MANTISSA_DIGITS)
+            throw IllegalArgumentException("Value is too large to display in base $radix")
+
+        // right align mantissa
+        valueStr = valueStr.padStart(NUM_MANTISSA_DIGITS, ' ')
+
+        // copy the mantissa and exponent characters to the display
+        valueStr.toCharArray().copyInto(display.mantissa)
+
+        display.exponent.fill(' ')
+        display.decimalPointPos = -1
     }
 
     private fun printValueFloat(value: Double) {

@@ -55,8 +55,8 @@ class Ti36Display : CalculatorStateInterface {
             mantissaStr = mantissaStr.replaceRange(pos, pos, ".")
         }
 
-        val mantissa = mantissaStr.toDoubleOrNull() ?: 0.0
-        val exponent = exponentStr.toIntOrNull() ?: 0
+        val mantissa = mantissaStr.trim().toDoubleOrNull() ?: 0.0
+        val exponent = exponentStr.trim().toIntOrNull() ?: 0
 
         return mantissa * Math.pow(10.0, exponent.toDouble())
     }
