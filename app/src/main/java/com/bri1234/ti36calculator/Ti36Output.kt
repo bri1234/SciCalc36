@@ -2,12 +2,8 @@ package com.bri1234.ti36calculator
 
 import kotlin.math.abs
 import kotlin.math.floor
-import kotlin.math.log10
 import com.bri1234.ti36calculator.utils.ObserverSubject
-import java.math.BigDecimal
 import java.util.Locale
-import kotlin.math.roundToInt
-import kotlin.toString
 
 enum class DisplayNumberFormat {
     FLOAT,
@@ -64,24 +60,33 @@ class Ti36Output(val display: Ti36Display) {
         onPrint(Unit)
     }
 
+    private fun printValueBin(value: Double) {
+        printInteger(value, 2, 10)
+    }
+
     private fun printValueOct(value: Double) {
-        printInteger(value, 8)
+        printInteger(value, 8, 30)
     }
 
     private fun printValueHex(value: Double) {
-        printInteger(value, 16)
+        printInteger(value, 16, 40)
     }
 
-    private fun printValueBin(value: Double) {
-        printInteger(value, 2)
-    }
+    private fun printInteger(value : Double, radix : Int, numBits : Int) {
+        val maxVal = 1L shl numBits
+        var valueInt = value.toLong()
 
-    private fun printInteger(value: Double, radix: Int) {
-        // TODO: handle negative numbers two's complement representation
+        if ((value > (maxVal / 2 - 1)) || (value < -(maxVal / 2)))
+            throw IllegalArgumentException("Value is too large to display as hexadecimal in radix $radix with $numBits bits")
 
-        var valueStr = value.toLong().toString(radix).uppercase(Locale.ROOT)
+        if (valueInt < 0)
+            valueInt += maxVal
+
+        check(valueInt >= 0)
+
+        var valueStr = valueInt.toString(radix).uppercase(Locale.ROOT)
         if (valueStr.length >= NUM_MANTISSA_DIGITS)
-            throw IllegalArgumentException("Value is too large to display in base $radix")
+            throw IllegalArgumentException("Value is too large to display as integer")
 
         // right align mantissa
         valueStr = valueStr.padStart(NUM_MANTISSA_DIGITS, ' ')
