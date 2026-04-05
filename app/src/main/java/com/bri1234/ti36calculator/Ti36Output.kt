@@ -1,9 +1,12 @@
 package com.bri1234.ti36calculator
 
-import kotlin.math.abs
-import kotlin.math.floor
 import com.bri1234.ti36calculator.utils.ObserverSubject
 import java.util.Locale
+import kotlin.math.abs
+import kotlin.math.ceil
+import kotlin.math.floor
+import kotlin.math.log10
+import kotlin.math.pow
 
 enum class DisplayNumberFormat {
     FLOAT,
@@ -48,16 +51,22 @@ class Ti36Output(val display: Ti36Display) {
 
         when (displayNumberFormat) {
             DisplayNumberFormat.FLOAT,
-            DisplayNumberFormat.SCIENTIFIC,
-            DisplayNumberFormat.ENGINEERING,
-            DisplayNumberFormat.FIX,
             DisplayNumberFormat.DECIMAL -> printValueFloat(value)
+            DisplayNumberFormat.SCIENTIFIC -> printValueScientific(value)
+            DisplayNumberFormat.ENGINEERING -> printValueEngineering(value)
             DisplayNumberFormat.OCTAL -> printValueOct(value)
             DisplayNumberFormat.HEXADECIMAL -> printValueHex(value)
             DisplayNumberFormat.BINARY -> printValueBin(value)
+            DisplayNumberFormat.FIX -> printValueFix(value)
         }
 
         onPrint(Unit)
+    }
+
+    private fun printValueFix(value: Double) {
+        display.mantissa.fill('-')
+        display.exponent.fill(' ')
+        display.decimalPointPos = -1
     }
 
     private fun printValueBin(value: Double) {
@@ -98,36 +107,24 @@ class Ti36Output(val display: Ti36Display) {
         display.decimalPointPos = -1
     }
 
-    private fun printValueFloat(value: Double) {
-        // TODO: rounding error because of output string is longer than the number of
-        //  digits in the mantissa.
+    private fun getExponent(value: Double): Int {
+        return if (value == 0.0) 0 else floor(log10(abs(value))).toInt()
+    }
 
-        // convert the number to a string depending on the display format
-        val formatStr = when (displayNumberFormat) {
-            DisplayNumberFormat.FLOAT, DisplayNumberFormat.DECIMAL -> {
-                if (abs(value) >= 1E10 || (value != 0.0 && abs(value) <= 1E-7))
-                    "% .10e"
-                else
-                    "% .9f"
-            }
-            DisplayNumberFormat.SCIENTIFIC, DisplayNumberFormat.ENGINEERING -> "% .10e"
-            DisplayNumberFormat.FIX -> "% .3f"
-            else -> throw IllegalStateException("Invalid number format for float display")
-        }
+    private fun printMantissa(mantissa : Double) {
+        val mantissaExponent = getExponent(mantissa)
+        val numDigitsBeforeDecimal = if (mantissaExponent >= 0) mantissaExponent + 1 else 1
+        val numDigitsAfterDecimal = (NUM_MANTISSA_DIGITS - 1) - numDigitsBeforeDecimal
+        val formatStr = "% .${numDigitsAfterDecimal}f"
+        var valueStr = String.format(Locale.ROOT, formatStr, mantissa)
 
-        var valueStr = String.format(Locale.ROOT, formatStr, value)
-
-        // get exponent
-        val exponentPos = valueStr.indexOf('e')
-        var exponentValue = 0
-        if (exponentPos != -1) {
-            exponentValue = valueStr.substring(exponentPos + 1).toInt()
-            valueStr = valueStr.removeRange(exponentPos, valueStr.length)
-        }
+        check(valueStr[0] == '-' || valueStr[0] == ' ')
 
         // find decimal point
         val decimalPointPos = valueStr.indexOf('.')
         if (decimalPointPos != -1) {
+            check(valueStr.length <= NUM_MANTISSA_DIGITS + 1)
+
             // remove trailing zeros after the decimal point
             var idx = valueStr.length - 1
             while (idx > decimalPointPos && valueStr[idx] == '0')
@@ -138,23 +135,9 @@ class Ti36Output(val display: Ti36Display) {
             display.decimalPointPos = decimalPointPos - 1
             valueStr = valueStr.removeRange(decimalPointPos, decimalPointPos + 1)
         } else {
+            check(valueStr.length <= NUM_MANTISSA_DIGITS)
+
             display.decimalPointPos = valueStr.length - 1
-        }
-
-        check(display.decimalPointPos < NUM_MANTISSA_DIGITS)
-
-        // adjust exponent for engineering notation
-        if (displayNumberFormat == DisplayNumberFormat.ENGINEERING) {
-            if (exponentValue % 3 != 0) {
-                val newExponentValue = floor(exponentValue / 3.0).toInt() * 3
-                check(newExponentValue < exponentValue)
-
-                display.decimalPointPos += (exponentValue - newExponentValue)
-                while (valueStr.length <= display.decimalPointPos)
-                    valueStr = valueStr + '0'
-
-                exponentValue = newExponentValue
-            }
         }
 
         check(display.decimalPointPos < NUM_MANTISSA_DIGITS)
@@ -167,26 +150,54 @@ class Ti36Output(val display: Ti36Display) {
         }
 
         check(display.decimalPointPos < NUM_MANTISSA_DIGITS)
-
-        if (valueStr.length > NUM_MANTISSA_DIGITS)
-            valueStr = valueStr.substring(0, NUM_MANTISSA_DIGITS)
+        check(valueStr.length == NUM_MANTISSA_DIGITS)
 
         // copy the mantissa and exponent characters to the display
         valueStr.toCharArray().copyInto(display.mantissa)
+    }
 
-        if (displayNumberFormat == DisplayNumberFormat.ENGINEERING
-            || displayNumberFormat == DisplayNumberFormat.SCIENTIFIC
-            || exponentValue != 0) {
+    private fun printExponent(exponent: Int) {
+        var exponentStr = String.format(Locale.ROOT, "%02d", abs(exponent))
+        exponentStr = if (exponent < 0) "-$exponentStr" else " $exponentStr"
 
-            var exponentStr = String.format(Locale.ROOT, "%02d", abs(exponentValue))
-            exponentStr = if (exponentValue < 0) "-$exponentStr" else " $exponentStr"
+        check(exponentStr.length == NUM_EXPONENT_DIGITS)
+        exponentStr.toCharArray().copyInto(display.exponent)
+    }
 
-            check(exponentStr.length == NUM_EXPONENT_DIGITS)
-            exponentStr.toCharArray().copyInto(display.exponent)
+    private fun printValueFloat(value: Double) {
+        if ((abs(value) >= 1E10) || (value != 0.0 && abs(value) < 1E-7)) {
+            printValueScientific(value)
+            return
         }
-        else {
-            display.exponent.fill(' ')
+
+        printMantissa(value)
+        display.exponent.fill(' ')
+    }
+
+    private fun printValueScientific(value: Double) {
+
+        val exponent = getExponent(value)
+        val mantissa =  value / 10.0.pow(exponent.toDouble())
+
+        printMantissa(mantissa)
+        printExponent(exponent)
+    }
+
+    private fun printValueEngineering(value: Double) {
+
+        var exponent = getExponent(value)
+
+        if (exponent < 0) {
+            val e = abs(exponent) % 3
+            exponent -= if (e == 0) 0 else (3 - e)
+        } else {
+            exponent -= exponent % 3
         }
+
+        val mantissa =  value / 10.0.pow(exponent.toDouble())
+
+        printMantissa(mantissa)
+        printExponent(exponent)
     }
 
     /**
