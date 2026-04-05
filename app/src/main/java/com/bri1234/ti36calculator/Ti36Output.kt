@@ -3,7 +3,6 @@ package com.bri1234.ti36calculator
 import com.bri1234.ti36calculator.utils.ObserverSubject
 import java.util.Locale
 import kotlin.math.abs
-import kotlin.math.ceil
 import kotlin.math.floor
 import kotlin.math.log10
 import kotlin.math.pow
@@ -12,7 +11,6 @@ enum class DisplayNumberFormat {
     FLOAT,
     SCIENTIFIC,
     ENGINEERING,
-    FIX,
     DECIMAL,
     OCTAL,
     HEXADECIMAL,
@@ -21,12 +19,26 @@ enum class DisplayNumberFormat {
 
 class Ti36Output(val display: Ti36Display) {
 
+    /** An observer subject that is triggered whenever a value is printed to the display.
+     * */
     val onPrint: ObserverSubject<Unit> = ObserverSubject()
 
+    /** Number of digits after decimal point if fix point notation is used.
+     * If negative, it means that the number format is not fixed point.
+     */
+    var numberOfDigitsAfterDecimalPoint: Int = -1
+
+    /** The current number format for displaying values. The default is FLOAT, which is the
+     * standard format for the TI-36.
+     */
     private var displayNumberFormat: DisplayNumberFormat = DisplayNumberFormat.FLOAT
 
+    /**
+     * Resets the number format to FLOAT.
+     */
     fun reset() {
         displayNumberFormat = DisplayNumberFormat.FLOAT
+        numberOfDigitsAfterDecimalPoint = -1
     }
 
     /**
@@ -50,25 +62,20 @@ class Ti36Output(val display: Ti36Display) {
             throw IllegalArgumentException("Value is out of range for display")
 
         when (displayNumberFormat) {
-            DisplayNumberFormat.FLOAT,
-            DisplayNumberFormat.DECIMAL -> printValueFloat(value)
+            DisplayNumberFormat.FLOAT -> printValueFloat(value)
+            DisplayNumberFormat.DECIMAL -> printValueDecimal(value)
             DisplayNumberFormat.SCIENTIFIC -> printValueScientific(value)
             DisplayNumberFormat.ENGINEERING -> printValueEngineering(value)
             DisplayNumberFormat.OCTAL -> printValueOct(value)
             DisplayNumberFormat.HEXADECIMAL -> printValueHex(value)
             DisplayNumberFormat.BINARY -> printValueBin(value)
-            DisplayNumberFormat.FIX -> printValueFix(value)
         }
 
         onPrint(Unit)
     }
 
-    private fun printValueFix(value: Double) {
-        display.mantissa.fill('-')
-        display.exponent.fill(' ')
-        display.decimalPointPos = -1
-    }
-
+    /** Prints a double value in binary format with radix 2 and 10 bits for the integer part.
+     * The value is treated as a signed integer, so it can represent values from -512 to 511. */
     private fun printValueBin(value: Double) {
         printInteger(value, 2, 10)
     }
@@ -114,7 +121,11 @@ class Ti36Output(val display: Ti36Display) {
     private fun printMantissa(mantissa : Double) {
         val mantissaExponent = getExponent(mantissa)
         val numDigitsBeforeDecimal = if (mantissaExponent >= 0) mantissaExponent + 1 else 1
-        val numDigitsAfterDecimal = (NUM_MANTISSA_DIGITS - 1) - numDigitsBeforeDecimal
+        var numDigitsAfterDecimal = (NUM_MANTISSA_DIGITS - 1) - numDigitsBeforeDecimal
+
+        if ((numberOfDigitsAfterDecimalPoint >= 0) && (numDigitsAfterDecimal > numberOfDigitsAfterDecimalPoint))
+            numDigitsAfterDecimal = numberOfDigitsAfterDecimalPoint
+
         val formatStr = "% .${numDigitsAfterDecimal}f"
         var valueStr = String.format(Locale.ROOT, formatStr, mantissa)
 
@@ -125,13 +136,16 @@ class Ti36Output(val display: Ti36Display) {
         if (decimalPointPos != -1) {
             check(valueStr.length <= NUM_MANTISSA_DIGITS + 1)
 
-            // remove trailing zeros after the decimal point
-            var idx = valueStr.length - 1
-            while (idx > decimalPointPos && valueStr[idx] == '0')
-                idx--
+            if (numberOfDigitsAfterDecimalPoint < 0) {
+                // remove trailing zeros after the decimal point
+                var idx = valueStr.length - 1
+                while (idx > decimalPointPos && valueStr[idx] == '0')
+                    idx--
 
-            valueStr = valueStr.removeRange(idx + 1, valueStr.length)
+                valueStr = valueStr.removeRange(idx + 1, valueStr.length)
+            }
 
+            // remove the decimal point and record its position
             display.decimalPointPos = decimalPointPos - 1
             valueStr = valueStr.removeRange(decimalPointPos, decimalPointPos + 1)
         } else {
@@ -164,6 +178,9 @@ class Ti36Output(val display: Ti36Display) {
         exponentStr.toCharArray().copyInto(display.exponent)
     }
 
+    /** Prints a double value in float format, which is the default format for the TI-36.
+     * It uses fixed-point notation for values that are not too large or too small, and switches to
+     * scientific notation for values that are outside the range of 1E-7 to 1E10. */
     private fun printValueFloat(value: Double) {
         if ((abs(value) >= 1E10) || (value != 0.0 && abs(value) < 1E-7)) {
             printValueScientific(value)
@@ -174,6 +191,9 @@ class Ti36Output(val display: Ti36Display) {
         display.exponent.fill(' ')
     }
 
+    /** Prints a double value in scientific notation, which is in the form of mantissa x 10^exponent.
+     * For example, 12345 would be printed as 1.2345 x 10^4, and 0.00123 would be printed as 1.23 x 10^-3.
+     */
     private fun printValueScientific(value: Double) {
 
         val exponent = getExponent(value)
@@ -183,6 +203,10 @@ class Ti36Output(val display: Ti36Display) {
         printExponent(exponent)
     }
 
+    /** Prints a double value in engineering notation, which is similar to scientific notation but the
+     * exponent is always a multiple of 3.
+     * For example, 12345 would be printed as 12.345 x 10^3, and 0.00123 would be printed as 1.23 x 10^-3.
+     */
     private fun printValueEngineering(value: Double) {
 
         var exponent = getExponent(value)
@@ -198,6 +222,12 @@ class Ti36Output(val display: Ti36Display) {
 
         printMantissa(mantissa)
         printExponent(exponent)
+    }
+
+    /** Prints a double value in decimal format, which is the same as float format.
+     */
+    private fun printValueDecimal(value: Double) {
+        printValueFloat(value)
     }
 
     /**
@@ -234,7 +264,18 @@ class Ti36Output(val display: Ti36Display) {
      * The TI-36 supports FLOAT, SCIENTIFIC, ENGINEERING, OCTAL, HEXADECIMAL, and BINARY formats.
      */
     fun setNumberFormat(numberFormat: DisplayNumberFormat) {
+        when (numberFormat) {
+            DisplayNumberFormat.BINARY,
+            DisplayNumberFormat.OCTAL,
+            DisplayNumberFormat.HEXADECIMAL -> numberOfDigitsAfterDecimalPoint = -1
+            else -> {}
+        }
+
         displayNumberFormat = numberFormat
     }
 
+    /** Gets the current number format for displaying values. */
+    fun getNumberFormat(): DisplayNumberFormat {
+        return displayNumberFormat
+    }
 }

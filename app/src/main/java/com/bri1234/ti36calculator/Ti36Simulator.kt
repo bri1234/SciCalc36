@@ -2,6 +2,13 @@ package com.bri1234.ti36calculator
 
 import android.util.Log
 
+private enum class CalculatorInputState {
+    NONE,
+    CONSTANT,
+    MEMORY,
+    FIXED_NUMBER_FORMAT,
+}
+
 /**
  * A simulator class for the TI-36 calculator.
  */
@@ -17,13 +24,15 @@ class Ti36Simulator {
 
     private var isErrorState: Boolean = false
 
-    private var modeConst: Boolean = false
-    private var modeConstWasSet: Boolean = false
-    private var modeMemory: MemoryOperation = MemoryOperation.NONE
-    private var modeMemoryWasSet: Boolean = false
+    private var currentInputState: CalculatorInputState = CalculatorInputState.NONE
+    private var currentInputStateWasSet: Boolean = false
+    private var currentMemoryOperation: MemoryOperation = MemoryOperation.NONE
 
+    /** Returns the current display state of the calculator. */
     fun getDisplayState(): CalculatorDisplayData = display.getDisplayState()
 
+    /** Initializes the simulator by setting up event listeners for input changes, edit mode, print events,
+     * result changes, and memory content changes. Also resets the calculator to its initial state. */
     init {
         buttonPressedAcOn()
         // viewAll()
@@ -35,12 +44,14 @@ class Ti36Simulator {
         memory.onContentChanged += { hasContent -> onMemoryContentChanged(hasContent) }
     }
 
+    /** Resets the calculator to its initial state, clearing any error state, resetting input states,
+     * and clearing all computations, display, input, output, and memory. */
     fun reset() {
         isErrorState = false
-        modeConst = false
-        modeConstWasSet = false
-        modeMemory = MemoryOperation.NONE
-        modeMemoryWasSet = false
+
+        currentInputState = CalculatorInputState.NONE
+        currentInputStateWasSet = false
+        currentMemoryOperation = MemoryOperation.NONE
 
         computation.reset()
         display.reset()
@@ -49,6 +60,11 @@ class Ti36Simulator {
         memory.reset()
     }
 
+    /** Simulates the pressing of a calculator button. Depending on the current state of the calculator
+     * and the button pressed, it will perform different actions such as entering constants,
+     * performing memory operations, changing number formats or executing functions.
+     * If an error occurs during the processing of the button press, it will set the error state
+     * and display an error message. */
     fun buttonPressed(button: CalculatorButton) {
 
         if (isErrorState) {
@@ -58,8 +74,7 @@ class Ti36Simulator {
             return
         }
 
-        modeConstWasSet = false
-        modeMemoryWasSet = false
+        currentInputStateWasSet = false
 
         try {
             when (button) {
@@ -68,22 +83,27 @@ class Ti36Simulator {
                 CalculatorButton.THIRD -> buttonPressedThird()
 
                 else -> {
-                    when {
-                        modeConst -> modeConstant(button)
-                        modeMemory != MemoryOperation.NONE -> modeMemory(button)
-                        display.isSecondFunctionActive() -> modeSecondFunction(button)
-                        display.isThirdFunctionActive() -> modeThirdFunction(button)
-                        else -> modeFirstFunction(button)
+                    when (currentInputState) {
+                        CalculatorInputState.CONSTANT -> modeConstant(button)
+                        CalculatorInputState.MEMORY -> modeMemory(button)
+                        CalculatorInputState.FIXED_NUMBER_FORMAT -> modeFixedNumberFormat(button)
+
+                        else -> {
+                            when {
+                                display.isSecondFunctionActive() -> modeSecondFunction(button)
+                                display.isThirdFunctionActive() -> modeThirdFunction(button)
+                                else -> modeFirstFunction(button)
+                            }
+                        }
                     }
                 }
 
             }
 
-            if (!modeConstWasSet)
-                modeConst = false
-
-            if (!modeMemoryWasSet)
-                modeMemory = MemoryOperation.NONE
+            if (!currentInputStateWasSet) {
+                currentInputState = CalculatorInputState.NONE
+                currentMemoryOperation = MemoryOperation.NONE
+            }
 
         } catch (e: Exception) {
             Log.e("Ti36Simulator", "Error during button press", e)
@@ -93,6 +113,9 @@ class Ti36Simulator {
 
     }
 
+    /** Handles the button presses for the first function of each button. Depending on the button pressed,
+     * it will execute the corresponding function or operation. If a button does not have a defined action
+     * in this mode, it will do nothing. */
     private fun modeFirstFunction(button : CalculatorButton) {
         when (button) {
             CalculatorButton.HYP -> functions.hyp()
@@ -138,6 +161,9 @@ class Ti36Simulator {
         }
     }
 
+    /** Handles the button presses for the second function of each button. When the second function mode is active,
+     * it will execute the corresponding function or operation for each button. If a button does not have a defined
+     * action in this mode, it will do nothing. After processing the button press, it will exit the second function mode. */
     private fun modeSecondFunction(button : CalculatorButton) {
         display.removeState(CalculatorState.SECOND)
 
@@ -145,7 +171,7 @@ class Ti36Simulator {
             CalculatorButton.HYP -> functions.cycleAngleUnit(false)
             CalculatorButton.LOG -> functions.tenPowX()
             CalculatorButton.LN -> functions.exp()
-            CalculatorButton.CE_C -> selectNumberFormat(DisplayNumberFormat.FIX)
+            CalculatorButton.CE_C -> buttonPressedFixed()
             CalculatorButton.SIN -> functions.asin()
             CalculatorButton.COS -> functions.acos()
             CalculatorButton.TAN -> functions.atan()
@@ -185,6 +211,9 @@ class Ti36Simulator {
         }
     }
 
+    /** Handles the button presses for the third function of each button. When the third function mode is active,
+     * it will execute the corresponding function or operation for each button. If a button does not have a defined
+     * action in this mode, it will do nothing. After processing the button press, it will exit the third function mode. */
     private fun modeThirdFunction(button : CalculatorButton)  {
         display.removeState(CalculatorState.THIRD)
 
@@ -232,15 +261,19 @@ class Ti36Simulator {
         }
     }
 
+    /** Handles the button press for the AC/ON button. When this button is pressed,
+     * it resets the calculator to its initial state and prints the current value to the display. */
     private fun buttonPressedAcOn() {
         reset()
         output.printValue(computation.getValue())
     }
 
+    /** Handles the CE/C button press (currently not implemented). */
     private fun buttonPressedCeC() {
         notImplemented()
     }
 
+    /** Toggles the THIRD function mode; deactivates SECOND mode if active. */
     private fun buttonPressedThird() {
         display.removeState(CalculatorState.SECOND)
 
@@ -251,6 +284,7 @@ class Ti36Simulator {
         }
     }
 
+    /** Toggles the SECOND function mode; deactivates THIRD mode if active. */
     private fun buttonPressedSecond() {
         display.removeState(CalculatorState.THIRD)
 
@@ -261,17 +295,38 @@ class Ti36Simulator {
         }
     }
 
+    /** Activates constant input mode; the next button press selects a physical constant. */
     private fun buttonPressedConst() {
-        modeConst = true
-        modeConstWasSet = true
-    }
+        currentInputState = CalculatorInputState.CONSTANT
+        currentInputStateWasSet = true
 
-    private fun buttonPressedMemory(memoryOperation: MemoryOperation) {
-        modeMemory = memoryOperation
-        modeMemoryWasSet = true
         output.printValue(computation.getValue())
     }
 
+    /** Activates memory mode for the given [memoryOperation]; the next button press selects the memory cell. */
+    private fun buttonPressedMemory(memoryOperation: MemoryOperation) {
+        currentInputState = CalculatorInputState.CONSTANT
+        currentInputStateWasSet = true
+        currentMemoryOperation = memoryOperation
+
+        output.printValue(computation.getValue())
+    }
+
+    /** Activates fixed number format mode, unless a non-decimal base (hex, octal, binary) is currently active. */
+    private fun buttonPressedFixed() {
+        when (output.getNumberFormat()) {
+            DisplayNumberFormat.HEXADECIMAL,
+            DisplayNumberFormat.OCTAL,
+            DisplayNumberFormat.BINARY -> return
+            else -> {}
+        }
+
+        currentInputState = CalculatorInputState.FIXED_NUMBER_FORMAT
+        currentInputStateWasSet = true
+    }
+
+    /** Maps the given [button] to a physical constant and stores it as the current result.
+     * Returns `true` on success, `false` if the button is not valid in constant mode. */
     private fun modeConstant(button : CalculatorButton): Boolean {
 
         try {
@@ -295,7 +350,10 @@ class Ti36Simulator {
         }
     }
 
+    /** Maps the given [button] (0–9) to a memory cell and executes the pending memory operation.
+     * Returns `true` on success, `false` if the button is not a digit. */
     private fun modeMemory(button : CalculatorButton): Boolean {
+        require(currentMemoryOperation != MemoryOperation.NONE)
 
         try {
 
@@ -313,7 +371,7 @@ class Ti36Simulator {
                 else -> throw IllegalArgumentException("Invalid button for memory mode")
             }
 
-            memory.performOperation(modeMemory, memoryCell)
+            memory.performOperation(currentMemoryOperation, memoryCell)
 
             return true
 
@@ -322,11 +380,43 @@ class Ti36Simulator {
         }
     }
 
+    /** Maps the given [button] (0–9) to a number of digits for fixed number format mode.
+     * Returns `true` on success, `false` if the button is not a digit. */
+    private fun modeFixedNumberFormat(button : CalculatorButton): Boolean {
+
+        try {
+
+            val numberOfDigits = when (button) {
+                CalculatorButton.ZERO -> 0
+                CalculatorButton.ONE -> 1
+                CalculatorButton.TWO -> 2
+                CalculatorButton.THREE -> 3
+                CalculatorButton.FOUR -> 4
+                CalculatorButton.FIVE -> 5
+                CalculatorButton.SIX -> 6
+                CalculatorButton.SEVEN -> 7
+                CalculatorButton.EIGHT -> 8
+                CalculatorButton.NINE -> -1 // 9 means "use as many digits as needed"
+                else -> throw IllegalArgumentException("Invalid button for fixed number format mode")
+            }
+
+            output.numberOfDigitsAfterDecimalPoint = numberOfDigits
+            output.printValue(computation.getValue())
+
+            return true
+
+        } catch (_: Exception) {
+            return false
+        }
+    }
+
+    /** Sets the given [numberFormat] and reprints the current value. */
     private fun selectNumberFormat(numberFormat: DisplayNumberFormat) {
         output.setNumberFormat(numberFormat)
         output.printValue(computation.getValue())
     }
 
+    /** Toggles the sign: negates via input in edit mode, otherwise applies the negate function. */
     private fun functionPlusMinus() {
         if (input.isEditMode) {
             input.inputPlusMinus()
@@ -335,23 +425,28 @@ class Ti36Simulator {
         }
     }
 
+    /** Called when the displayed input changes; converts the display value to a number and updates the computation. */
     private fun onEditInputChanged() {
         val inputValue = display.convertDisplayValueToNumeric()
         computation.setValue(inputValue)
     }
 
+    /** Called when edit mode begins; signals the computation to accept a new number. */
     private fun onEditModeBegin() {
         computation.enterNewNumber()
     }
 
+    /** Called when a value is printed to the display; ends the input edit mode. */
     private fun onPrint() {
         input.endEditMode()
     }
 
+    /** Called when the computation result changes; prints the new [value] to the display. */
     private fun onResultChanged(value : Double) {
         output.printValue(value)
     }
 
+    /** Called when the memory content changes; shows or hides the MEMORY indicator on the display. */
     private fun onMemoryContentChanged(hasContent : Boolean) {
         if (hasContent) {
             display.addState(CalculatorState.MEMORY)
@@ -360,10 +455,12 @@ class Ti36Simulator {
         }
     }
 
+    /** Displays a "not implemented" message on the display. */
     private fun notImplemented() {
         display.printNotImplemented()
     }
 
+    /** Explicit no-op placeholder for buttons without a function in the current mode. */
     private fun noOperation() {
         // do nothing
     }
