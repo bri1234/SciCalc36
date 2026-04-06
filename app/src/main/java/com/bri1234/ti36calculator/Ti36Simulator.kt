@@ -9,6 +9,15 @@ private enum class CalculatorInputState {
     FIXED_NUMBER_FORMAT,
 }
 
+/*
+Next features to implement (in order):
+- parentheses handling in computation
+- CE/C button (clear entry / clear)
+- A/B/C button (variable storage and usage)
+- R->P button (rectangular to polar conversion)
+- P->R button (polar to rectangular conversion)
+*/
+
 /**
  * A simulator class for the TI-36 calculator.
  */
