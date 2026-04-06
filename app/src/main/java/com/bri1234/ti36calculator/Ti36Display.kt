@@ -1,3 +1,21 @@
+/*
+ * Ti36Calculator - A TI-36 calculator simulator for Android.
+ * Copyright (C) 2026 Torsten Brischalle <torsten@brischalle.de>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://gnu.org>.
+ */
+
 package com.bri1234.ti36calculator
 
 import com.bri1234.ti36calculator.contracts.CalculatorStateInterface
@@ -13,6 +31,10 @@ class Ti36Display : CalculatorStateInterface {
 
     private val labels: MutableSet<CalculatorState> = mutableSetOf()
 
+    /**
+     * Retrieves the current display state, including the mantissa, decimal point position, exponent, and active labels.
+     * @return A [CalculatorDisplayData] object representing the current state of the display.
+     */
     fun getDisplayState(): CalculatorDisplayData {
         // Return a dummy display state for now
         return CalculatorDisplayData(
@@ -36,6 +58,10 @@ class Ti36Display : CalculatorStateInterface {
         exponent.fill(' ')
     }
 
+    /**
+     * Sets the display to show all segments lit up, which is typically used for testing or demonstration purposes.
+     * This method fills the mantissa with '8's, sets the decimal point position to 1, and fills the exponent with '8's.
+     */
     fun displayViewAllSegments() {
         "-8888888888".toCharArray().copyInto(mantissa)
         decimalPointPos = 1
@@ -96,6 +122,10 @@ class Ti36Display : CalculatorStateInterface {
         labels.remove(state)
     }
 
+    /**
+     * Sets the display to show "not IPL" when a function is not implemented.
+     * This method updates the mantissa to display "not IPL" and clears the exponent.
+     */
     override fun printNotImplemented() {
         "  not IPL  ".toCharArray().copyInto(mantissa)
         decimalPointPos = -1

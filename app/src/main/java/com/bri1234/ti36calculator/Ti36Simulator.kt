@@ -1,3 +1,21 @@
+/*
+ * Ti36Calculator - A TI-36 calculator simulator for Android.
+ * Copyright (C) 2026 Torsten Brischalle <torsten@brischalle.de>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://gnu.org>.
+ */
+
 package com.bri1234.ti36calculator
 
 import android.util.Log
@@ -37,11 +55,15 @@ class Ti36Simulator {
     private var currentInputStateWasSet: Boolean = false
     private var currentMemoryOperation: MemoryOperation = MemoryOperation.NONE
 
-    /** Returns the current display state of the calculator. */
+    /**
+     * Returns the current display state of the calculator.
+     *
+     * @return The current [CalculatorDisplayData].
+     */
     fun getDisplayState(): CalculatorDisplayData = display.getDisplayState()
 
-    /** Initializes the simulator by setting up event listeners for input changes, edit mode, print events,
-     * result changes, and memory content changes. Also resets the calculator to its initial state. */
+    // Sets up event listeners for input changes, edit mode, print events,
+    // result changes, and memory content changes. Also resets the calculator to its initial state.
     init {
         buttonPressedAcOn()
         // viewAll()
@@ -53,8 +75,10 @@ class Ti36Simulator {
         memory.onContentChanged += { hasContent -> onMemoryContentChanged(hasContent) }
     }
 
-    /** Resets the calculator to its initial state, clearing any error state, resetting input states,
-     * and clearing all computations, display, input, output, and memory. */
+    /**
+     * Resets the calculator to its initial state, clearing any error state, resetting input states,
+     * and clearing all computations, display, input, output, and memory.
+     */
     fun reset() {
         isErrorState = false
 
@@ -69,11 +93,15 @@ class Ti36Simulator {
         memory.reset()
     }
 
-    /** Simulates the pressing of a calculator button. Depending on the current state of the calculator
+    /**
+     * Simulates the pressing of a calculator button. Depending on the current state of the calculator
      * and the button pressed, it will perform different actions such as entering constants,
      * performing memory operations, changing number formats or executing functions.
      * If an error occurs during the processing of the button press, it will set the error state
-     * and display an error message. */
+     * and display an error message.
+     *
+     * @param button The [CalculatorButton] that was pressed.
+     */
     fun buttonPressed(button: CalculatorButton) {
 
         if (isErrorState) {
@@ -122,9 +150,13 @@ class Ti36Simulator {
 
     }
 
-    /** Handles the button presses for the first function of each button. Depending on the button pressed,
+    /**
+     * Handles the button presses for the first function of each button. Depending on the button pressed,
      * it will execute the corresponding function or operation. If a button does not have a defined action
-     * in this mode, it will do nothing. */
+     * in this mode, it will do nothing.
+     *
+     * @param button The [CalculatorButton] that was pressed.
+     */
     private fun modeFirstFunction(button : CalculatorButton) {
         when (button) {
             CalculatorButton.HYP -> functions.hyp()
@@ -170,9 +202,14 @@ class Ti36Simulator {
         }
     }
 
-    /** Handles the button presses for the second function of each button. When the second function mode is active,
-     * it will execute the corresponding function or operation for each button. If a button does not have a defined
-     * action in this mode, it will do nothing. After processing the button press, it will exit the second function mode. */
+    /**
+     * Handles the button presses for the second function of each button. When the second function mode
+     * is active, it will execute the corresponding function or operation for each button. If a button
+     * does not have a defined action in this mode, it will do nothing. After processing the button press,
+     * it will exit the second function mode.
+     *
+     * @param button The [CalculatorButton] that was pressed.
+     */
     private fun modeSecondFunction(button : CalculatorButton) {
         display.removeState(CalculatorState.SECOND)
 
@@ -220,9 +257,14 @@ class Ti36Simulator {
         }
     }
 
-    /** Handles the button presses for the third function of each button. When the third function mode is active,
-     * it will execute the corresponding function or operation for each button. If a button does not have a defined
-     * action in this mode, it will do nothing. After processing the button press, it will exit the third function mode. */
+    /**
+     * Handles the button presses for the third function of each button. When the third function mode
+     * is active, it will execute the corresponding function or operation for each button. If a button
+     * does not have a defined action in this mode, it will do nothing. After processing the button press,
+     * it will exit the third function mode.
+     *
+     * @param button The [CalculatorButton] that was pressed.
+     */
     private fun modeThirdFunction(button : CalculatorButton)  {
         display.removeState(CalculatorState.THIRD)
 
@@ -270,8 +312,10 @@ class Ti36Simulator {
         }
     }
 
-    /** Handles the button press for the AC/ON button. When this button is pressed,
-     * it resets the calculator to its initial state and prints the current value to the display. */
+    /**
+     * Handles the button press for the AC/ON button. Resets the calculator to its initial state
+     * and prints the current value to the display.
+     */
     private fun buttonPressedAcOn() {
         reset()
         output.printValue(computation.getValue())
@@ -312,7 +356,11 @@ class Ti36Simulator {
         output.printValue(computation.getValue())
     }
 
-    /** Activates memory mode for the given [memoryOperation]; the next button press selects the memory cell. */
+    /**
+     * Activates memory mode for the given operation; the next button press selects the memory cell.
+     *
+     * @param memoryOperation The [MemoryOperation] to perform.
+     */
     private fun buttonPressedMemory(memoryOperation: MemoryOperation) {
         currentInputState = CalculatorInputState.CONSTANT
         currentInputStateWasSet = true
@@ -334,8 +382,12 @@ class Ti36Simulator {
         currentInputStateWasSet = true
     }
 
-    /** Maps the given [button] to a physical constant and stores it as the current result.
-     * Returns `true` on success, `false` if the button is not valid in constant mode. */
+    /**
+     * Maps the given button to a physical constant and stores it as the current result.
+     *
+     * @param button The [CalculatorButton] that selects the constant.
+     * @return `true` on success, `false` if the button is not valid in constant mode.
+     */
     private fun modeConstant(button : CalculatorButton): Boolean {
 
         try {
@@ -359,8 +411,12 @@ class Ti36Simulator {
         }
     }
 
-    /** Maps the given [button] (0–9) to a memory cell and executes the pending memory operation.
-     * Returns `true` on success, `false` if the button is not a digit. */
+    /**
+     * Maps the given button (0–9) to a memory cell and executes the pending memory operation.
+     *
+     * @param button The [CalculatorButton] representing the memory cell index (0–9).
+     * @return `true` on success, `false` if the button is not a digit.
+     */
     private fun modeMemory(button : CalculatorButton): Boolean {
         require(currentMemoryOperation != MemoryOperation.NONE)
 
@@ -389,8 +445,12 @@ class Ti36Simulator {
         }
     }
 
-    /** Maps the given [button] (0–9) to a number of digits for fixed number format mode.
-     * Returns `true` on success, `false` if the button is not a digit. */
+    /**
+     * Maps the given button (0–9) to a number of decimal digits and applies the fixed number format.
+     *
+     * @param button The [CalculatorButton] representing the number of digits (0–8; 9 = automatic).
+     * @return `true` on success, `false` if the button is not a digit.
+     */
     private fun modeFixedNumberFormat(button : CalculatorButton): Boolean {
 
         try {
@@ -419,7 +479,11 @@ class Ti36Simulator {
         }
     }
 
-    /** Sets the given [numberFormat] and reprints the current value. */
+    /**
+     * Sets the given number format and reprints the current value.
+     *
+     * @param numberFormat The [DisplayNumberFormat] to apply.
+     */
     private fun selectNumberFormat(numberFormat: DisplayNumberFormat) {
         output.setNumberFormat(numberFormat)
         output.printValue(computation.getValue())
@@ -450,12 +514,20 @@ class Ti36Simulator {
         input.endEditMode()
     }
 
-    /** Called when the computation result changes; prints the new [value] to the display. */
+    /**
+     * Called when the computation result changes; prints the new value to the display.
+     *
+     * @param value The new result value to display.
+     */
     private fun onResultChanged(value : Double) {
         output.printValue(value)
     }
 
-    /** Called when the memory content changes; shows or hides the MEMORY indicator on the display. */
+    /**
+     * Called when the memory content changes; shows or hides the MEMORY indicator on the display.
+     *
+     * @param hasContent `true` if memory contains a value, `false` if it is empty.
+     */
     private fun onMemoryContentChanged(hasContent : Boolean) {
         if (hasContent) {
             display.addState(CalculatorState.MEMORY)
@@ -474,6 +546,3 @@ class Ti36Simulator {
         // do nothing
     }
 }
-
-
-
