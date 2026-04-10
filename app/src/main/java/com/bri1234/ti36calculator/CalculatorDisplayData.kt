@@ -30,7 +30,7 @@ data class CalculatorDisplayData (
     val digitsLarge: CharArray = charArrayOf(' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '0'),
     val decimalPointIndex: Int = 10,
     val digitsSmall: CharArray = charArrayOf(' ', ' ', ' '),
-    val displayLabels: Set<CalculatorState> = setOf(CalculatorState.DEG),
+    val displayLabels: MutableSet<CalculatorState> = mutableSetOf(CalculatorState.DEG),
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

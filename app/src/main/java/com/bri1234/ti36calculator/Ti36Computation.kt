@@ -25,22 +25,33 @@ import kotlin.math.round
 private const val REGISTER_COUNT = 64
 private const val OPERATION_COUNT = 256
 
-enum class Operation(val order: Int) {
-    NONE(-1),
-    LEFT_PARENTHESES(1),
-    RIGHT_PARENTHESES(1),
-    Y_POW_X(3),
-    Y_ROOT_X(3),
-    MULTIPLICATION(4),
-    DIVISION(4),
-    ADDITION(5),
-    SUBTRACTION(5),
-    BITWISE_AND(6),
-    BITWISE_OR(7),
-    BITWISE_XOR(7),
-    BITWISE_XNOR(7),
+/**
+ * These are the supported stack operations, ordered by precedence (lower order means higher precedence).
+ */
+private enum class Operation(val order: Int, val caption: String) {
+    NONE(-1, "none"),
+    Y_POW_X(3, "^"),
+    Y_ROOT_X(3, "sqrt"),
+    MULTIPLICATION(4, "*"),
+    DIVISION(4, "/"),
+    ADDITION(5, "+"),
+    SUBTRACTION(5, "-"),
+    BITWISE_AND(6, "and"),
+    BITWISE_OR(7, "or"),
+    BITWISE_XOR(7, "xor"),
+    BITWISE_XNOR(7, "xnor"),
 }
 
+private enum class StackEvaluationMode {
+    PARTIAL, // evaluates the stack until the next operation with higher precedence is encountered
+    PARENTHESES, // evaluates the stack until the next left parentheses is encountered
+    FULL, // evaluates the entire stack to a single result
+}
+
+/**
+ * Manages the computation stack for the TI-36 calculator, including registers and operations.
+ * It supports basic arithmetic, exponentiation, roots, and bitwise operations.
+ */
 class Ti36Computation {
 
     val onResultChanged: ObserverSubject<Double> = ObserverSubject()
@@ -50,12 +61,18 @@ class Ti36Computation {
     private val operationArray: Array<Operation> = Array(OPERATION_COUNT) { Operation.NONE }
     private var operationIndex: Int = 0
 
+    private val parenthesesArray: Array<Int> = Array(OPERATION_COUNT) { 0 }
+
+
     /** Resets all registers and operations to their initial state. */
     fun reset() {
         registerArray.fill(0.0)
         registerIndex = 0
+
         operationArray.fill(Operation.NONE)
         operationIndex = 0
+
+        parenthesesArray.fill(0)
     }
 
     /**
@@ -155,47 +172,62 @@ class Ti36Computation {
     }
 
     /**
+     * Evaluates the operation at [idx] using the values in the register array and updates the stack accordingly.
+     * @param idx The index of the operation to evaluate.
+     */
+    private fun calculateStackAtIndex(idx : Int) {
+
+        val leftValue = registerArray[idx]
+        val rightValue = registerArray[idx + 1]
+
+        val result = calculate(operationArray[idx], leftValue, rightValue)
+
+        if (operationIndex > 1) { // to keep the last operation in memory for repeated evaluation
+            removeElementAt(operationArray, idx, Operation.NONE)
+            removeElementAt(registerArray, idx, 0.0)
+        }
+
+        registerArray[idx] = result
+
+        operationIndex--
+        registerIndex--
+        check(operationIndex >= 0 && registerIndex >= 0)
+    }
+
+    /**
      * Reduces the operation stack by evaluating all applicable operations.
      * @param evaluateAll If true, collapses the entire stack to a single result.
      */
-    private fun evaluateStack(evaluateAll : Boolean = false) {
+    private fun evaluateStack(mode : StackEvaluationMode) {
         var done = false
 
         while (!done) {
             done = true
 
             for (idx in 0 until operationIndex) {
+
                 if ((operationArray[idx].order <= operationArray[idx + 1].order)
-                    || (evaluateAll && (idx == operationIndex - 1))) {
+                    || ((mode == StackEvaluationMode.FULL) && (idx == operationIndex - 1))) {
 
-                    val leftValue = registerArray[idx]
-                    val rightValue = registerArray[idx + 1]
-                    val result = calculate(operationArray[idx], leftValue, rightValue)
-
-                    if (operationIndex > 1) { // to keep the last operation in memory for repeated evaluation
-                        removeElementAt(operationArray, idx, Operation.NONE)
-                        removeElementAt(registerArray, idx, 0.0)
-                    }
-
-                    registerArray[idx] = result
-
-                    operationIndex--
-                    registerIndex--
-                    check(operationIndex >= 0 && registerIndex >= 0)
-
+                    calculateStackAtIndex(idx)
                     done = false
                     break
                 }
+
             }
         }
 
         onResultChanged(registerArray[registerIndex])
     }
 
-    /** Advances the register index so the next input writes to a new slot. */
+    /**
+     * Advances the register index so the next input writes to a new slot.
+     */
     fun enterNewNumber() {
-        if (registerIndex >= REGISTER_COUNT - 1)
-            throw IllegalStateException("Register stack overflow")
+        require(registerIndex < REGISTER_COUNT - 1)
+
+        if (parenthesesArray[operationIndex] > 0)
+            return
 
         registerIndex = operationIndex
     }
@@ -204,34 +236,35 @@ class Ti36Computation {
      * Pushes [operation] onto the stack and triggers a partial evaluation.
      * @param operation The operation to enqueue.
      */
-    fun operation(operation: Operation) {
-        if (operationIndex >= OPERATION_COUNT - 1)
-            throw IllegalStateException("Operation stack overflow")
-
-        if (registerIndex >= REGISTER_COUNT - 1)
-            throw IllegalStateException("Register stack overflow")
+    private fun operation(operation: Operation) {
+        require(operationIndex < OPERATION_COUNT - 1)
+        require(registerIndex < REGISTER_COUNT - 1)
 
         operationArray[operationIndex] = operation
         operationIndex++
 
-        evaluateStack()
+        evaluateStack(StackEvaluationMode.PARTIAL)
     }
 
-    /** Collapses the entire stack to a single result; repeats the last operation if the stack is empty. */
+    /**
+     * Collapses the entire stack to a single result; repeats the last operation if the stack is empty.
+     */
     fun evaluateAll() {
+        // repeat operation with the last two operands?
         if ((operationIndex == 0) && (registerIndex == 0)) {
-            // repeat operation with the last two operands
             if (operationArray[0] != Operation.NONE) {
                 operationIndex++
                 registerIndex++
             }
         }
 
-        evaluateStack(true)
+        evaluateStack(StackEvaluationMode.FULL)
         check(operationIndex == 0 && registerIndex == 0)
     }
 
-    /** Swaps the top two register values and notifies observers. */
+    /**
+     * Swaps the top two register values and notifies observers.
+     */
     fun swap() {
         if (registerIndex == 0) {
             val tmp = registerArray[1]
@@ -245,6 +278,62 @@ class Ti36Computation {
         }
     }
 
+    /**
+     * Prints the current state of the computation stack for debugging purposes.
+     */
+    fun printInfo() {
+        var idx = 0
+
+        println("~~~ Computation stack info ~~~")
+        println("register index: $registerIndex, operation index: $operationIndex")
+        println("Idx  ()    Op  Value")
+
+        while (idx <= registerIndex || idx <= operationIndex) {
+            val reg = registerArray[idx]
+            val op = operationArray[idx].name
+
+            val str = "%02d:  %02d  %4s  %g".format(idx,
+                parenthesesArray[idx], operationArray[idx].caption, registerArray[idx])
+
+            println(str)
+            idx++
+        }
+    }
+
+    fun leftParentheses() {
+        require(operationIndex < OPERATION_COUNT - 1)
+        require(registerIndex < REGISTER_COUNT - 1)
+
+        if ((parenthesesArray[operationIndex] == 0) && (operationIndex > 0))
+            registerIndex++
+
+        parenthesesArray[operationIndex]++
+
+        onResultChanged(registerArray[registerIndex])
+    }
+
+    fun rightParentheses() {
+        evaluateStack(StackEvaluationMode.PARENTHESES)
+    }
+
+    fun addition() = operation(Operation.ADDITION)
+    fun subtraction() = operation(Operation.SUBTRACTION)
+    fun multiplication() = operation(Operation.MULTIPLICATION)
+    fun division() = operation(Operation.DIVISION)
+    fun yPowerX() = operation(Operation.Y_POW_X)
+    fun yRootX() = operation(Operation.Y_ROOT_X)
+    fun bitwiseAnd() = operation(Operation.BITWISE_AND)
+    fun bitwiseOr() = operation(Operation.BITWISE_OR)
+    fun bitwiseXor() = operation(Operation.BITWISE_XOR)
+    fun bitwiseXnor() = operation(Operation.BITWISE_XNOR)
+
+    fun hasParentheses() : Boolean {
+        for (idx in 0 .. operationIndex) {
+            if (parenthesesArray[idx] > 0)
+                return true
+        }
+        return false
+    }
 }
 
 /**

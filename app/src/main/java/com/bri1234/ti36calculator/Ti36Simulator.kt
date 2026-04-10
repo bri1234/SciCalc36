@@ -60,7 +60,16 @@ class Ti36Simulator {
      *
      * @return The current [CalculatorDisplayData].
      */
-    fun getDisplayState(): CalculatorDisplayData = display.getDisplayState()
+    fun getDisplayState(): CalculatorDisplayData {
+        val state = display.getDisplayState()
+
+        if (computation.hasParentheses())
+            state.displayLabels.add(CalculatorState.PARENTHESES)
+        else
+            state.displayLabels.remove(CalculatorState.PARENTHESES)
+
+        return state
+    }
 
     // Sets up event listeners for input changes, edit mode, print events,
     // result changes, and memory content changes. Also resets the calculator to its initial state.
@@ -103,6 +112,8 @@ class Ti36Simulator {
      * @param button The [CalculatorButton] that was pressed.
      */
     fun buttonPressed(button: CalculatorButton) {
+
+        computation.printInfo()
 
         if (isErrorState) {
             if (button == CalculatorButton.AC_ON) {
@@ -148,6 +159,7 @@ class Ti36Simulator {
             output.printError()
         }
 
+        computation.printInfo()
     }
 
     /**
@@ -166,27 +178,27 @@ class Ti36Simulator {
             CalculatorButton.SIN -> functions.sin()
             CalculatorButton.COS -> functions.cos()
             CalculatorButton.TAN -> functions.tan()
-            CalculatorButton.Y_POW_X -> computation.operation(Operation.Y_POW_X)
+            CalculatorButton.Y_POW_X -> computation.yPowerX()
             CalculatorButton.X_SWAP_Y -> computation.swap()
             CalculatorButton.ONE_DIV_X -> functions.oneDivX()
             CalculatorButton.X_SQUARED -> functions.xSquared()
             CalculatorButton.SQRT_X -> functions.squareRootX()
-            CalculatorButton.DIVIDE -> computation.operation(Operation.DIVISION)
+            CalculatorButton.DIVIDE -> computation.division()
             CalculatorButton.SUM_PLUS -> notImplemented()
             CalculatorButton.EE -> input.enterExponentEditMode()
-            CalculatorButton.LEFT_PARENTHESES -> computation.operation(Operation.LEFT_PARENTHESES)
-            CalculatorButton.RIGHT_PARENTHESES -> computation.operation(Operation.RIGHT_PARENTHESES)
-            CalculatorButton.MULTIPLY -> computation.operation(Operation.MULTIPLICATION)
+            CalculatorButton.LEFT_PARENTHESES -> computation.leftParentheses()
+            CalculatorButton.RIGHT_PARENTHESES -> computation.rightParentheses()
+            CalculatorButton.MULTIPLY -> computation.multiplication()
             CalculatorButton.STORE -> buttonPressedMemory(MemoryOperation.STORE)
             CalculatorButton.SEVEN -> input.inputDigit(7)
             CalculatorButton.EIGHT -> input.inputDigit(8)
             CalculatorButton.NINE -> input.inputDigit(9)
-            CalculatorButton.MINUS -> computation.operation(Operation.SUBTRACTION)
+            CalculatorButton.MINUS -> computation.subtraction()
             CalculatorButton.RECALL -> buttonPressedMemory(MemoryOperation.RECALL)
             CalculatorButton.FOUR -> input.inputDigit(4)
             CalculatorButton.FIVE -> input.inputDigit(5)
             CalculatorButton.SIX -> input.inputDigit(6)
-            CalculatorButton.PLUS -> computation.operation(Operation.ADDITION)
+            CalculatorButton.PLUS -> computation.addition()
             CalculatorButton.A_B_C -> notImplemented()
             CalculatorButton.ONE -> input.inputDigit(1)
             CalculatorButton.TWO -> input.inputDigit(2)
@@ -221,7 +233,7 @@ class Ti36Simulator {
             CalculatorButton.SIN -> functions.asin()
             CalculatorButton.COS -> functions.acos()
             CalculatorButton.TAN -> functions.atan()
-            CalculatorButton.Y_POW_X -> computation.operation(Operation.Y_ROOT_X)
+            CalculatorButton.Y_POW_X -> computation.yRootX()
             CalculatorButton.X_SWAP_Y -> notImplemented()
             CalculatorButton.ONE_DIV_X -> notImplemented()
             CalculatorButton.X_SQUARED -> notImplemented()
@@ -287,10 +299,10 @@ class Ti36Simulator {
             CalculatorButton.LEFT_PARENTHESES -> selectNumberFormat(DisplayNumberFormat.HEXADECIMAL)
             CalculatorButton.RIGHT_PARENTHESES -> selectNumberFormat(DisplayNumberFormat.OCTAL)
             CalculatorButton.MULTIPLY -> selectNumberFormat(DisplayNumberFormat.BINARY)
-            CalculatorButton.STORE -> computation.operation(Operation.BITWISE_AND)
-            CalculatorButton.SEVEN -> computation.operation(Operation.BITWISE_OR)
-            CalculatorButton.EIGHT -> computation.operation(Operation.BITWISE_XOR)
-            CalculatorButton.NINE -> computation.operation(Operation.BITWISE_XNOR)
+            CalculatorButton.STORE -> computation.bitwiseAnd()
+            CalculatorButton.SEVEN -> computation.bitwiseOr()
+            CalculatorButton.EIGHT -> computation.bitwiseXor()
+            CalculatorButton.NINE -> computation.bitwiseXnor()
             CalculatorButton.MINUS -> functions.bitwiseNot()
             CalculatorButton.RECALL -> buttonPressedMemory(MemoryOperation.EXCHANGE)
             CalculatorButton.FOUR -> notImplemented()

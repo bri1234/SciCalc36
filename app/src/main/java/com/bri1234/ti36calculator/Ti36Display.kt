@@ -41,7 +41,7 @@ class Ti36Display : CalculatorStateInterface {
             digitsLarge = mantissa.copyOf(),
             decimalPointIndex = decimalPointPos,
             digitsSmall = exponent.copyOf(),
-            displayLabels = labels.toSet(),
+            displayLabels = labels.toMutableSet(),
         )
     }
 
