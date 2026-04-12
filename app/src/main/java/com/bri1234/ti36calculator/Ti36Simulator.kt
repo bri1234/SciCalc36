@@ -31,10 +31,8 @@ private enum class CalculatorInputState {
 Next features to implement:
 - refactoring: separate display state from internal state, display state created from internal state (e.g. STAT, BIN, OCT, HEX ...)
 
-- conversion DMS -> DD
 - CE/C button (clear entry / clear)
 - A/B/C button (Fractions)
-- percent function
 - HEX, OCT, BIN number input
 - STAT 1 & 2 mode
 
@@ -264,7 +262,7 @@ class Ti36Simulator {
             CalculatorButton.ONE -> functions.convertCmToInch()
             CalculatorButton.TWO -> functions.convertLiterToGallon()
             CalculatorButton.THREE -> functions.convertKgToPound()
-            CalculatorButton.EQUAL -> notImplemented()
+            CalculatorButton.EQUAL -> functions.convertDegreesMinutesSecondsToDecimal()
             CalculatorButton.BACK -> functions2.nPr()
             CalculatorButton.ZERO -> functions.convertCelsiusToFahrenheit()
             CalculatorButton.DOT -> functions.convertGramToOunce()

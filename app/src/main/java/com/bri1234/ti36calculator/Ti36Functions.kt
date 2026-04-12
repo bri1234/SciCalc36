@@ -340,4 +340,19 @@ class Ti36Functions(val labels: CalculatorStateInterface,
 
         computation.setValue(result)
     }
+
+    fun convertDegreesMinutesSecondsToDecimal() {
+        var value = computation.getValue()
+
+        val degrees = floor(value)
+        value -= degrees
+        value *= 100
+        val minutes = floor(value)
+        value -= minutes
+        value *= 100
+        val seconds = value
+
+        val result = degrees + minutes / 60.0 + seconds / 3600.0
+        computation.setValue(result)
+    }
 }
