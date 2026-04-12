@@ -71,6 +71,8 @@ private val SEGMENTS = mapOf(
     '°' to listOf(true, true, false, false, false, true, true),
     '\'' to listOf(false, false, false, false, false, true, false),
     '"' to listOf(false, true, false, false, false, true, false),
+    '_' to listOf(false, false, false, true, false, false, false),
+    ';' to listOf(false, false, true, true, false, false, false),
 )
 
 /**

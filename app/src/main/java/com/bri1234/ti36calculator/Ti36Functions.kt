@@ -325,4 +325,19 @@ class Ti36Functions(val labels: CalculatorStateInterface,
         computation.setValue(result)
     }
 
+    fun percent() {
+        val value = computation.getValue()
+        val op = computation.getLastOperation()
+
+        val result = when (op) {
+            Operation.ADDITION,
+            Operation.SUBTRACTION -> {
+                val valueBase = computation.getPreviousValue()
+                value / 100.0 * valueBase
+            }
+            else -> value / 100.0
+        }
+
+        computation.setValue(result)
+    }
 }

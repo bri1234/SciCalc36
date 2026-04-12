@@ -28,7 +28,7 @@ private const val OPERATION_COUNT = 256
 /**
  * These are the supported stack operations, ordered by precedence (lower order means higher precedence).
  */
-private enum class Operation(val order: Int, val caption: String) {
+enum class Operation(val order: Int, val caption: String) {
     NONE(-1, "none"),
     Y_POW_X(3, "^"),
     Y_ROOT_X(3, "sqrt"),
@@ -76,11 +76,35 @@ class Ti36Computation {
     }
 
     /**
+     * Returns the last operation on the stack, or Operation.NONE if the stack is empty.
+      * @return The last enqueued operation, or Operation.NONE if no operations are on the stack.
+     */
+    fun getLastOperation() : Operation {
+        return if (operationIndex > 0) operationArray[operationIndex - 1] else Operation.NONE
+    }
+
+    /**
      * Returns the current top-of-stack register value.
      * @return The value stored in the current register slot.
      */
     fun getValue() : Double {
+        if (registerIndex < operationIndex) {
+            check(operationIndex >= 1 && registerIndex == operationIndex - 1)
+
+            registerIndex = operationIndex
+            registerArray[registerIndex] = registerArray[registerIndex - 1]
+        }
+
         return registerArray[registerIndex]
+    }
+
+    /**
+     * Returns the previous register value, which is the value stored in the register slot before the current one.
+     * If the current register index is 0, it returns the value in register slot 0, as there is no previous slot.
+      * @return The value stored in the previous register slot, or the current slot if at the bottom of the stack.
+     */
+    fun getPreviousValue() : Double {
+        return if (registerIndex == 0) registerArray[0] else registerArray[registerIndex - 1]
     }
 
     /**

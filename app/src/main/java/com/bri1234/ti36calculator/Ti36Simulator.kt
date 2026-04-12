@@ -28,11 +28,16 @@ private enum class CalculatorInputState {
 }
 
 /*
-Next features to implement (in order):
-- CE/C button (clear entry / clear)
-- A/B/C button (variable storage and usage)
-- STAT mode
+Next features to implement:
 - refactoring: separate display state from internal state, display state created from internal state (e.g. STAT, BIN, OCT, HEX ...)
+
+- conversion DMS -> DD
+- CE/C button (clear entry / clear)
+- A/B/C button (Fractions)
+- percent function
+- HEX, OCT, BIN number input
+- STAT 1 & 2 mode
+
 */
 
 /**
@@ -289,7 +294,7 @@ class Ti36Simulator {
             CalculatorButton.SIN -> noOperation()
             CalculatorButton.COS -> noOperation()
             CalculatorButton.TAN -> noOperation()
-            CalculatorButton.Y_POW_X -> notImplemented()
+            CalculatorButton.Y_POW_X -> functions.percent()
             CalculatorButton.X_SWAP_Y -> notImplemented()
             CalculatorButton.ONE_DIV_X -> noOperation()
             CalculatorButton.X_SQUARED -> noOperation()
