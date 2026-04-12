@@ -87,17 +87,40 @@ class Ti36Computation {
      * Sets the current top-of-stack register to [newValue].
      * @param newValue The value to store in the current register.
      */
-    fun setValue(newValue: Double) {
+    fun setValue(newValue: Double, updateDisplay: Boolean = true) {
         registerArray[registerIndex] = newValue
+
+        if (updateDisplay)
+            onResultChanged(newValue)
     }
 
     /**
-     * Sets the current register to [newValue] and notifies observers.
-     * @param newValue The new result value.
+     * Returns the top two register values as a pair, with the current register as the first element
+     * and the previous register as the second.
      */
-    fun setResult(newValue: Double) {
-        setValue(newValue)
-        onResultChanged(newValue)
+    fun getTwoValues(): Pair<Double, Double> {
+        if (registerIndex == 0) {
+            return Pair(registerArray[0], registerArray[1])
+        } else {
+            return Pair(registerArray[registerIndex], registerArray[registerIndex - 1])
+        }
+    }
+
+    /**
+     * Sets the top two register values to [first] and [second], with [first] being the current register
+     * and [second] being the previous register.
+     */
+    fun setTwoValues(first: Double, second: Double, updateDisplay: Boolean = true) {
+        if (registerIndex == 0) {
+            registerArray[0] = first
+            registerArray[1] = second
+        } else {
+            registerArray[registerIndex] = first
+            registerArray[registerIndex - 1] = second
+        }
+
+        if (updateDisplay)
+            onResultChanged(first)
     }
 
     /**
@@ -281,22 +304,6 @@ class Ti36Computation {
 
         evaluateStack(StackEvaluationMode.FULL)
         check(operationIndex == 0 && registerIndex == 0)
-    }
-
-    /**
-     * Swaps the top two register values and notifies observers.
-     */
-    fun swap() {
-        if (registerIndex == 0) {
-            val tmp = registerArray[1]
-            registerArray[1] = registerArray[0]
-            setResult(tmp)
-        } else {
-            check(registerIndex > 0 && registerIndex < REGISTER_COUNT - 1)
-            val tmp = registerArray[registerIndex - 1]
-            registerArray[registerIndex - 1] = registerArray[registerIndex]
-            setResult(tmp)
-        }
     }
 
     /**

@@ -19,12 +19,14 @@
 package com.bri1234.ti36calculator
 
 import com.bri1234.ti36calculator.contracts.CalculatorStateInterface
+import com.bri1234.ti36calculator.utils.factorial as mathUtilsFactorial
+import com.bri1234.ti36calculator.utils.getIntFromDouble
+
 import kotlin.math.*
 import kotlin.math.pow
 
 /**
- * A class representing the functions of the TI-36 calculator.
- * Each function corresponds to a button on the calculator and manipulates the display labels accordingly.
+ * This class implements the one parameter functions of the TI-36 calculator.
  */
 class Ti36Functions(val labels: CalculatorStateInterface,
                     val computation: Ti36Computation) {
@@ -49,7 +51,7 @@ class Ti36Functions(val labels: CalculatorStateInterface,
 
                 if (convert) {
                     val value = computation.getValue()
-                    computation.setResult(value * Math.PI / 180)
+                    computation.setValue(value * Math.PI / 180)
                 }
             }
             labels.hasState(CalculatorState.RAD) -> {
@@ -58,7 +60,7 @@ class Ti36Functions(val labels: CalculatorStateInterface,
 
                 if (convert) {
                     val value = computation.getValue()
-                    computation.setResult(value * 200 / Math.PI)
+                    computation.setValue(value * 200 / Math.PI)
                 }
             }
             labels.hasState(CalculatorState.GRAD) -> {
@@ -67,14 +69,14 @@ class Ti36Functions(val labels: CalculatorStateInterface,
 
                 if (convert) {
                     val value = computation.getValue()
-                    computation.setResult(value * 180 / 200)
+                    computation.setValue(value * 180 / 200)
                 }
             }
         }
     }
 
     fun pi() {
-        computation.setResult(Math.PI)
+        computation.setValue(Math.PI)
     }
 
     fun log() {
@@ -83,7 +85,7 @@ class Ti36Functions(val labels: CalculatorStateInterface,
             throw IllegalArgumentException("log(): Input value must be greater than 0")
 
         val result = log10(value)
-        computation.setResult(result)
+        computation.setValue(result)
     }
 
     fun ln() {
@@ -92,7 +94,7 @@ class Ti36Functions(val labels: CalculatorStateInterface,
             throw IllegalArgumentException("ln(): Input value must be greater than 0")
 
         val result = ln(value)
-        computation.setResult(result)
+        computation.setValue(result)
     }
 
     fun sin() {
@@ -104,14 +106,14 @@ class Ti36Functions(val labels: CalculatorStateInterface,
             labels.hasState(CalculatorState.GRAD) -> sin(Math.toRadians(value * 0.9))
             else -> throw IllegalStateException("sin(): No angle unit label found")
         }
-        computation.setResult(result)
+        computation.setValue(result)
     }
 
     fun asin() {
         val value = computation.getValue()
 
         if (labels.hasState(CalculatorState.HYP)) {
-            computation.setResult(asinh(value))
+            computation.setValue(asinh(value))
             return
         }
 
@@ -126,7 +128,7 @@ class Ti36Functions(val labels: CalculatorStateInterface,
             labels.hasState(CalculatorState.GRAD) -> Math.toDegrees(r) / 0.9
             else -> throw IllegalStateException("asin(): No angle unit label found")
         }
-        computation.setResult(result)
+        computation.setValue(result)
     }
 
     fun cos() {
@@ -138,7 +140,7 @@ class Ti36Functions(val labels: CalculatorStateInterface,
             labels.hasState(CalculatorState.GRAD) -> cos(Math.toRadians(value * 0.9))
             else -> throw IllegalStateException("cos(): No angle unit label found")
         }
-        computation.setResult(result)
+        computation.setValue(result)
     }
 
     fun acos() {
@@ -148,7 +150,7 @@ class Ti36Functions(val labels: CalculatorStateInterface,
             if (value < 1.0)
                 throw IllegalArgumentException("acos(): Input value must be in the range [1, +inf)]")
 
-            computation.setResult(acosh(value))
+            computation.setValue(acosh(value))
             return
         }
 
@@ -163,7 +165,7 @@ class Ti36Functions(val labels: CalculatorStateInterface,
             labels.hasState(CalculatorState.GRAD) -> Math.toDegrees(r) / 0.9
             else -> throw IllegalStateException("acos(): No angle unit label found")
         }
-        computation.setResult(result)
+        computation.setValue(result)
     }
 
     fun tan() {
@@ -175,7 +177,7 @@ class Ti36Functions(val labels: CalculatorStateInterface,
             labels.hasState(CalculatorState.GRAD) -> tan(Math.toRadians(value * 0.9))
             else -> throw IllegalStateException("tan(): No angle unit label found")
         }
-        computation.setResult(result)
+        computation.setValue(result)
     }
 
     fun atan() {
@@ -185,7 +187,7 @@ class Ti36Functions(val labels: CalculatorStateInterface,
             if ((value <= 1.0) || (value >= 1.0))
                 throw IllegalArgumentException("atan(): Input value must be in the range (-1, 1)")
 
-            computation.setResult(atanh(value))
+            computation.setValue(atanh(value))
             return
         }
 
@@ -197,7 +199,7 @@ class Ti36Functions(val labels: CalculatorStateInterface,
             labels.hasState(CalculatorState.GRAD) -> Math.toDegrees(r) / 0.9
             else -> throw IllegalStateException("atan(): No angle unit label found")
         }
-        computation.setResult(result)
+        computation.setValue(result)
     }
 
     fun oneDivX() {
@@ -206,13 +208,13 @@ class Ti36Functions(val labels: CalculatorStateInterface,
             throw IllegalArgumentException("1 / x: Input value must be not equal 0")
 
         val result = 1.0 / value
-        computation.setResult(result)
+        computation.setValue(result)
     }
 
     fun xSquared() {
         val value = computation.getValue()
         val result = value * value
-        computation.setResult(result)
+        computation.setValue(result)
     }
 
     fun squareRootX() {
@@ -221,118 +223,107 @@ class Ti36Functions(val labels: CalculatorStateInterface,
             throw IllegalArgumentException("sqrt(): Input value must be greater than 0")
 
         val result = sqrt(value)
-        computation.setResult(result)
+        computation.setValue(result)
     }
 
     fun negate() {
         val value = computation.getValue()
         val result = -value
-        computation.setResult(result)
+        computation.setValue(result)
     }
 
     fun thirdRootX() {
         val value = computation.getValue()
         val result = cbrt(value)
-        computation.setResult(result)
+        computation.setValue(result)
     }
 
     fun factorial() {
-        val value = computation.getValue()
-        val intValue = round(value).toInt()
-
-        if (abs(value - intValue) > 1E-12)
-            throw IllegalArgumentException("factorial(): Input value must be an integer")
+        val intValue = getIntFromDouble(computation.getValue())
 
         if ((intValue < 0) || (intValue > 69))
             throw IllegalArgumentException("factorial(): Input value must be in the range [0, 69]")
 
-        val result = if (intValue == 0) 1.0 else {
-            var res = 1.0
-            for (i in 1..intValue) {
-                res *= i
-            }
-            res
-        }
-
-        computation.setResult(result)
+        val result = mathUtilsFactorial(intValue)
+        computation.setValue(result)
     }
 
     fun exp() {
         val value = computation.getValue()
         val result = exp(value)
-        computation.setResult(result)
+        computation.setValue(result)
     }
 
     fun tenPowX() {
         val value = computation.getValue()
         val result = 10.0.pow(value)
-        computation.setResult(result)
+        computation.setValue(result)
     }
 
     fun bitwiseNot() {
         val value = computation.getValue()
         val result = round(value).toLong().inv()
-        computation.setResult(result.toDouble())
+        computation.setValue(result.toDouble())
     }
 
     fun convertCmToInch() {
         val value = computation.getValue()
         val result = value / 2.54
-        computation.setResult(result)
+        computation.setValue(result)
     }
 
     fun convertLiterToGallon() {
         val value = computation.getValue()
         val result = value / 3.785411784
-        computation.setResult(result)
+        computation.setValue(result)
     }
 
     fun convertKgToPound() {
         val value = computation.getValue()
         val result = value / 0.45359237
-        computation.setResult(result)
+        computation.setValue(result)
     }
 
     fun convertGramToOunce() {
         val value = computation.getValue()
         val result = value / 28.349523125
-        computation.setResult(result)
+        computation.setValue(result)
     }
 
     fun convertCelsiusToFahrenheit() {
         val value = computation.getValue()
         val result = value * 9.0 / 5.0 + 32.0
-        computation.setResult(result)
+        computation.setValue(result)
     }
 
     fun convertInchToCm() {
         val value = computation.getValue()
         val result = value * 2.54
-        computation.setResult(result)
+        computation.setValue(result)
     }
 
     fun convertGallonToLiter() {
         val value = computation.getValue()
         val result = value * 3.785411784
-        computation.setResult(result)
+        computation.setValue(result)
     }
 
     fun convertPoundToKg() {
         val value = computation.getValue()
         val result = value * 0.45359237
-        computation.setResult(result)
+        computation.setValue(result)
     }
 
     fun convertFahrenheitToCelsius() {
         val value = computation.getValue()
         val result = (value - 32.0) * 5.0 / 9.0
-        computation.setResult(result)
+        computation.setValue(result)
     }
 
     fun convertOunceToGram() {
         val value = computation.getValue()
         val result = value * 28.349523125
-        computation.setResult(result)
+        computation.setValue(result)
     }
 
 }

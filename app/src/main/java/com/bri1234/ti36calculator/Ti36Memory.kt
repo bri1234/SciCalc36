@@ -39,11 +39,11 @@ class Ti36Memory(val computation: Ti36Computation) {
 
         when (operation) {
             MemoryOperation.STORE -> memoryArray[memoryCell] = computation.getValue()
-            MemoryOperation.RECALL -> computation.setResult(memoryArray[memoryCell])
+            MemoryOperation.RECALL -> computation.setValue(memoryArray[memoryCell])
             MemoryOperation.EXCHANGE -> {
                 val tmp = memoryArray[memoryCell]
                 memoryArray[memoryCell] = computation.getValue()
-                computation.setResult(tmp)
+                computation.setValue(tmp)
             }
             MemoryOperation.SUM -> memoryArray[memoryCell] += computation.getValue()
             MemoryOperation.NONE -> {}

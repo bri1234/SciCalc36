@@ -29,11 +29,12 @@ private enum class CalculatorInputState {
 
 /*
 Next features to implement (in order):
-- parentheses handling in computation
 - CE/C button (clear entry / clear)
 - A/B/C button (variable storage and usage)
 - R->P button (rectangular to polar conversion)
 - P->R button (polar to rectangular conversion)
+- STAT mode
+- refactoring: separate display state from internal state, display state created from internal state (e.g. STAT, BIN, OCT, HEX ...)
 */
 
 /**
@@ -45,7 +46,10 @@ class Ti36Simulator {
     private val input = Ti36Input(display)
     private val output = Ti36Output(display)
     private val computation = Ti36Computation()
+
+    // TODO: instead of display use internal state to determine which functions are active.
     private val functions = Ti36Functions(display, computation)
+    private val functions2 = Ti36Functions2(computation)
 
     private val memory = Ti36Memory(computation)
 
@@ -179,7 +183,7 @@ class Ti36Simulator {
             CalculatorButton.COS -> functions.cos()
             CalculatorButton.TAN -> functions.tan()
             CalculatorButton.Y_POW_X -> computation.yPowerX()
-            CalculatorButton.X_SWAP_Y -> computation.swap()
+            CalculatorButton.X_SWAP_Y -> functions2.swap()
             CalculatorButton.ONE_DIV_X -> functions.oneDivX()
             CalculatorButton.X_SQUARED -> functions.xSquared()
             CalculatorButton.SQRT_X -> functions.squareRootX()
@@ -259,7 +263,7 @@ class Ti36Simulator {
             CalculatorButton.TWO -> functions.convertLiterToGallon()
             CalculatorButton.THREE -> functions.convertKgToPound()
             CalculatorButton.EQUAL -> notImplemented()
-            CalculatorButton.BACK -> notImplemented()
+            CalculatorButton.BACK -> functions2.nPr()
             CalculatorButton.ZERO -> functions.convertCelsiusToFahrenheit()
             CalculatorButton.DOT -> functions.convertGramToOunce()
             CalculatorButton.PLUS_MINUS -> notImplemented()
@@ -314,7 +318,7 @@ class Ti36Simulator {
             CalculatorButton.TWO -> functions.convertGallonToLiter()
             CalculatorButton.THREE -> functions.convertPoundToKg()
             CalculatorButton.EQUAL -> notImplemented()
-            CalculatorButton.BACK -> notImplemented()
+            CalculatorButton.BACK -> functions2.nCr()
             CalculatorButton.ZERO -> functions.convertFahrenheitToCelsius()
             CalculatorButton.DOT -> functions.convertOunceToGram()
             CalculatorButton.PLUS_MINUS -> notImplemented()
@@ -415,7 +419,7 @@ class Ti36Simulator {
                 CalculatorButton.DIVIDE -> 6.6743015E-11 // gravitational constant in m^3/(kg*s^2)
                 else -> throw IllegalArgumentException("Invalid button for constant mode")
             }
-            computation.setResult(constant)
+            computation.setValue(constant)
             return true
 
         } catch (_: Exception) {
@@ -513,7 +517,7 @@ class Ti36Simulator {
     /** Called when the displayed input changes; converts the display value to a number and updates the computation. */
     private fun onEditInputChanged() {
         val inputValue = display.convertDisplayValueToNumeric()
-        computation.setValue(inputValue)
+        computation.setValue(inputValue, false)
     }
 
     /** Called when edit mode begins; signals the computation to accept a new number. */
