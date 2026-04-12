@@ -19,6 +19,9 @@
 package com.bri1234.ti36calculator
 
 import com.bri1234.ti36calculator.contracts.CalculatorStateInterface
+import java.util.Locale
+import kotlin.math.floor
+import kotlin.math.abs
 
 const val NUM_MANTISSA_DIGITS = 11
 const val NUM_EXPONENT_DIGITS = 3
@@ -128,6 +131,32 @@ class Ti36Display : CalculatorStateInterface {
      */
     override fun printNotImplemented() {
         "  not IPL  ".toCharArray().copyInto(mantissa)
+        decimalPointPos = -1
+        exponent.fill(' ')
+    }
+
+    fun viewValueAsDegreesMinutesSeconds(valueDegrees: Double) {
+        var value = abs(valueDegrees)
+        val degrees = floor(value).toInt()
+        value -= degrees
+        value *= 60
+        val minutes = floor(value).toInt()
+        value -= minutes
+        value *= 60
+        val seconds = floor(value).toInt()
+        value -= seconds
+        value *= 100
+        val centiSeconds = value
+        val sign = if (valueDegrees < 0) "-" else " "
+
+        var dmsString = String.format(
+            Locale.ROOT, "%s%d°%02d'%02d\"%02.0f",
+            sign, degrees, minutes, seconds, centiSeconds)
+
+        if (dmsString.length > NUM_MANTISSA_DIGITS)
+            dmsString = dmsString.substring(0, NUM_MANTISSA_DIGITS)
+
+        dmsString.toCharArray().copyInto(mantissa)
         decimalPointPos = -1
         exponent.fill(' ')
     }

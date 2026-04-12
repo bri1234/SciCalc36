@@ -314,7 +314,7 @@ class Ti36Simulator {
             CalculatorButton.ONE -> functions.convertInchToCm()
             CalculatorButton.TWO -> functions.convertGallonToLiter()
             CalculatorButton.THREE -> functions.convertPoundToKg()
-            CalculatorButton.EQUAL -> notImplemented()
+            CalculatorButton.EQUAL -> viewCurrentValueAsDegreesMinutesSeconds()
             CalculatorButton.BACK -> functions2.nCr()
             CalculatorButton.ZERO -> functions.convertFahrenheitToCelsius()
             CalculatorButton.DOT -> functions.convertOunceToGram()
@@ -547,6 +547,14 @@ class Ti36Simulator {
         } else {
             display.removeState(CalculatorState.MEMORY)
         }
+    }
+
+    /**
+     * Displays the current value on the display in degrees, minutes, and seconds format.
+     */
+    private fun viewCurrentValueAsDegreesMinutesSeconds() {
+        val currentValue = computation.getValue()
+        display.viewValueAsDegreesMinutesSeconds(currentValue)
     }
 
     /** Displays a "not implemented" message on the display. */

@@ -45,9 +45,11 @@ private val SEGMENTS = mapOf(
     '9' to listOf(true, true, true, true, false, true, true),
     'A' to listOf(true, true, true, false, true, true, true),
     'B' to listOf(false, false, true, true, true, true ,true),
+    'b' to listOf(false, false, true, true, true, true ,true),
     'C' to listOf(true,false,false,true,true,true,false),
     'c' to listOf(false, false, false, true, true, false, true),
     'D' to listOf(false,true,true,true,true,false,true),
+    'd' to listOf(false,true,true,true,true,false,true),
     'E' to listOf(true,false,false,true,true,true,true),
     'F' to listOf(true,false,false,false,true,true,true),
     'H' to listOf(false, true, true, false, true, true, true),
@@ -66,6 +68,9 @@ private val SEGMENTS = mapOf(
     'U' to listOf(false, true, true, true, true, true, false),
     'u' to listOf(false, false, true, true, true, false, false),
     'Y' to listOf(false, true, true, true, false, true, true),
+    '°' to listOf(true, true, false, false, false, true, true),
+    '\'' to listOf(false, false, false, false, false, true, false),
+    '"' to listOf(false, true, false, false, false, true, false),
 )
 
 /**
