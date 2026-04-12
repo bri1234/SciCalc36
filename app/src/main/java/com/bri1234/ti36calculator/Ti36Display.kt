@@ -22,6 +22,7 @@ import com.bri1234.ti36calculator.contracts.CalculatorStateInterface
 import java.util.Locale
 import kotlin.math.floor
 import kotlin.math.abs
+import kotlin.math.pow
 
 const val NUM_MANTISSA_DIGITS = 11
 const val NUM_EXPONENT_DIGITS = 3
@@ -87,7 +88,7 @@ class Ti36Display : CalculatorStateInterface {
         val mantissa = mantissaStr.trim().toDoubleOrNull() ?: 0.0
         val exponent = exponentStr.trim().toIntOrNull() ?: 0
 
-        return mantissa * Math.pow(10.0, exponent.toDouble())
+        return mantissa * 10.0.pow(exponent.toDouble())
     }
 
     /**
