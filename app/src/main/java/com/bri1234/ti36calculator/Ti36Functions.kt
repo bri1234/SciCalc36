@@ -23,7 +23,6 @@ import com.bri1234.ti36calculator.utils.factorial as mathUtilsFactorial
 import com.bri1234.ti36calculator.utils.getIntFromDouble
 
 import kotlin.math.*
-import kotlin.math.pow
 
 /**
  * This class implements the one parameter functions of the TI-36 calculator.

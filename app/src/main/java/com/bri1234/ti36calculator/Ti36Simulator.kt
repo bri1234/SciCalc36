@@ -31,8 +31,6 @@ private enum class CalculatorInputState {
 Next features to implement (in order):
 - CE/C button (clear entry / clear)
 - A/B/C button (variable storage and usage)
-- R->P button (rectangular to polar conversion)
-- P->R button (polar to rectangular conversion)
 - STAT mode
 - refactoring: separate display state from internal state, display state created from internal state (e.g. STAT, BIN, OCT, HEX ...)
 */
@@ -47,9 +45,8 @@ class Ti36Simulator {
     private val output = Ti36Output(display)
     private val computation = Ti36Computation()
 
-    // TODO: instead of display use internal state to determine which functions are active.
     private val functions = Ti36Functions(display, computation)
-    private val functions2 = Ti36Functions2(computation)
+    private val functions2 = Ti36Functions2(display, computation)
 
     private val memory = Ti36Memory(computation)
 
@@ -266,7 +263,7 @@ class Ti36Simulator {
             CalculatorButton.BACK -> functions2.nPr()
             CalculatorButton.ZERO -> functions.convertCelsiusToFahrenheit()
             CalculatorButton.DOT -> functions.convertGramToOunce()
-            CalculatorButton.PLUS_MINUS -> notImplemented()
+            CalculatorButton.PLUS_MINUS -> functions2.polarToRectangular()
             else -> {
                 // do nothing
             }
@@ -321,7 +318,7 @@ class Ti36Simulator {
             CalculatorButton.BACK -> functions2.nCr()
             CalculatorButton.ZERO -> functions.convertFahrenheitToCelsius()
             CalculatorButton.DOT -> functions.convertOunceToGram()
-            CalculatorButton.PLUS_MINUS -> notImplemented()
+            CalculatorButton.PLUS_MINUS -> functions2.rectangularToPolar()
             else -> {
                 // do nothing
             }
