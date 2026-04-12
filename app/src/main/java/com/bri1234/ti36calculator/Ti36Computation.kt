@@ -196,25 +196,46 @@ class Ti36Computation {
 
     /**
      * Reduces the operation stack by evaluating all applicable operations.
-     * @param evaluateAll If true, collapses the entire stack to a single result.
+     * @param mode The evaluation mode determining how far to evaluate the stack.
+       - PARTIAL: Evaluates until the next operation with higher precedence is encountered.
+       - PARENTHESES: Evaluates until the next left parentheses is encountered.
+       - FULL: Evaluates the entire stack to a single result.
      */
     private fun evaluateStack(mode : StackEvaluationMode) {
-        var done = false
 
-        while (!done) {
+        var forceEvaluation = (mode == StackEvaluationMode.PARENTHESES) || (mode == StackEvaluationMode.FULL)
+
+        var done = false
+        while (!done && (operationIndex > 0)) {
             done = true
 
-            for (idx in 0 until operationIndex) {
+            // find the last parentheses
+            var startIdx = operationIndex - 1
+            while (startIdx > 0 && parenthesesArray[startIdx] == 0)
+                startIdx--
+
+            // evaluate part of the stack after last parentheses
+            for (idx in startIdx ..< operationIndex) {
 
                 if ((operationArray[idx].order <= operationArray[idx + 1].order)
-                    || ((mode == StackEvaluationMode.FULL) && (idx == operationIndex - 1))) {
+                    || (forceEvaluation && (idx == operationIndex - 1))) {
 
                     calculateStackAtIndex(idx)
+
                     done = false
                     break
                 }
 
             }
+
+            // if we evaluated the part after the last parentheses, we can remove the parentheses
+            if (forceEvaluation && (parenthesesArray[startIdx] > 0))
+                parenthesesArray[startIdx]--
+
+            // closing parentheses only forces evaluation of the part after the last parentheses
+            if (mode != StackEvaluationMode.FULL)
+                forceEvaluation = false
+
         }
 
         onResultChanged(registerArray[registerIndex])
@@ -289,9 +310,6 @@ class Ti36Computation {
         println("Idx  ()    Op  Value")
 
         while (idx <= registerIndex || idx <= operationIndex) {
-            val reg = registerArray[idx]
-            val op = operationArray[idx].name
-
             val str = "%02d:  %02d  %4s  %g".format(idx,
                 parenthesesArray[idx], operationArray[idx].caption, registerArray[idx])
 
