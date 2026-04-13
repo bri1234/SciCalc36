@@ -98,7 +98,7 @@ class CalculatorSimulator {
      */
     fun buttonPressed(button: CalculatorButton) {
 
-        computation.printInfo()
+        if (BuildConfig.DEBUG) computation.printInfo()
 
         if (isErrorState) {
             if (button == CalculatorButton.AC_ON) {
@@ -148,7 +148,7 @@ class CalculatorSimulator {
             display.printError()
         }
 
-        computation.printInfo()
+        if (BuildConfig.DEBUG) computation.printInfo()
     }
 
     /**
