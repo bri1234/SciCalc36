@@ -19,15 +19,15 @@
 package com.bri1234.ti36calculator
 
 import android.util.Log
-import com.bri1234.ti36calculator.contracts.ICalculatorState
 import com.bri1234.ti36calculator.views.DisplayLabels
 
 /*
 Next features to implement:
 
+- HEX, OCT, BIN number input
+
 - CE/C button (clear entry / clear)
 - A/B/C button (Fractions)
-- HEX, OCT, BIN number input
 - STAT 1 & 2 mode
 
 */
@@ -35,16 +35,16 @@ Next features to implement:
 /**
  * A simulator class for the TI-36 calculator.
  */
-class Ti36Simulator : ICalculatorState {
+class CalculatorSimulator {
 
-    private val display = Ti36NumericDisplay()
-    private val input = Ti36Input(display)
-    private val computation = Ti36Computation()
+    private val state = CalculatorState()
 
-    private val functions = Ti36Functions(this, computation)
-    private val functions2 = Ti36Functions2(this, computation)
-
-    private val memory = Ti36Memory(computation)
+    private val display = CalculatorNumericDisplay(state)
+    private val input = CalculatorInput(display)
+    private val computation = CalculatorComputation()
+    private val functions = CalculatorFunctions(state, computation)
+    private val functions2 = CalculatorFunctions2(state, computation)
+    private val memory = CalculatorMemory(computation)
 
     private var isErrorState: Boolean = false
 
@@ -52,12 +52,7 @@ class Ti36Simulator : ICalculatorState {
     private var currentInputStateWasSet: Boolean = false
     private var currentMemoryOperation: MemoryOperation = MemoryOperation.NONE
 
-    private var calculatorAngleUnit: CalculatorAngleUnit = CalculatorAngleUnit.DEG
-    private var calculatorFunction: CalculatorFunction = CalculatorFunction.FIRST
-    private var calculatorStatisticMode: CalculatorStatisticMode = CalculatorStatisticMode.OFF
-    private var calculatorHypMode: CalculatorHypMode = CalculatorHypMode.OFF
     private var calculatorHypModeWasSet: Boolean = false
-
 
     // Sets up event listeners for input changes, edit mode, print events,
     // result changes, and memory content changes. Also resets the calculator to its initial state.
@@ -69,7 +64,6 @@ class Ti36Simulator : ICalculatorState {
         input.onEditModeBegin += { onEditModeBegin() }
         display.onPrint += { onPrint() }
         computation.onResultChanged += { value -> onResultChanged(value) }
-        memory.onContentChanged += { hasContent -> onMemoryContentChanged(hasContent) }
     }
 
     /**
@@ -81,14 +75,12 @@ class Ti36Simulator : ICalculatorState {
 
         currentInputState = CalculatorInputState.NONE
         currentInputStateWasSet = false
+
         currentMemoryOperation = MemoryOperation.NONE
 
-        calculatorAngleUnit = CalculatorAngleUnit.DEG
-        calculatorFunction = CalculatorFunction.FIRST
-        calculatorStatisticMode = CalculatorStatisticMode.OFF
-        calculatorHypMode = CalculatorHypMode.OFF
         calculatorHypModeWasSet = false
 
+        state.reset()
         computation.reset()
         display.reset()
         input.reset()
@@ -129,9 +121,8 @@ class Ti36Simulator : ICalculatorState {
                         CalculatorInputState.CONSTANT -> modeConstant(button)
                         CalculatorInputState.MEMORY -> modeMemory(button)
                         CalculatorInputState.FIXED_NUMBER_FORMAT -> modeFixedNumberFormat(button)
-
-                        else -> {
-                            when (calculatorFunction) {
+                        CalculatorInputState.NONE -> {
+                            when (state.calculatorFunction) {
                                 CalculatorFunction.FIRST -> modeFirstFunction(button)
                                 CalculatorFunction.SECOND -> modeSecondFunction(button)
                                 CalculatorFunction.THIRD -> modeThirdFunction(button)
@@ -140,7 +131,7 @@ class Ti36Simulator : ICalculatorState {
                     }
 
                     if (!calculatorHypModeWasSet) {
-                        calculatorHypMode = CalculatorHypMode.OFF
+                        state.calculatorHypMode = CalculatorHypMode.OFF
                     }
                 }
 
@@ -221,7 +212,7 @@ class Ti36Simulator : ICalculatorState {
      * @param button The [CalculatorButton] that was pressed.
      */
     private fun modeSecondFunction(button : CalculatorButton) {
-        calculatorFunction = CalculatorFunction.FIRST
+        state.calculatorFunction = CalculatorFunction.FIRST
 
         when (button) {
             CalculatorButton.HYP -> cycleAngleUnit(false)
@@ -276,27 +267,27 @@ class Ti36Simulator : ICalculatorState {
      * @param button The [CalculatorButton] that was pressed.
      */
     private fun modeThirdFunction(button : CalculatorButton)  {
-        calculatorFunction = CalculatorFunction.FIRST
+        state.calculatorFunction = CalculatorFunction.FIRST
 
         when (button) {
             CalculatorButton.HYP -> cycleAngleUnit(true)
             CalculatorButton.LOG -> functions.factorial()
             CalculatorButton.LN -> functions.thirdRootX()
             CalculatorButton.CE_C -> buttonPressedConst()
-            CalculatorButton.SIN -> notImplemented("D")
-            CalculatorButton.COS -> notImplemented("E")
-            CalculatorButton.TAN -> notImplemented("F")
+            CalculatorButton.SIN -> noOperation()
+            CalculatorButton.COS -> noOperation()
+            CalculatorButton.TAN -> noOperation()
             CalculatorButton.Y_POW_X -> functions.percent()
             CalculatorButton.X_SWAP_Y -> notImplemented("STAT 1")
-            CalculatorButton.ONE_DIV_X -> notImplemented("A")
-            CalculatorButton.X_SQUARED -> notImplemented("B")
-            CalculatorButton.SQRT_X -> notImplemented("C")
+            CalculatorButton.ONE_DIV_X -> noOperation()
+            CalculatorButton.X_SQUARED -> noOperation()
+            CalculatorButton.SQRT_X -> noOperation()
             CalculatorButton.DIVIDE -> functions.pi()
             CalculatorButton.SUM_PLUS -> notImplemented("STAT 2")
-            CalculatorButton.EE -> selectNumberFormat(DisplayNumberFormat.DECIMAL)
-            CalculatorButton.LEFT_PARENTHESES -> selectNumberFormat(DisplayNumberFormat.HEXADECIMAL)
-            CalculatorButton.RIGHT_PARENTHESES -> selectNumberFormat(DisplayNumberFormat.OCTAL)
-            CalculatorButton.MULTIPLY -> selectNumberFormat(DisplayNumberFormat.BINARY)
+            CalculatorButton.EE -> selectNumberFormat(DisplayNumberFormat.FLOAT)
+            CalculatorButton.LEFT_PARENTHESES -> selectNumberMode(CalculatorNumberMode.HEXADECIMAL)
+            CalculatorButton.RIGHT_PARENTHESES -> selectNumberMode(CalculatorNumberMode.OCTAL)
+            CalculatorButton.MULTIPLY -> selectNumberMode(CalculatorNumberMode.BINARY)
             CalculatorButton.STORE -> computation.bitwiseAnd()
             CalculatorButton.SEVEN -> computation.bitwiseOr()
             CalculatorButton.EIGHT -> computation.bitwiseXor()
@@ -338,7 +329,7 @@ class Ti36Simulator : ICalculatorState {
 
     /** Toggles the THIRD function mode; deactivates SECOND mode if active. */
     private fun buttonPressedThird() {
-        calculatorFunction = when (calculatorFunction) {
+        state.calculatorFunction = when (state.calculatorFunction) {
             CalculatorFunction.THIRD -> CalculatorFunction.FIRST
             else -> CalculatorFunction.THIRD
         }
@@ -346,7 +337,7 @@ class Ti36Simulator : ICalculatorState {
 
     /** Toggles the SECOND function mode; deactivates THIRD mode if active. */
     private fun buttonPressedSecond() {
-        calculatorFunction = when (calculatorFunction) {
+        state.calculatorFunction = when (state.calculatorFunction) {
             CalculatorFunction.SECOND -> CalculatorFunction.FIRST
             else -> CalculatorFunction.SECOND
         }
@@ -357,17 +348,17 @@ class Ti36Simulator : ICalculatorState {
      * If it is currently inactive, it will be activated unless the current number format is hexadecimal, octal, or binary.
      */
     private fun buttonPressedHyp() {
-        if (calculatorHypMode == CalculatorHypMode.HYP) {
-            calculatorHypMode = CalculatorHypMode.OFF
+        if (state.calculatorHypMode == CalculatorHypMode.HYP) {
+            state.calculatorHypMode = CalculatorHypMode.OFF
         }
         else
         {
-            when (display.getNumberFormat()) {
-                DisplayNumberFormat.HEXADECIMAL,
-                DisplayNumberFormat.OCTAL,
-                DisplayNumberFormat.BINARY -> {}
+            when (state.calculatorNumberMode) {
+                CalculatorNumberMode.HEXADECIMAL,
+                CalculatorNumberMode.OCTAL,
+                CalculatorNumberMode.BINARY -> {}
                 else -> {
-                    calculatorHypMode = CalculatorHypMode.HYP
+                    state.calculatorHypMode = CalculatorHypMode.HYP
                     calculatorHypModeWasSet = true
                 }
             }
@@ -397,15 +388,15 @@ class Ti36Simulator : ICalculatorState {
 
     /** Activates fixed number format mode, unless a non-decimal base (hex, octal, binary) is currently active. */
     private fun buttonPressedFixed() {
-        when (display.getNumberFormat()) {
-            DisplayNumberFormat.HEXADECIMAL,
-            DisplayNumberFormat.OCTAL,
-            DisplayNumberFormat.BINARY -> return
-            else -> {}
+        when (state.calculatorNumberMode) {
+            CalculatorNumberMode.HEXADECIMAL,
+            CalculatorNumberMode.OCTAL,
+            CalculatorNumberMode.BINARY -> {}
+            else -> {
+                currentInputState = CalculatorInputState.FIXED_NUMBER_FORMAT
+                currentInputStateWasSet = true
+            }
         }
-
-        currentInputState = CalculatorInputState.FIXED_NUMBER_FORMAT
-        currentInputStateWasSet = true
     }
 
     /**
@@ -516,6 +507,16 @@ class Ti36Simulator : ICalculatorState {
         display.printValue(computation.getValue())
     }
 
+    /**
+     * Sets the given number mode and reprints the current value.
+     *
+     * @param numberMode The [CalculatorNumberMode] to apply.
+     */
+    private fun selectNumberMode(numberMode: CalculatorNumberMode) {
+        state.calculatorNumberMode = numberMode
+        display.printValue(computation.getValue())
+    }
+
     /** Toggles the sign: negates via input in edit mode, otherwise applies the negate function. */
     private fun functionPlusMinus() {
         if (input.isEditMode) {
@@ -551,15 +552,6 @@ class Ti36Simulator : ICalculatorState {
     }
 
     /**
-     * Called when the memory content changes; shows or hides the MEMORY indicator on the display.
-     *
-     * @param hasContent `true` if memory contains a value, `false` if it is empty.
-     */
-    private fun onMemoryContentChanged(hasContent : Boolean) {
-        // nothing to do
-    }
-
-    /**
      * Displays the current value on the display in degrees, minutes, and seconds format.
      */
     private fun viewCurrentValueAsDegreesMinutesSeconds() {
@@ -578,7 +570,7 @@ class Ti36Simulator : ICalculatorState {
      */
     private fun cycleAngleUnit(convert: Boolean) {
 
-        calculatorAngleUnit = when (calculatorAngleUnit) {
+        state.calculatorAngleUnit = when (state.calculatorAngleUnit) {
 
             CalculatorAngleUnit.DEG -> {
                 if (convert) {
@@ -613,7 +605,6 @@ class Ti36Simulator : ICalculatorState {
      */
     fun getDisplayData(): CalculatorDisplayData {
 
-        val displayFormat = display.getNumberFormat()
         val labels = mutableSetOf<DisplayLabels>()
 
         if (memory.hasNonZeroMemory())
@@ -622,37 +613,37 @@ class Ti36Simulator : ICalculatorState {
         if (computation.hasParentheses())
             labels.add(DisplayLabels.PARENTHESES)
 
-        if (calculatorAngleUnit == CalculatorAngleUnit.DEG)
+        if (state.calculatorAngleUnit == CalculatorAngleUnit.DEG)
             labels.add(DisplayLabels.DEG)
 
-        if (calculatorAngleUnit == CalculatorAngleUnit.RAD)
+        if (state.calculatorAngleUnit == CalculatorAngleUnit.RAD)
             labels.add(DisplayLabels.RAD)
 
-        if (calculatorAngleUnit == CalculatorAngleUnit.GRAD)
+        if (state.calculatorAngleUnit == CalculatorAngleUnit.GRAD)
             labels.add(DisplayLabels.GRAD)
 
-        if (calculatorHypMode == CalculatorHypMode.HYP)
+        if (state.calculatorHypMode == CalculatorHypMode.HYP)
             labels.add(DisplayLabels.HYP)
 
-        if (calculatorStatisticMode == CalculatorStatisticMode.STAT1)
+        if (state.calculatorStatisticMode == CalculatorStatisticMode.STAT1)
             labels.add(DisplayLabels.STAT)
 
-        if (calculatorStatisticMode == CalculatorStatisticMode.STAT2)
+        if (state.calculatorStatisticMode == CalculatorStatisticMode.STAT2)
             labels.add(DisplayLabels.STAT)
 
-        if (displayFormat == DisplayNumberFormat.HEXADECIMAL)
+        if (state.calculatorNumberMode == CalculatorNumberMode.HEXADECIMAL)
             labels.add(DisplayLabels.HEX)
 
-        if (displayFormat == DisplayNumberFormat.OCTAL)
+        if (state.calculatorNumberMode == CalculatorNumberMode.OCTAL)
             labels.add(DisplayLabels.OCT)
 
-        if (displayFormat == DisplayNumberFormat.BINARY)
+        if (state.calculatorNumberMode == CalculatorNumberMode.BINARY)
             labels.add(DisplayLabels.BIN)
 
-        if (calculatorFunction == CalculatorFunction.SECOND)
+        if (state.calculatorFunction == CalculatorFunction.SECOND)
             labels.add(DisplayLabels.SECOND)
 
-        if (calculatorFunction == CalculatorFunction.THIRD)
+        if (state.calculatorFunction == CalculatorFunction.THIRD)
             labels.add(DisplayLabels.THIRD)
 
         return CalculatorDisplayData(
@@ -663,12 +654,8 @@ class Ti36Simulator : ICalculatorState {
         )
     }
 
-    override fun isFunctionHyp(): Boolean = calculatorHypMode == CalculatorHypMode.HYP
-
-    override fun isAngleDeg(): Boolean = calculatorAngleUnit == CalculatorAngleUnit.DEG
-
-    override fun isAngleRad(): Boolean = calculatorAngleUnit == CalculatorAngleUnit.RAD
-
-    override fun isAngleGrad(): Boolean = calculatorAngleUnit == CalculatorAngleUnit.GRAD
+    private fun noOperation() {
+        // do nothing
+    }
 
 }

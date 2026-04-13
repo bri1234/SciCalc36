@@ -20,7 +20,7 @@ package com.bri1234.ti36calculator
 
 import com.bri1234.ti36calculator.utils.ObserverSubject
 
-class Ti36Input(val display: Ti36NumericDisplay) {
+class CalculatorInput(val display: CalculatorNumericDisplay) {
 
     val onEditInputChanged: ObserverSubject<Unit> = ObserverSubject()
     val onEditModeBegin: ObserverSubject<Unit> = ObserverSubject()

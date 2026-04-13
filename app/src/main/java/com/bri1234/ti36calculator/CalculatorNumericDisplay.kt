@@ -20,7 +20,6 @@ package com.bri1234.ti36calculator
 
 import com.bri1234.ti36calculator.utils.ObserverSubject
 import java.util.Locale
-import kotlin.compareTo
 import kotlin.math.floor
 import kotlin.math.abs
 import kotlin.math.log10
@@ -36,17 +35,13 @@ enum class DisplayNumberFormat {
     FLOAT,
     SCIENTIFIC,
     ENGINEERING,
-    DECIMAL,
-    OCTAL,
-    HEXADECIMAL,
-    BINARY,
 }
 
 /**
  * Class representing the numeric display of the TI-36 calculator. It manages the mantissa, exponent,
  * and decimal point position, and provides methods to print values in various formats.
  */
-class Ti36NumericDisplay  {
+class CalculatorNumericDisplay(val state: CalculatorState)  {
 
     /** An observer subject that is triggered whenever a value is printed to the display.
      * */
@@ -83,11 +78,11 @@ class Ti36NumericDisplay  {
      * Sets the display to show all segments lit up, which is typically used for testing or demonstration purposes.
      * This method fills the mantissa with '8's, sets the decimal point position to 1, and fills the exponent with '8's.
      */
-    fun displayViewAllSegments() {
-        "-8888888888".toCharArray().copyInto(displayMantissa)
-        displayDecimalPointPos = 1
-        "-88".toCharArray().copyInto(displayExponent)
-    }
+//    fun displayViewAllSegments() {
+//        "-8888888888".toCharArray().copyInto(displayMantissa)
+//        displayDecimalPointPos = 1
+//        "-88".toCharArray().copyInto(displayExponent)
+//    }
 
     /**
      * Converts the current display value (mantissa and exponent) into a numeric double value.
@@ -158,14 +153,17 @@ class Ti36NumericDisplay  {
         if ((abs(value) >= 1e100) || ((abs(value) <= 1e-100) && (value != 0.0)))
             throw IllegalArgumentException("Value is out of range for display")
 
-        when (displayNumberFormat) {
-            DisplayNumberFormat.FLOAT -> printValueFloat(value)
-            DisplayNumberFormat.DECIMAL -> printValueDecimal(value)
-            DisplayNumberFormat.SCIENTIFIC -> printValueScientific(value)
-            DisplayNumberFormat.ENGINEERING -> printValueEngineering(value)
-            DisplayNumberFormat.OCTAL -> printValueOct(value)
-            DisplayNumberFormat.HEXADECIMAL -> printValueHex(value)
-            DisplayNumberFormat.BINARY -> printValueBin(value)
+        when (state.calculatorNumberMode) {
+            CalculatorNumberMode.HEXADECIMAL -> printValueHex(value)
+            CalculatorNumberMode.OCTAL -> printValueOct(value)
+            CalculatorNumberMode.BINARY -> printValueBin(value)
+            else -> {
+                when (displayNumberFormat) {
+                    DisplayNumberFormat.FLOAT -> printValueFloat(value)
+                    DisplayNumberFormat.SCIENTIFIC -> printValueScientific(value)
+                    DisplayNumberFormat.ENGINEERING -> printValueEngineering(value)
+                }
+            }
         }
 
         onPrint(Unit)
@@ -338,12 +336,6 @@ class Ti36NumericDisplay  {
         printExponent(exponent)
     }
 
-    /** Prints a double value in decimal format, which is the same as float format.
-     */
-    private fun printValueDecimal(value: Double) {
-        printValueFloat(value)
-    }
-
     /**
      * Prints "Error" to the display, with leading and trailing spaces to fill the mantissa.
      */
@@ -378,19 +370,7 @@ class Ti36NumericDisplay  {
      * The TI-36 supports FLOAT, SCIENTIFIC, ENGINEERING, OCTAL, HEXADECIMAL, and BINARY formats.
      */
     fun setNumberFormat(numberFormat: DisplayNumberFormat) {
-        when (numberFormat) {
-            DisplayNumberFormat.BINARY,
-            DisplayNumberFormat.OCTAL,
-            DisplayNumberFormat.HEXADECIMAL -> numberOfDigitsAfterDecimalPoint = -1
-            else -> {}
-        }
-
         displayNumberFormat = numberFormat
-    }
-
-    /** Gets the current number format for displaying values. */
-    fun getNumberFormat(): DisplayNumberFormat {
-        return displayNumberFormat
     }
 
 }

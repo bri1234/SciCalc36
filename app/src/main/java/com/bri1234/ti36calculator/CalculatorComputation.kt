@@ -52,7 +52,7 @@ private enum class StackEvaluationMode {
  * Manages the computation stack for the TI-36 calculator, including registers and operations.
  * It supports basic arithmetic, exponentiation, roots, and bitwise operations.
  */
-class Ti36Computation {
+class CalculatorComputation {
 
     val onResultChanged: ObserverSubject<Double> = ObserverSubject()
 

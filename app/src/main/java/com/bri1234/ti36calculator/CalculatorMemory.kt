@@ -28,7 +28,7 @@ enum class MemoryOperation {
     SUM,
 }
 
-class Ti36Memory(val computation: Ti36Computation) {
+class CalculatorMemory(val computation: CalculatorComputation) {
 
     val onContentChanged: ObserverSubject<Boolean> = ObserverSubject()
 

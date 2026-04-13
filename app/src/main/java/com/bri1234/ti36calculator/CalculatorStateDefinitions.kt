@@ -48,3 +48,10 @@ enum class CalculatorHypMode {
     HYP,
 }
 
+enum class CalculatorNumberMode {
+    DECIMAL,
+    HEXADECIMAL,
+    OCTAL,
+    BINARY,
+}
+
