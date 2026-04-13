@@ -45,6 +45,6 @@ class CalculatorViewModel(
     }
 
     private fun updateDisplayState() {
-        _displayState.value = simulator.getDisplayState()
+        _displayState.value = simulator.getDisplayData()
     }
 }

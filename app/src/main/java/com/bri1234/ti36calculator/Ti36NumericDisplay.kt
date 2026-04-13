@@ -20,11 +20,18 @@ package com.bri1234.ti36calculator
 
 import com.bri1234.ti36calculator.utils.ObserverSubject
 import java.util.Locale
-import kotlin.math.abs
+import kotlin.compareTo
 import kotlin.math.floor
+import kotlin.math.abs
 import kotlin.math.log10
 import kotlin.math.pow
 
+const val NUM_MANTISSA_DIGITS = 11
+const val NUM_EXPONENT_DIGITS = 3
+
+/**
+ * Enum representing the numeric output format.
+ */
 enum class DisplayNumberFormat {
     FLOAT,
     SCIENTIFIC,
@@ -35,11 +42,19 @@ enum class DisplayNumberFormat {
     BINARY,
 }
 
-class Ti36Output(val display: Ti36Display) {
+/**
+ * Class representing the numeric display of the TI-36 calculator. It manages the mantissa, exponent,
+ * and decimal point position, and provides methods to print values in various formats.
+ */
+class Ti36NumericDisplay  {
 
     /** An observer subject that is triggered whenever a value is printed to the display.
      * */
     val onPrint: ObserverSubject<Unit> = ObserverSubject()
+
+    val displayMantissa = CharArray(NUM_MANTISSA_DIGITS) { ' ' }
+    var displayDecimalPointPos: Int = -1
+    val displayExponent = CharArray(NUM_EXPONENT_DIGITS) { ' ' }
 
     /** Number of digits after decimal point if fix point notation is used.
      * If negative, it means that the number format is not fixed point.
@@ -52,11 +67,75 @@ class Ti36Output(val display: Ti36Display) {
     private var displayNumberFormat: DisplayNumberFormat = DisplayNumberFormat.FLOAT
 
     /**
-     * Resets the number format to FLOAT.
+     * Resets the display to its default state, clearing all labels and setting the numeric value to 0.
+     * The default label is DEG for angle unit.
      */
     fun reset() {
+        displayMantissa.fill(' ')
+        displayDecimalPointPos = -1
+        displayExponent.fill(' ')
+
         displayNumberFormat = DisplayNumberFormat.FLOAT
         numberOfDigitsAfterDecimalPoint = -1
+    }
+
+    /**
+     * Sets the display to show all segments lit up, which is typically used for testing or demonstration purposes.
+     * This method fills the mantissa with '8's, sets the decimal point position to 1, and fills the exponent with '8's.
+     */
+    fun displayViewAllSegments() {
+        "-8888888888".toCharArray().copyInto(displayMantissa)
+        displayDecimalPointPos = 1
+        "-88".toCharArray().copyInto(displayExponent)
+    }
+
+    /**
+     * Converts the current display value (mantissa and exponent) into a numeric double value.
+     * @return The numeric value represented by the current display state.
+     */
+    fun convertDisplayValueToNumeric(): Double {
+        var mantissaStr = displayMantissa.concatToString()
+        val exponentStr = displayExponent.concatToString()
+
+        if (displayDecimalPointPos != -1) {
+            val pos = displayDecimalPointPos + 1
+            mantissaStr = mantissaStr.replaceRange(pos, pos, ".")
+        }
+
+        val mantissa = mantissaStr.trim().toDoubleOrNull() ?: 0.0
+        val exponent = exponentStr.trim().toIntOrNull() ?: 0
+
+        return mantissa * 10.0.pow(exponent.toDouble())
+    }
+
+    /**
+     * Shows a numeric value in degrees in degrees, minutes, and seconds (DMS) format,
+     * @param valueDegrees The numeric value in decimal degrees to be displayed in DMS format.
+     */
+    fun viewValueAsDegreesMinutesSeconds(valueDegrees: Double) {
+        var value = abs(valueDegrees)
+        val degrees = floor(value).toInt()
+        value -= degrees
+        value *= 60
+        val minutes = floor(value).toInt()
+        value -= minutes
+        value *= 60
+        val seconds = floor(value).toInt()
+        value -= seconds
+        value *= 100
+        val centiSeconds = value
+        val sign = if (valueDegrees < 0) "-" else " "
+
+        var dmsString = String.format(
+            Locale.ROOT, "%s%d°%02d'%02d\"%02.0f",
+            sign, degrees, minutes, seconds, centiSeconds)
+
+        if (dmsString.length > NUM_MANTISSA_DIGITS)
+            dmsString = dmsString.substring(0, NUM_MANTISSA_DIGITS)
+
+        dmsString.toCharArray().copyInto(displayMantissa)
+        displayDecimalPointPos = -1
+        displayExponent.fill(' ')
     }
 
     /**
@@ -98,14 +177,22 @@ class Ti36Output(val display: Ti36Display) {
         printInteger(value, 2, 10)
     }
 
+    /** Prints a double value in octal format with radix 8 and 30 bits for the integer part.
+     * The value is treated as a signed integer, so it can represent values from -2^29 to 2^29 - 1. */
     private fun printValueOct(value: Double) {
         printInteger(value, 8, 30)
     }
 
+    /** Prints a double value in octal format with radix 16 and 40 bits for the integer part.
+     * The value is treated as a signed integer, so it can represent values from -2^39 to 2^39 - 1. */
     private fun printValueHex(value: Double) {
         printInteger(value, 16, 40)
     }
 
+    /**
+     * Prints a double value as an integer in the specified radix (base) and number of bits.
+     * The value is treated as a signed integer, so it can represent values from -2^(numBits-1) to 2^(numBits-1) - 1.
+     */
     private fun printInteger(value : Double, radix : Int, numBits : Int) {
         val maxVal = 1L shl numBits
         var valueInt = value.toLong()
@@ -126,16 +213,22 @@ class Ti36Output(val display: Ti36Display) {
         valueStr = valueStr.padStart(NUM_MANTISSA_DIGITS, ' ')
 
         // copy the mantissa and exponent characters to the display
-        valueStr.toCharArray().copyInto(display.mantissa)
+        valueStr.toCharArray().copyInto(displayMantissa)
 
-        display.exponent.fill(' ')
-        display.decimalPointPos = -1
+        displayExponent.fill(' ')
+        displayDecimalPointPos = -1
     }
 
+    /**
+     * Gets the exponent of a double value, which is the integer part of the base-10 logarithm of the absolute value.
+     */
     private fun getExponent(value: Double): Int {
         return if (value == 0.0) 0 else floor(log10(abs(value))).toInt()
     }
 
+    /**
+     * Prints the mantissa of a double value to the display, formatted according to the current number format setting.
+     */
     private fun printMantissa(mantissa : Double) {
         val mantissaExponent = getExponent(mantissa)
         val numDigitsBeforeDecimal = if (mantissaExponent >= 0) mantissaExponent + 1 else 1
@@ -164,36 +257,39 @@ class Ti36Output(val display: Ti36Display) {
             }
 
             // remove the decimal point and record its position
-            display.decimalPointPos = decimalPointPos - 1
+            displayDecimalPointPos = decimalPointPos - 1
             valueStr = valueStr.removeRange(decimalPointPos, decimalPointPos + 1)
         } else {
             check(valueStr.length <= NUM_MANTISSA_DIGITS)
 
-            display.decimalPointPos = valueStr.length - 1
+            displayDecimalPointPos = valueStr.length - 1
         }
 
-        check(display.decimalPointPos < NUM_MANTISSA_DIGITS)
+        check(displayDecimalPointPos < NUM_MANTISSA_DIGITS)
 
         // right align mantissa
         if (valueStr.length < NUM_MANTISSA_DIGITS) {
             val lenBefore = valueStr.length
             valueStr = valueStr.padStart(NUM_MANTISSA_DIGITS, ' ')
-            display.decimalPointPos += (valueStr.length - lenBefore)
+            displayDecimalPointPos += (valueStr.length - lenBefore)
         }
 
-        check(display.decimalPointPos < NUM_MANTISSA_DIGITS)
+        check(displayDecimalPointPos < NUM_MANTISSA_DIGITS)
         check(valueStr.length == NUM_MANTISSA_DIGITS)
 
         // copy the mantissa and exponent characters to the display
-        valueStr.toCharArray().copyInto(display.mantissa)
+        valueStr.toCharArray().copyInto(displayMantissa)
     }
 
+    /**
+     * Prints the exponent of a double value to the display, formatted as a signed two-digit integer with leading zeros if necessary.
+     */
     private fun printExponent(exponent: Int) {
         var exponentStr = String.format(Locale.ROOT, "%02d", abs(exponent))
         exponentStr = if (exponent < 0) "-$exponentStr" else " $exponentStr"
 
         check(exponentStr.length == NUM_EXPONENT_DIGITS)
-        exponentStr.toCharArray().copyInto(display.exponent)
+        exponentStr.toCharArray().copyInto(displayExponent)
     }
 
     /** Prints a double value in float format, which is the default format for the TI-36.
@@ -206,7 +302,7 @@ class Ti36Output(val display: Ti36Display) {
         }
 
         printMantissa(value)
-        display.exponent.fill(' ')
+        displayExponent.fill(' ')
     }
 
     /** Prints a double value in scientific notation, which is in the form of mantissa x 10^exponent.
@@ -252,18 +348,18 @@ class Ti36Output(val display: Ti36Display) {
      * Prints "Error" to the display, with leading and trailing spaces to fill the mantissa.
      */
     fun printError() {
-        "    Error  ".toCharArray().copyInto(display.mantissa)
-        display.decimalPointPos = -1
-        display.exponent.fill(' ')
+        "    Error  ".toCharArray().copyInto(displayMantissa)
+        displayDecimalPointPos = -1
+        displayExponent.fill(' ')
     }
 
     /**
      *  Prints "nAn" to the display, with leading and trailing spaces to fill the mantissa.
      */
     private fun printNan() {
-        "    nAn    ".toCharArray().copyInto(display.mantissa)
-        display.decimalPointPos = -1
-        display.exponent.fill(' ')
+        "    nAn    ".toCharArray().copyInto(displayMantissa)
+        displayDecimalPointPos = -1
+        displayExponent.fill(' ')
     }
 
     /**
@@ -271,10 +367,10 @@ class Ti36Output(val display: Ti36Display) {
      */
     private fun printInf(isPositive: Boolean) {
         val infStr = if (isPositive) "    InF    " else "   -InF    "
-        infStr.toCharArray().copyInto(display.mantissa)
+        infStr.toCharArray().copyInto(displayMantissa)
 
-        display.decimalPointPos = -1
-        display.exponent.fill(' ')
+        displayDecimalPointPos = -1
+        displayExponent.fill(' ')
     }
 
     /**
@@ -296,4 +392,7 @@ class Ti36Output(val display: Ti36Display) {
     fun getNumberFormat(): DisplayNumberFormat {
         return displayNumberFormat
     }
+
 }
+
+

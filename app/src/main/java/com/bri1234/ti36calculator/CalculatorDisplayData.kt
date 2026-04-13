@@ -18,6 +18,8 @@
 
 package com.bri1234.ti36calculator
 
+import com.bri1234.ti36calculator.views.DisplayLabels
+
 /**
  * Represents the state of the calculator display, including the digits shown and any labels.
  *
@@ -30,7 +32,7 @@ data class CalculatorDisplayData (
     val digitsLarge: CharArray = charArrayOf(' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '0'),
     val decimalPointIndex: Int = 10,
     val digitsSmall: CharArray = charArrayOf(' ', ' ', ' '),
-    val displayLabels: MutableSet<CalculatorState> = mutableSetOf(CalculatorState.DEG),
+    val displayLabels: Set<DisplayLabels> = setOf(DisplayLabels.DEG),
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

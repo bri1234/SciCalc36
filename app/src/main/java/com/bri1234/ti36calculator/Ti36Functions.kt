@@ -18,7 +18,7 @@
 
 package com.bri1234.ti36calculator
 
-import com.bri1234.ti36calculator.contracts.CalculatorStateInterface
+import com.bri1234.ti36calculator.contracts.ICalculatorState
 import com.bri1234.ti36calculator.utils.factorial as mathUtilsFactorial
 import com.bri1234.ti36calculator.utils.getIntFromDouble
 
@@ -27,52 +27,8 @@ import kotlin.math.*
 /**
  * This class implements the one parameter functions of the TI-36 calculator.
  */
-class Ti36Functions(val labels: CalculatorStateInterface,
+class Ti36Functions(val state: ICalculatorState,
                     val computation: Ti36Computation) {
-
-    fun hyp() {
-        if (labels.hasState(CalculatorState.HYP))
-            labels.removeState(CalculatorState.HYP)
-        else if (
-            !labels.hasState(CalculatorState.BIN) &&
-            !labels.hasState(CalculatorState.OCT) &&
-            !labels.hasState(CalculatorState.HEX)
-        ) {
-            labels.addState(CalculatorState.HYP)
-        }
-    }
-
-    fun cycleAngleUnit(convert: Boolean) {
-        when {
-            labels.hasState(CalculatorState.DEG) -> {
-                labels.removeState(CalculatorState.DEG)
-                labels.addState(CalculatorState.RAD)
-
-                if (convert) {
-                    val value = computation.getValue()
-                    computation.setValue(value * Math.PI / 180)
-                }
-            }
-            labels.hasState(CalculatorState.RAD) -> {
-                labels.removeState(CalculatorState.RAD)
-                labels.addState(CalculatorState.GRAD)
-
-                if (convert) {
-                    val value = computation.getValue()
-                    computation.setValue(value * 200 / Math.PI)
-                }
-            }
-            labels.hasState(CalculatorState.GRAD) -> {
-                labels.removeState(CalculatorState.GRAD)
-                labels.addState(CalculatorState.DEG)
-
-                if (convert) {
-                    val value = computation.getValue()
-                    computation.setValue(value * 180 / 200)
-                }
-            }
-        }
-    }
 
     fun pi() {
         computation.setValue(Math.PI)
@@ -99,10 +55,10 @@ class Ti36Functions(val labels: CalculatorStateInterface,
     fun sin() {
         val value = computation.getValue()
         val result = when {
-            labels.hasState(CalculatorState.HYP) -> sinh(value)
-            labels.hasState(CalculatorState.DEG) -> sin(Math.toRadians(value))
-            labels.hasState(CalculatorState.RAD) -> sin(value)
-            labels.hasState(CalculatorState.GRAD) -> sin(Math.toRadians(value * 0.9))
+            state.isFunctionHyp() -> sinh(value)
+            state.isAngleDeg() -> sin(Math.toRadians(value))
+            state.isAngleRad() -> sin(value)
+            state.isAngleGrad() -> sin(Math.toRadians(value * 0.9))
             else -> throw IllegalStateException("sin(): No angle unit label found")
         }
         computation.setValue(result)
@@ -111,7 +67,7 @@ class Ti36Functions(val labels: CalculatorStateInterface,
     fun asin() {
         val value = computation.getValue()
 
-        if (labels.hasState(CalculatorState.HYP)) {
+        if (state.isFunctionHyp()) {
             computation.setValue(asinh(value))
             return
         }
@@ -122,9 +78,9 @@ class Ti36Functions(val labels: CalculatorStateInterface,
         val r = asin(value)
 
         val result = when {
-            labels.hasState(CalculatorState.DEG) -> Math.toDegrees(r)
-            labels.hasState(CalculatorState.RAD) -> r
-            labels.hasState(CalculatorState.GRAD) -> Math.toDegrees(r) / 0.9
+            state.isAngleDeg() -> Math.toDegrees(r)
+            state.isAngleRad() -> r
+            state.isAngleGrad() -> Math.toDegrees(r) / 0.9
             else -> throw IllegalStateException("asin(): No angle unit label found")
         }
         computation.setValue(result)
@@ -133,10 +89,10 @@ class Ti36Functions(val labels: CalculatorStateInterface,
     fun cos() {
         val value = computation.getValue()
         val result = when {
-            labels.hasState(CalculatorState.HYP) -> cosh(value)
-            labels.hasState(CalculatorState.DEG) -> cos(Math.toRadians(value))
-            labels.hasState(CalculatorState.RAD) -> cos(value)
-            labels.hasState(CalculatorState.GRAD) -> cos(Math.toRadians(value * 0.9))
+            state.isFunctionHyp() -> cosh(value)
+            state.isAngleDeg() -> cos(Math.toRadians(value))
+            state.isAngleRad() -> cos(value)
+            state.isAngleGrad() -> cos(Math.toRadians(value * 0.9))
             else -> throw IllegalStateException("cos(): No angle unit label found")
         }
         computation.setValue(result)
@@ -145,7 +101,7 @@ class Ti36Functions(val labels: CalculatorStateInterface,
     fun acos() {
         val value = computation.getValue()
 
-        if (labels.hasState(CalculatorState.HYP)) {
+        if (state.isFunctionHyp()) {
             if (value < 1.0)
                 throw IllegalArgumentException("acos(): Input value must be in the range [1, +inf)]")
 
@@ -159,9 +115,9 @@ class Ti36Functions(val labels: CalculatorStateInterface,
         val r = acos(value)
 
         val result = when {
-            labels.hasState(CalculatorState.DEG) -> Math.toDegrees(r)
-            labels.hasState(CalculatorState.RAD) -> r
-            labels.hasState(CalculatorState.GRAD) -> Math.toDegrees(r) / 0.9
+            state.isAngleDeg() -> Math.toDegrees(r)
+            state.isAngleRad() -> r
+            state.isAngleGrad() -> Math.toDegrees(r) / 0.9
             else -> throw IllegalStateException("acos(): No angle unit label found")
         }
         computation.setValue(result)
@@ -170,10 +126,10 @@ class Ti36Functions(val labels: CalculatorStateInterface,
     fun tan() {
         val value = computation.getValue()
         val result = when {
-            labels.hasState(CalculatorState.HYP) -> tanh(value)
-            labels.hasState(CalculatorState.DEG) -> tan(Math.toRadians(value))
-            labels.hasState(CalculatorState.RAD) -> tan(value)
-            labels.hasState(CalculatorState.GRAD) -> tan(Math.toRadians(value * 0.9))
+            state.isFunctionHyp() -> tanh(value)
+            state.isAngleDeg() -> tan(Math.toRadians(value))
+            state.isAngleRad() -> tan(value)
+            state.isAngleGrad() -> tan(Math.toRadians(value * 0.9))
             else -> throw IllegalStateException("tan(): No angle unit label found")
         }
         computation.setValue(result)
@@ -182,7 +138,7 @@ class Ti36Functions(val labels: CalculatorStateInterface,
     fun atan() {
         val value = computation.getValue()
 
-        if (labels.hasState(CalculatorState.HYP)) {
+        if (state.isFunctionHyp()) {
             if ((value <= 1.0) || (value >= 1.0))
                 throw IllegalArgumentException("atan(): Input value must be in the range (-1, 1)")
 
@@ -193,9 +149,9 @@ class Ti36Functions(val labels: CalculatorStateInterface,
         val r = atan(value)
 
         val result = when {
-            labels.hasState(CalculatorState.DEG) -> Math.toDegrees(r)
-            labels.hasState(CalculatorState.RAD) -> r
-            labels.hasState(CalculatorState.GRAD) -> Math.toDegrees(r) / 0.9
+            state.isAngleDeg() -> Math.toDegrees(r)
+            state.isAngleRad() -> r
+            state.isAngleGrad() -> Math.toDegrees(r) / 0.9
             else -> throw IllegalStateException("atan(): No angle unit label found")
         }
         computation.setValue(result)

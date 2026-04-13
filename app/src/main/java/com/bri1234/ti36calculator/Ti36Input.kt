@@ -20,7 +20,7 @@ package com.bri1234.ti36calculator
 
 import com.bri1234.ti36calculator.utils.ObserverSubject
 
-class Ti36Input(val display: Ti36Display) {
+class Ti36Input(val display: Ti36NumericDisplay) {
 
     val onEditInputChanged: ObserverSubject<Unit> = ObserverSubject()
     val onEditModeBegin: ObserverSubject<Unit> = ObserverSubject()
@@ -49,9 +49,9 @@ class Ti36Input(val display: Ti36Display) {
 
         inputPositionMantissa = 10
 
-        "          0".toCharArray().copyInto(display.mantissa)
-        display.decimalPointPos = -1
-        display.exponent.fill(' ')
+        "          0".toCharArray().copyInto(display.displayMantissa)
+        display.displayDecimalPointPos = -1
+        display.displayExponent.fill(' ')
 
         onEditModeBegin(Unit)
     }
@@ -78,26 +78,26 @@ class Ti36Input(val display: Ti36Display) {
             beginEditMode()
 
         if (isEditExponent) {
-            display.exponent[1] = display.exponent[2]
-            display.exponent[2] = "$digit"[0]
+            display.displayExponent[1] = display.displayExponent[2]
+            display.displayExponent[2] = "$digit"[0]
         } else {
             if (inputPositionMantissa < 1)
                 return
 
-            val hasMinus = display.mantissa[inputPositionMantissa] == '-'
+            val hasMinus = display.displayMantissa[inputPositionMantissa] == '-'
 
             for (idx in inputPositionMantissa ..< NUM_MANTISSA_DIGITS - 1) {
-                display.mantissa[idx] = display.mantissa[idx + 1]
+                display.displayMantissa[idx] = display.displayMantissa[idx + 1]
             }
-            display.mantissa[NUM_MANTISSA_DIGITS - 1] = "$digit"[0]
+            display.displayMantissa[NUM_MANTISSA_DIGITS - 1] = "$digit"[0]
 
             inputPositionMantissa--
 
             if (hasMinus)
-                display.mantissa[inputPositionMantissa] = '-'
+                display.displayMantissa[inputPositionMantissa] = '-'
 
-            if (display.decimalPointPos != -1)
-                display.decimalPointPos--
+            if (display.displayDecimalPointPos != -1)
+                display.displayDecimalPointPos--
         }
 
         onEditInputChanged(Unit)
@@ -110,13 +110,13 @@ class Ti36Input(val display: Ti36Display) {
         if (!isEditMode)
             beginEditMode()
 
-        if (isEditExponent || (display.decimalPointPos != -1))
+        if (isEditExponent || (display.displayDecimalPointPos != -1))
             return
 
         if (inputPositionMantissa == NUM_MANTISSA_DIGITS - 1)
             inputDigit(0)
 
-        display.decimalPointPos = NUM_MANTISSA_DIGITS - 1
+        display.displayDecimalPointPos = NUM_MANTISSA_DIGITS - 1
 
         onEditInputChanged(Unit)
     }
@@ -129,15 +129,15 @@ class Ti36Input(val display: Ti36Display) {
             return
 
         if (isEditExponent) {
-            when (display.exponent[0]) {
-                ' ' -> display.exponent[0] = '-'
-                '-' -> display.exponent[0] = ' '
+            when (display.displayExponent[0]) {
+                ' ' -> display.displayExponent[0] = '-'
+                '-' -> display.displayExponent[0] = ' '
                 else -> error("Invalid state: plus/minus can only be toggled on a space or a minus sign")
             }
         } else {
-            when (display.mantissa[inputPositionMantissa]) {
-                ' ' -> display.mantissa[inputPositionMantissa] = '-'
-                '-' -> display.mantissa[inputPositionMantissa] = ' '
+            when (display.displayMantissa[inputPositionMantissa]) {
+                ' ' -> display.displayMantissa[inputPositionMantissa] = '-'
+                '-' -> display.displayMantissa[inputPositionMantissa] = ' '
                 else -> error("Invalid state: plus/minus can only be toggled on a space or a minus sign")
             }
         }
@@ -155,22 +155,22 @@ class Ti36Input(val display: Ti36Display) {
         if (inputPositionMantissa >= NUM_MANTISSA_DIGITS - 1)
             return
 
-        val hasMinus = display.mantissa[inputPositionMantissa] == '-'
+        val hasMinus = display.displayMantissa[inputPositionMantissa] == '-'
         if (hasMinus)
-            display.mantissa[inputPositionMantissa] = ' '
+            display.displayMantissa[inputPositionMantissa] = ' '
 
         for (idx in NUM_MANTISSA_DIGITS - 1 downTo inputPositionMantissa + 1) {
-            display.mantissa[idx] = display.mantissa[idx - 1]
+            display.displayMantissa[idx] = display.displayMantissa[idx - 1]
         }
 
         inputPositionMantissa++
-        display.mantissa[inputPositionMantissa] = ' '
+        display.displayMantissa[inputPositionMantissa] = ' '
 
-        if (display.decimalPointPos != -1)
-            display.decimalPointPos++
+        if (display.displayDecimalPointPos != -1)
+            display.displayDecimalPointPos++
 
         if (hasMinus)
-            display.mantissa[inputPositionMantissa] = '-'
+            display.displayMantissa[inputPositionMantissa] = '-'
 
         onEditInputChanged(Unit)
     }
@@ -184,7 +184,7 @@ class Ti36Input(val display: Ti36Display) {
             return
 
         isEditExponent = true
-        " 00".toCharArray().copyInto(display.exponent)
+        " 00".toCharArray().copyInto(display.displayExponent)
 
         onEditInputChanged(Unit)
     }

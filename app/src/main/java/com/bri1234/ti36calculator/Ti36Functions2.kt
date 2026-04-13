@@ -1,6 +1,6 @@
 package com.bri1234.ti36calculator
 
-import com.bri1234.ti36calculator.contracts.CalculatorStateInterface
+import com.bri1234.ti36calculator.contracts.ICalculatorState
 import com.bri1234.ti36calculator.utils.factorial
 import com.bri1234.ti36calculator.utils.getIntFromDouble
 import kotlin.math.atan2
@@ -11,7 +11,7 @@ import kotlin.math.sin
 /**
  * This class implements the two parameter functions of the TI-36 calculator.
  */
-class Ti36Functions2(val labels: CalculatorStateInterface,
+class Ti36Functions2(val state: ICalculatorState,
                      val computation: Ti36Computation) {
 
     fun swap() {
@@ -48,9 +48,9 @@ class Ti36Functions2(val labels: CalculatorStateInterface,
         val rad = atan2(y, x)
 
         val phi = when {
-            labels.hasState(CalculatorState.RAD) -> rad
-            labels.hasState(CalculatorState.DEG) -> Math.toDegrees(rad)
-            labels.hasState(CalculatorState.GRAD) -> Math.toDegrees(rad) / 0.9
+            state.isAngleRad() -> rad
+            state.isAngleDeg() -> Math.toDegrees(rad)
+            state.isAngleGrad() -> Math.toDegrees(rad) / 0.9
             else -> throw IllegalStateException("Unknown angle unit")
         }
 
@@ -61,9 +61,9 @@ class Ti36Functions2(val labels: CalculatorStateInterface,
         val (phi, r) = computation.getTwoValues()
 
         val rad = when {
-            labels.hasState(CalculatorState.RAD) -> phi
-            labels.hasState(CalculatorState.DEG) -> Math.toRadians(phi)
-            labels.hasState(CalculatorState.GRAD) -> Math.toRadians(phi * 0.9)
+            state.isAngleRad() -> phi
+            state.isAngleDeg() -> Math.toRadians(phi)
+            state.isAngleGrad() -> Math.toRadians(phi * 0.9)
             else -> throw IllegalStateException("Unknown angle unit")
         }
 

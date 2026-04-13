@@ -18,30 +18,33 @@
 
 package com.bri1234.ti36calculator
 
-/**
- * Enum class representing the various labels that can be displayed on the calculator screen.
- *
- * @property caption The text caption for the label as it should appear on the display.
- */
-enum class CalculatorState(val caption: String) {
-    MEMORY("M"),
-    SECOND("2nd"),
-    THIRD("3rd"),
-    HYP("HYP"),
-    BIN("BIN"),
-    OCT("OCT"),
-    HEX("HEX"),
-    STAT1("STAT1"),
-    STAT2("STAT2"),
-    DEG("DEG"),
-    RAD("RAD"),
-    GRAD("GRAD"),
-    X("x"),
-    R("r"),
-    PARENTHESES("()"),
-    FLO("FLO"),
-    SCI("SCI"),
-    ENG("ENG"),
-    FIX("FIX"),
+enum class CalculatorInputState {
+    NONE,
+    CONSTANT,
+    MEMORY,
+    FIXED_NUMBER_FORMAT,
+}
+
+enum class CalculatorAngleUnit {
+    DEG,
+    RAD,
+    GRAD,
+}
+
+enum class CalculatorFunction {
+    FIRST,
+    SECOND,
+    THIRD,
+}
+
+enum class CalculatorStatisticMode {
+    OFF,
+    STAT1,
+    STAT2,
+}
+
+enum class CalculatorHypMode {
+    OFF,
+    HYP,
 }
 
