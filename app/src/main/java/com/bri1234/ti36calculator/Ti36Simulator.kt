@@ -138,6 +138,10 @@ class Ti36Simulator : ICalculatorState {
                             }
                         }
                     }
+
+                    if (!calculatorHypModeWasSet) {
+                        calculatorHypMode = CalculatorHypMode.OFF
+                    }
                 }
 
             }
@@ -145,10 +149,6 @@ class Ti36Simulator : ICalculatorState {
             if (!currentInputStateWasSet) {
                 currentInputState = CalculatorInputState.NONE
                 currentMemoryOperation = MemoryOperation.NONE
-            }
-
-            if (!calculatorHypModeWasSet) {
-                calculatorHypMode = CalculatorHypMode.OFF
             }
 
         } catch (e: Exception) {
@@ -373,7 +373,6 @@ class Ti36Simulator : ICalculatorState {
             }
         }
     }
-
 
     /** Activates constant input mode; the next button press selects a physical constant. */
     private fun buttonPressedConst() {
@@ -617,19 +616,44 @@ class Ti36Simulator : ICalculatorState {
         val displayFormat = display.getNumberFormat()
         val labels = mutableSetOf<DisplayLabels>()
 
-        when {
-            memory.hasNonZeroMemory() -> labels.add(DisplayLabels.MEMORY)
-            computation.hasParentheses() -> labels.add(DisplayLabels.PARENTHESES)
-            calculatorAngleUnit == CalculatorAngleUnit.DEG -> labels.add(DisplayLabels.DEG)
-            calculatorAngleUnit == CalculatorAngleUnit.RAD -> labels.add(DisplayLabels.RAD)
-            calculatorAngleUnit == CalculatorAngleUnit.GRAD -> labels.add(DisplayLabels.GRAD)
-            calculatorHypMode == CalculatorHypMode.HYP -> labels.add(DisplayLabels.HYP)
-            calculatorStatisticMode == CalculatorStatisticMode.STAT1 -> labels.add(DisplayLabels.STAT)
-            calculatorStatisticMode == CalculatorStatisticMode.STAT2 -> labels.add(DisplayLabels.STAT)
-            displayFormat == DisplayNumberFormat.HEXADECIMAL -> labels.add(DisplayLabels.HEX)
-            displayFormat == DisplayNumberFormat.OCTAL -> labels.add(DisplayLabels.OCT)
-            displayFormat == DisplayNumberFormat.BINARY -> labels.add(DisplayLabels.BIN)
-        }
+        if (memory.hasNonZeroMemory())
+            labels.add(DisplayLabels.MEMORY)
+
+        if (computation.hasParentheses())
+            labels.add(DisplayLabels.PARENTHESES)
+
+        if (calculatorAngleUnit == CalculatorAngleUnit.DEG)
+            labels.add(DisplayLabels.DEG)
+
+        if (calculatorAngleUnit == CalculatorAngleUnit.RAD)
+            labels.add(DisplayLabels.RAD)
+
+        if (calculatorAngleUnit == CalculatorAngleUnit.GRAD)
+            labels.add(DisplayLabels.GRAD)
+
+        if (calculatorHypMode == CalculatorHypMode.HYP)
+            labels.add(DisplayLabels.HYP)
+
+        if (calculatorStatisticMode == CalculatorStatisticMode.STAT1)
+            labels.add(DisplayLabels.STAT)
+
+        if (calculatorStatisticMode == CalculatorStatisticMode.STAT2)
+            labels.add(DisplayLabels.STAT)
+
+        if (displayFormat == DisplayNumberFormat.HEXADECIMAL)
+            labels.add(DisplayLabels.HEX)
+
+        if (displayFormat == DisplayNumberFormat.OCTAL)
+            labels.add(DisplayLabels.OCT)
+
+        if (displayFormat == DisplayNumberFormat.BINARY)
+            labels.add(DisplayLabels.BIN)
+
+        if (calculatorFunction == CalculatorFunction.SECOND)
+            labels.add(DisplayLabels.SECOND)
+
+        if (calculatorFunction == CalculatorFunction.THIRD)
+            labels.add(DisplayLabels.THIRD)
 
         return CalculatorDisplayData(
             digitsLarge = display.displayMantissa.copyOf(),
