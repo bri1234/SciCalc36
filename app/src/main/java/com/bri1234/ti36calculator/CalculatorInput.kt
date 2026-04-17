@@ -20,7 +20,8 @@ package com.bri1234.ti36calculator
 
 import com.bri1234.ti36calculator.utils.ObserverSubject
 
-class CalculatorInput(val display: CalculatorNumericDisplay) {
+class CalculatorInput(val state: CalculatorState,
+                      val display: CalculatorNumericDisplay) {
 
     val onEditInputChanged: ObserverSubject<Unit> = ObserverSubject()
     val onEditModeBegin: ObserverSubject<Unit> = ObserverSubject()
@@ -72,7 +73,12 @@ class CalculatorInput(val display: CalculatorNumericDisplay) {
      * @param digit The digit to input (0-9).
      */
     fun inputDigit(digit : Int) {
-        require(digit in 0..9)
+        when (state.calculatorNumberMode) {
+            CalculatorNumberMode.DECIMAL -> if (digit !in 0..9) return
+            CalculatorNumberMode.HEXADECIMAL -> if (digit !in 0..15) return
+            CalculatorNumberMode.OCTAL -> if (digit !in 0..7) return
+            CalculatorNumberMode.BINARY -> if (digit !in 0..1) return
+        }
 
         if (!isEditMode)
             beginEditMode()
@@ -107,6 +113,9 @@ class CalculatorInput(val display: CalculatorNumericDisplay) {
      * Inputs a decimal point into the mantissa, if not already present.
      */
     fun inputDecimalPoint() {
+        if (state.calculatorNumberMode != CalculatorNumberMode.DECIMAL)
+            return
+
         if (!isEditMode)
             beginEditMode()
 

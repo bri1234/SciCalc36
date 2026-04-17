@@ -24,8 +24,6 @@ import com.bri1234.ti36calculator.views.DisplayLabels
 /*
 Next features to implement:
 
-- HEX, OCT, BIN number input
-
 - CE/C button (clear entry / clear)
 - A/B/C button (Fractions)
 - STAT 1 & 2 mode
@@ -40,7 +38,7 @@ class CalculatorSimulator {
     private val state = CalculatorState()
 
     private val display = CalculatorNumericDisplay(state)
-    private val input = CalculatorInput(display)
+    private val input = CalculatorInput(state, display)
     private val computation = CalculatorComputation()
     private val functions = CalculatorFunctions(state, computation)
     private val functions2 = CalculatorFunctions2(state, computation)
@@ -122,11 +120,17 @@ class CalculatorSimulator {
                         CalculatorInputState.MEMORY -> modeMemory(button)
                         CalculatorInputState.FIXED_NUMBER_FORMAT -> modeFixedNumberFormat(button)
                         CalculatorInputState.NONE -> {
-                            when (state.calculatorFunction) {
-                                CalculatorFunction.FIRST -> modeFirstFunction(button)
-                                CalculatorFunction.SECOND -> modeSecondFunction(button)
-                                CalculatorFunction.THIRD -> modeThirdFunction(button)
+
+                            when (state.calculatorNumberMode) {
+                                CalculatorNumberMode.HEXADECIMAL,
+                                CalculatorNumberMode.OCTAL,
+                                CalculatorNumberMode.BINARY -> modeHexOctBin(button)
+                                else -> {
+                                    modeFunctions(button)
+                                }
                             }
+
+                            state.calculatorFunction = CalculatorFunction.FIRST
                         }
                     }
 
@@ -149,6 +153,18 @@ class CalculatorSimulator {
         }
 
         if (BuildConfig.DEBUG) computation.printInfo()
+    }
+
+    /** Handles the button presses for the current function mode.
+     *
+     * @param button The [CalculatorButton] that was pressed.
+     */
+    private fun modeFunctions(button : CalculatorButton) {
+        when (state.calculatorFunction) {
+            CalculatorFunction.FIRST -> modeFirstFunction(button)
+            CalculatorFunction.SECOND -> modeSecondFunction(button)
+            CalculatorFunction.THIRD -> modeThirdFunction(button)
+        }
     }
 
     /**
@@ -212,8 +228,6 @@ class CalculatorSimulator {
      * @param button The [CalculatorButton] that was pressed.
      */
     private fun modeSecondFunction(button : CalculatorButton) {
-        state.calculatorFunction = CalculatorFunction.FIRST
-
         when (button) {
             CalculatorButton.HYP -> cycleAngleUnit(false)
             CalculatorButton.LOG -> functions.tenPowX()
@@ -267,8 +281,6 @@ class CalculatorSimulator {
      * @param button The [CalculatorButton] that was pressed.
      */
     private fun modeThirdFunction(button : CalculatorButton)  {
-        state.calculatorFunction = CalculatorFunction.FIRST
-
         when (button) {
             CalculatorButton.HYP -> cycleAngleUnit(true)
             CalculatorButton.LOG -> functions.factorial()
@@ -309,6 +321,80 @@ class CalculatorSimulator {
             CalculatorButton.PLUS_MINUS -> functions2.rectangularToPolar()
             else -> {
                 // do nothing
+            }
+        }
+    }
+
+    /**
+     * Handles the button presses for the HEX mode.
+     *
+     * @param button The [CalculatorButton] that was pressed.
+     */
+    private fun modeHexOctBin(button : CalculatorButton)  {
+        val isFirstFunc = state.calculatorFunction == CalculatorFunction.FIRST
+        val isSecondFunc = state.calculatorFunction == CalculatorFunction.SECOND
+        val isThirdFunc = state.calculatorFunction == CalculatorFunction.THIRD
+        val isHex = state.calculatorNumberMode == CalculatorNumberMode.HEXADECIMAL
+
+        when (button) {
+            CalculatorButton.HYP -> check(!isThirdFunc)
+
+            CalculatorButton.LOG -> { check(!isFirstFunc); modeFunctions(button) }
+
+            CalculatorButton.CE_C -> if (isFirstFunc) modeFunctions(button)
+
+            CalculatorButton.ONE_DIV_X -> { check(isHex); input.inputDigit(10) }
+
+            CalculatorButton.X_SQUARED -> {
+                if (isHex) input.inputDigit(11)
+                else {
+                    check(isFirstFunc)
+                    modeFunctions(button)
+                }
+            }
+
+            CalculatorButton.SQRT_X -> { check(isHex); input.inputDigit(12) }
+            CalculatorButton.SIN -> { check(isHex); input.inputDigit(13) }
+            CalculatorButton.COS -> { check(isHex); input.inputDigit(14) }
+            CalculatorButton.TAN -> { check(isHex); input.inputDigit(15) }
+
+            CalculatorButton.SUM_PLUS -> { check(isThirdFunc); modeFunctions(button) }
+
+            CalculatorButton.EE -> { check(!isSecondFunc); if (isThirdFunc) modeFunctions(button) }
+
+            CalculatorButton.X_SWAP_Y,
+            CalculatorButton.LEFT_PARENTHESES,
+            CalculatorButton.RIGHT_PARENTHESES,
+            CalculatorButton.MULTIPLY,
+            CalculatorButton.STORE,
+            CalculatorButton.SEVEN,
+            CalculatorButton.EIGHT,
+            CalculatorButton.NINE,
+            CalculatorButton.MINUS -> { check(!isSecondFunc); modeFunctions(button) }
+
+            CalculatorButton.RECALL -> modeFunctions(button)
+
+            CalculatorButton.FIVE,
+            CalculatorButton.SIX,
+            CalculatorButton.PLUS -> { check(!isSecondFunc); if (isFirstFunc) modeFunctions(button) }
+
+            CalculatorButton.A_B_C -> noOperation()
+
+            CalculatorButton.DIVIDE,
+            CalculatorButton.Y_POW_X,
+            CalculatorButton.ONE,
+            CalculatorButton.TWO,
+            CalculatorButton.THREE,
+            CalculatorButton.FOUR,
+            CalculatorButton.EQUAL,
+            CalculatorButton.BACK,
+            CalculatorButton.ZERO,
+            CalculatorButton.PLUS_MINUS -> { check(isFirstFunc); modeFunctions(button) }
+
+            CalculatorButton.DOT -> check(isFirstFunc)
+
+            else -> {
+                throw IllegalArgumentException("Invalid button in hexadecimal mode")
             }
         }
     }
