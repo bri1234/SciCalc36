@@ -19,6 +19,7 @@
 package com.bri1234.ti36calculator
 
 import com.bri1234.ti36calculator.utils.ObserverSubject
+import java.util.Locale
 
 class CalculatorInput(val state: CalculatorState,
                       val display: CalculatorNumericDisplay) {
@@ -80,12 +81,14 @@ class CalculatorInput(val state: CalculatorState,
             CalculatorNumberMode.BINARY -> if (digit !in 0..1) return
         }
 
+        val digitCh = digit.toString(16).uppercase(Locale.ROOT)[0]
+
         if (!isEditMode)
             beginEditMode()
 
         if (isEditExponent) {
             display.displayExponent[1] = display.displayExponent[2]
-            display.displayExponent[2] = "$digit"[0]
+            display.displayExponent[2] = digitCh
         } else {
             if (inputPositionMantissa < 1)
                 return
@@ -95,7 +98,7 @@ class CalculatorInput(val state: CalculatorState,
             for (idx in inputPositionMantissa ..< NUM_MANTISSA_DIGITS - 1) {
                 display.displayMantissa[idx] = display.displayMantissa[idx + 1]
             }
-            display.displayMantissa[NUM_MANTISSA_DIGITS - 1] = "$digit"[0]
+            display.displayMantissa[NUM_MANTISSA_DIGITS - 1] = digitCh
 
             inputPositionMantissa--
 

@@ -605,10 +605,14 @@ class CalculatorSimulator {
 
     /** Toggles the sign: negates via input in edit mode, otherwise applies the negate function. */
     private fun functionPlusMinus() {
-        if (input.isEditMode) {
-            input.inputPlusMinus()
-        } else {
+        if (!input.isEditMode
+            || (state.calculatorNumberMode == CalculatorNumberMode.HEXADECIMAL)
+            || (state.calculatorNumberMode == CalculatorNumberMode.OCTAL)
+            || (state.calculatorNumberMode == CalculatorNumberMode.BINARY)) {
+
             functions.negate()
+        } else {
+            input.inputPlusMinus()
         }
     }
 
