@@ -24,7 +24,6 @@ import com.bri1234.ti36calculator.views.DisplayLabels
 /*
 Next features to implement:
 
-- CE/C button (clear entry / clear)
 - A/B/C button (Fractions)
 - STAT 1 & 2 mode
 
@@ -84,6 +83,24 @@ class CalculatorSimulator {
         input.reset()
         memory.reset()
     }
+
+    /** Handles the CE/C button press. */
+    private fun buttonPressedCeC() {
+        // TODO: distinguish CE and C based on current input state (CE in edit mode, C otherwise)
+
+        isErrorState = false
+
+        currentInputState = CalculatorInputState.NONE
+        currentInputStateWasSet = false
+
+        currentMemoryOperation = MemoryOperation.NONE
+
+        calculatorHypModeWasSet = false
+
+        computation.setValue(0.0)
+        input.reset()
+    }
+
 
     /**
      * Simulates the pressing of a calculator button. Depending on the current state of the calculator
@@ -406,11 +423,6 @@ class CalculatorSimulator {
     private fun buttonPressedAcOn() {
         reset()
         display.printValue(computation.getValue())
-    }
-
-    /** Handles the CE/C button press (currently not implemented). */
-    private fun buttonPressedCeC() {
-        notImplemented("CeC")
     }
 
     /** Toggles the THIRD function mode; deactivates SECOND mode if active. */
