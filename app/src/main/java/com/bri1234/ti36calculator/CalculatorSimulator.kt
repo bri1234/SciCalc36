@@ -24,8 +24,10 @@ import com.bri1234.ti36calculator.views.DisplayLabels
 /*
 Next features to implement:
 
-- A/B/C button (Fractions)
-- STAT 1 & 2 mode
+- Statistics: FRQ Button
+- A B/C button (Fractions)
+- d/c button (Fractions)
+- F<->D button (Fractions)
 
 */
 
@@ -42,6 +44,7 @@ class CalculatorSimulator {
     private val functions = CalculatorFunctions(state, computation)
     private val functions2 = CalculatorFunctions2(state, computation)
     private val memory = CalculatorMemory(computation)
+    private val statistic = CalculatorStatistic(state, computation)
 
     private var isErrorState: Boolean = false
 
@@ -82,6 +85,7 @@ class CalculatorSimulator {
         display.reset()
         input.reset()
         memory.reset()
+        statistic.reset()
     }
 
     /** Handles the CE/C button press. */
@@ -206,7 +210,7 @@ class CalculatorSimulator {
             CalculatorButton.X_SQUARED -> functions.xSquared()
             CalculatorButton.SQRT_X -> functions.squareRootX()
             CalculatorButton.DIVIDE -> computation.division()
-            CalculatorButton.SUM_PLUS -> notImplemented("Sum+")
+            CalculatorButton.SUM_PLUS -> statistic.addValue()
             CalculatorButton.EE -> input.enterExponentEditMode()
             CalculatorButton.LEFT_PARENTHESES -> computation.leftParentheses()
             CalculatorButton.RIGHT_PARENTHESES -> computation.rightParentheses()
@@ -254,26 +258,26 @@ class CalculatorSimulator {
             CalculatorButton.COS -> functions.acos()
             CalculatorButton.TAN -> functions.atan()
             CalculatorButton.Y_POW_X -> computation.yRootX()
-            CalculatorButton.X_SWAP_Y -> notImplemented("CSR")
+            CalculatorButton.X_SWAP_Y -> statistic.clearStatistic()
             CalculatorButton.ONE_DIV_X -> notImplemented("FRQ")
-            CalculatorButton.X_SQUARED -> notImplemented("/X")
-            CalculatorButton.SQRT_X -> notImplemented("S xn-1")
-            CalculatorButton.DIVIDE -> notImplemented("S xn")
-            CalculatorButton.SUM_PLUS -> notImplemented("Sum-")
-            CalculatorButton.EE -> notImplemented("n")
-            CalculatorButton.LEFT_PARENTHESES -> notImplemented("/y")
-            CalculatorButton.RIGHT_PARENTHESES -> notImplemented("S yn-1")
-            CalculatorButton.MULTIPLY -> notImplemented("S yn")
-            CalculatorButton.STORE -> notImplemented("Sum x")
-            CalculatorButton.SEVEN -> notImplemented("Sum x^2")
-            CalculatorButton.EIGHT -> notImplemented("Sum y")
-            CalculatorButton.NINE -> notImplemented("Sum y^2")
-            CalculatorButton.MINUS -> notImplemented("Sum x*y")
+            CalculatorButton.X_SQUARED -> statistic.printMeanX()
+            CalculatorButton.SQRT_X -> statistic.printSampleStandardDeviationX()
+            CalculatorButton.DIVIDE -> statistic.printPopulationStandardDeviationX()
+            CalculatorButton.SUM_PLUS -> statistic.subtractValue()
+            CalculatorButton.EE -> statistic.printCount()
+            CalculatorButton.LEFT_PARENTHESES -> statistic.printMeanY()
+            CalculatorButton.RIGHT_PARENTHESES -> statistic.printSampleStandardDeviationY()
+            CalculatorButton.MULTIPLY -> statistic.printPopulationStandardDeviationY()
+            CalculatorButton.STORE -> statistic.printSumX()
+            CalculatorButton.SEVEN -> statistic.printSumX2()
+            CalculatorButton.EIGHT -> statistic.printSumY()
+            CalculatorButton.NINE -> statistic.printSumY2()
+            CalculatorButton.MINUS -> statistic.printSumXY()
             CalculatorButton.RECALL -> buttonPressedMemory(MemoryOperation.SUM)
-            CalculatorButton.FOUR -> notImplemented("ITC")
-            CalculatorButton.FIVE -> notImplemented("SLP")
-            CalculatorButton.SIX -> notImplemented("x'")
-            CalculatorButton.PLUS -> notImplemented("y'")
+            CalculatorButton.FOUR -> statistic.printIntercept()
+            CalculatorButton.FIVE -> statistic.printSlope()
+            CalculatorButton.SIX -> statistic.printPredictedX()
+            CalculatorButton.PLUS -> statistic.printPredictedY()
             CalculatorButton.A_B_C -> notImplemented("D/C")
             CalculatorButton.ONE -> functions.convertCmToInch()
             CalculatorButton.TWO -> functions.convertLiterToGallon()
@@ -307,12 +311,12 @@ class CalculatorSimulator {
             CalculatorButton.COS -> noOperation()
             CalculatorButton.TAN -> noOperation()
             CalculatorButton.Y_POW_X -> functions.percent()
-            CalculatorButton.X_SWAP_Y -> notImplemented("STAT 1")
+            CalculatorButton.X_SWAP_Y -> statistic.enableStatistic1()
             CalculatorButton.ONE_DIV_X -> noOperation()
             CalculatorButton.X_SQUARED -> noOperation()
             CalculatorButton.SQRT_X -> noOperation()
             CalculatorButton.DIVIDE -> functions.pi()
-            CalculatorButton.SUM_PLUS -> notImplemented("STAT 2")
+            CalculatorButton.SUM_PLUS -> statistic.enableStatistic2()
             CalculatorButton.EE -> selectNumberFormat(DisplayNumberFormat.FLOAT)
             CalculatorButton.LEFT_PARENTHESES -> selectNumberMode(CalculatorNumberMode.HEXADECIMAL)
             CalculatorButton.RIGHT_PARENTHESES -> selectNumberMode(CalculatorNumberMode.OCTAL)
@@ -323,7 +327,7 @@ class CalculatorSimulator {
             CalculatorButton.NINE -> computation.bitwiseXnor()
             CalculatorButton.MINUS -> functions.bitwiseNot()
             CalculatorButton.RECALL -> buttonPressedMemory(MemoryOperation.EXCHANGE)
-            CalculatorButton.FOUR -> notImplemented("COR")
+            CalculatorButton.FOUR -> statistic.printCorrelationCoefficient()
             CalculatorButton.FIVE -> selectNumberFormat(DisplayNumberFormat.FLOAT)
             CalculatorButton.SIX -> selectNumberFormat(DisplayNumberFormat.SCIENTIFIC)
             CalculatorButton.PLUS -> selectNumberFormat(DisplayNumberFormat.ENGINEERING)
@@ -612,6 +616,7 @@ class CalculatorSimulator {
      */
     private fun selectNumberMode(numberMode: CalculatorNumberMode) {
         state.calculatorNumberMode = numberMode
+        state.calculatorStatisticMode = CalculatorStatisticMode.OFF
         display.printValue(computation.getValue())
     }
 
@@ -659,11 +664,6 @@ class CalculatorSimulator {
     private fun viewCurrentValueAsDegreesMinutesSeconds() {
         val currentValue = computation.getValue()
         display.viewValueAsDegreesMinutesSeconds(currentValue)
-    }
-
-    /** Displays a "not implemented" message on the display. */
-    private fun notImplemented(functionName: String) {
-        Log.i("Ti36Simulator", "function $functionName is not implemented")
     }
 
     /**
@@ -758,6 +758,11 @@ class CalculatorSimulator {
 
     private fun noOperation() {
         // do nothing
+    }
+
+    /** Displays a "not implemented" message on the display. */
+    private fun notImplemented(functionName: String) {
+        Log.i("Ti36Simulator", "function $functionName is not implemented")
     }
 
 }
