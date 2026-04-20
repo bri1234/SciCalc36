@@ -2,7 +2,7 @@ package com.bri1234.ti36calculator
 
 import org.junit.Test
 
-class UnitTestMemory {
+class UnitTestArithmetic {
     @Test
     fun testBasicArithmetic() {
         val sim = CalculatorSimulator()
