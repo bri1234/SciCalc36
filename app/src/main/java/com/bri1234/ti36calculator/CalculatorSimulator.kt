@@ -38,7 +38,7 @@ class CalculatorSimulator {
 
     private val state = CalculatorState()
 
-    private val display = CalculatorNumericDisplay(state)
+    val display = CalculatorNumericDisplay(state)
     private val input = CalculatorInput(state, display)
     private val computation = CalculatorComputation()
     private val functions = CalculatorFunctions(state, computation)
