@@ -1,5 +1,6 @@
 package com.bri1234.ti36calculator
 
+import com.bri1234.ti36calculator.views.DisplayLabels
 import org.junit.Assert.assertEquals
 
 fun CalculatorSimulator.input(vararg buttons: CalculatorButton) {
@@ -41,6 +42,10 @@ private val strToButtons = mapOf(
     "1/x" to listOf(CalculatorButton.ONE_DIV_X),
     "x^2" to listOf(CalculatorButton.X_SQUARED),
     "sqrt" to listOf(CalculatorButton.SQRT_X),
+    "hyp" to listOf(CalculatorButton.HYP),
+    "sin" to listOf(CalculatorButton.SIN),
+    "cos" to listOf(CalculatorButton.COS),
+    "tan" to listOf(CalculatorButton.TAN),
 )
 
 fun CalculatorSimulator.input(inputStr: String) {
@@ -71,5 +76,12 @@ fun CalculatorSimulator.assertDisplay(mantissa: String, exponent: String) {
 
     assertEquals("Expected exponent: '$exponentStr1', actual exponent: '$exponentStr2'",
         exponentStr1, exponentStr2)
+}
+
+fun CalculatorSimulator.assertDisplayLabel(displayLabel : DisplayLabels, isVisible: Boolean) {
+    val data = getDisplayData()
+
+    assertEquals("Expected display label: $isVisible but is: ${data.displayLabels.contains(displayLabel)}",
+        isVisible, data.displayLabels.contains(displayLabel))
 }
 
