@@ -36,6 +36,11 @@ private val strToButtons = mapOf(
     "y^x" to listOf(CalculatorButton.Y_POW_X),
     "yrootx" to listOf(CalculatorButton.SECOND, CalculatorButton.Y_POW_X),
     "%" to listOf(CalculatorButton.THIRD, CalculatorButton.Y_POW_X),
+    "2nd" to listOf(CalculatorButton.SECOND),
+    "3rd" to listOf(CalculatorButton.THIRD),
+    "1/x" to listOf(CalculatorButton.ONE_DIV_X),
+    "x^2" to listOf(CalculatorButton.X_SQUARED),
+    "sqrt" to listOf(CalculatorButton.SQRT_X),
 )
 
 fun CalculatorSimulator.input(inputStr: String) {
