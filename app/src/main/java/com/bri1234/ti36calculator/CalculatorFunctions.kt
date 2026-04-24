@@ -139,7 +139,7 @@ class CalculatorFunctions(val state: CalculatorState,
         val value = computation.getValue()
 
         if (isFunctionHyp()) {
-            if ((value <= 1.0) || (value >= 1.0))
+            if ((value <= -1.0) || (value >= 1.0))
                 throw IllegalArgumentException("atan(): Input value must be in the range (-1, 1)")
 
             computation.setValue(atanh(value))
