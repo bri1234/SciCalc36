@@ -8,7 +8,7 @@ class UnitTestInput {
     fun testInput() {
         val sim = CalculatorSimulator()
 
-        sim.buttonPressed(CalculatorButton.AC_ON)
+        sim.input("AC/ON")
         sim.assertDisplay("0.", "")
         sim.input("4")
         sim.assertDisplay("4", "")
@@ -59,17 +59,17 @@ class UnitTestInput {
         sim.assertDisplayLabel(DisplayLabels.THIRD, false)
         sim.assertDisplayLabel(DisplayLabels.HYP, false)
 
-        sim.input("hyp")
+        sim.input("HYP")
         sim.assertDisplayLabel(DisplayLabels.SECOND, false)
         sim.assertDisplayLabel(DisplayLabels.THIRD, false)
         sim.assertDisplayLabel(DisplayLabels.HYP, true)
 
-        sim.input("hyp")
+        sim.input("HYP")
         sim.assertDisplayLabel(DisplayLabels.SECOND, false)
         sim.assertDisplayLabel(DisplayLabels.THIRD, false)
         sim.assertDisplayLabel(DisplayLabels.HYP, false)
 
-        sim.input("hyp 3rd")
+        sim.input("HYP 3rd")
         sim.assertDisplayLabel(DisplayLabels.SECOND, false)
         sim.assertDisplayLabel(DisplayLabels.THIRD, true)
         sim.assertDisplayLabel(DisplayLabels.HYP, true)
@@ -78,13 +78,12 @@ class UnitTestInput {
         sim.assertDisplayLabel(DisplayLabels.THIRD, false)
         sim.assertDisplayLabel(DisplayLabels.HYP, true)
 
-        sim.input(CalculatorButton.AC_ON)
-        sim.input("2nd hyp")
+        sim.input("AC/ON 2nd HYP")
         sim.assertDisplayLabel(DisplayLabels.SECOND, false)
         sim.assertDisplayLabel(DisplayLabels.THIRD, false)
         sim.assertDisplayLabel(DisplayLabels.HYP, false)
         
-        sim.input("3rd hyp")
+        sim.input("3rd HYP")
         sim.assertDisplayLabel(DisplayLabels.SECOND, false)
         sim.assertDisplayLabel(DisplayLabels.THIRD, false)
         sim.assertDisplayLabel(DisplayLabels.HYP, false)

@@ -115,15 +115,23 @@ class CalculatorNumericDisplay(val state: CalculatorState)  {
         val minutes = floor(value).toInt()
         value -= minutes
         value *= 60
-        val seconds = floor(value).toInt()
-        value -= seconds
-        value *= 100
-        val centiSeconds = value
+        val seconds = value
         val sign = if (valueDegrees < 0) "-" else " "
 
-        var dmsString = String.format(
-            Locale.ROOT, "%s%d°%02d'%02d\"%02.0f",
-            sign, degrees, minutes, seconds, centiSeconds)
+        var dmsString = String.format(Locale.ROOT, "%s%d°%02d'",sign, degrees, minutes)
+        val secondsDigitCount = NUM_MANTISSA_DIGITS - dmsString.length
+        val secondsFmt = when (secondsDigitCount) {
+            5 -> "%05.2f"
+            4 -> "%04.1f"
+            else -> "%02.0f"
+        }
+
+        val secondsStr = String.format(Locale.ROOT, secondsFmt, seconds)
+
+        if (secondsStr.contains('.'))
+            dmsString += secondsStr.replace('.', '"')
+        else
+            dmsString += secondsStr + '"'
 
         if (dmsString.length > NUM_MANTISSA_DIGITS)
             dmsString = dmsString.substring(0, NUM_MANTISSA_DIGITS)
