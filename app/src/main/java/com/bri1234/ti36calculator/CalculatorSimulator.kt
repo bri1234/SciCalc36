@@ -315,7 +315,7 @@ class CalculatorSimulator {
             CalculatorButton.ONE_DIV_X -> noOperation()
             CalculatorButton.X_SQUARED -> noOperation()
             CalculatorButton.SQRT_X -> noOperation()
-            CalculatorButton.DIVIDE -> functions.pi()
+            CalculatorButton.DIVIDE -> pi()
             CalculatorButton.SUM_PLUS -> statistic.enableStatistic2()
             CalculatorButton.EE -> selectNumberFormat(DisplayNumberFormat.FLOAT)
             CalculatorButton.LEFT_PARENTHESES -> selectNumberMode(CalculatorNumberMode.HEXADECIMAL)
@@ -528,6 +528,11 @@ class CalculatorSimulator {
         } catch (_: Exception) {
             return false
         }
+    }
+
+    fun pi() {
+        computation.getValue()
+        computation.setValue(Math.PI)
     }
 
     /**

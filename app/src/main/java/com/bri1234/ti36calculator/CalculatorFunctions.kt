@@ -34,10 +34,6 @@ class CalculatorFunctions(val state: CalculatorState,
     private fun isAngleRad() = state.calculatorAngleUnit == CalculatorAngleUnit.RAD
     private fun isAngleGrad() = state.calculatorAngleUnit == CalculatorAngleUnit.GRAD
 
-    fun pi() {
-        computation.setValue(Math.PI)
-    }
-
     fun log() {
         val value = computation.getValue()
         if (value <= 0.0)

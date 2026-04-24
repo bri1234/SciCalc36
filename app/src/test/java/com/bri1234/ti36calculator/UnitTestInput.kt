@@ -89,4 +89,20 @@ class UnitTestInput {
         sim.assertDisplayLabel(DisplayLabels.HYP, false)
 
     }
+
+    @Test
+    fun testUnusualInput() {
+        val sim = CalculatorSimulator()
+
+        sim.input("AC/ON 2")
+        sim.assertDisplay("2", "")
+        sim.input("*")
+        sim.assertDisplay("2.", "")
+        sim.input("*")
+        sim.assertDisplay("2.", "")
+        sim.input("*")
+        sim.assertDisplay("2.", "")
+        sim.input("5 =")
+        sim.assertDisplay("10.", "")
+    }
 }
