@@ -24,7 +24,7 @@ import com.bri1234.ti36calculator.views.DisplayLabels
 /*
 Next features to implement:
 
-- Statistics: FRQ Button
+- P->R, R->P buttons (Polar/Rectangular conversion)
 - A B/C button (Fractions)
 - d/c button (Fractions)
 - F<->D button (Fractions)
@@ -34,7 +34,7 @@ Next features to implement:
 /**
  * A simulator class for the TI-36 calculator.
  */
-class CalculatorSimulator {
+class CalculatorCore {
 
     private val state = CalculatorState()
 
@@ -259,7 +259,7 @@ class CalculatorSimulator {
             CalculatorButton.TAN -> functions.atan()
             CalculatorButton.Y_POW_X -> computation.yRootX()
             CalculatorButton.X_SWAP_Y -> statistic.clearStatistic()
-            CalculatorButton.ONE_DIV_X -> notImplemented("FRQ")
+            CalculatorButton.ONE_DIV_X -> enterFrequencyMode()
             CalculatorButton.X_SQUARED -> statistic.printMeanX()
             CalculatorButton.SQRT_X -> statistic.printSampleStandardDeviationX()
             CalculatorButton.DIVIDE -> statistic.printPopulationStandardDeviationX()
@@ -770,4 +770,11 @@ class CalculatorSimulator {
         Log.i("Ti36Simulator", "function $functionName is not implemented")
     }
 
+    private fun enterFrequencyMode() {
+        require(state.calculatorStatisticMode != CalculatorStatisticMode.OFF)
+
+        // notImplemented("FRQ")
+
+
+    }
 }

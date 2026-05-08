@@ -21,6 +21,12 @@ package com.bri1234.ti36calculator
 import com.bri1234.ti36calculator.utils.ObserverSubject
 import java.util.Locale
 
+enum class DigitInputMode {
+    MANTISSA,
+    EXPONENT,
+    FREQUENCY
+}
+
 class CalculatorInput(val state: CalculatorState,
                       val display: CalculatorNumericDisplay) {
 
@@ -31,7 +37,7 @@ class CalculatorInput(val state: CalculatorState,
     var isEditMode: Boolean = false
         private set
 
-    private var isEditExponent: Boolean = false
+    private var digitInputMode: DigitInputMode = DigitInputMode.MANTISSA
     private var inputPositionMantissa: Int = 0
 
     /**
@@ -47,7 +53,7 @@ class CalculatorInput(val state: CalculatorState,
      */
     private fun beginEditMode() {
         isEditMode = true
-        isEditExponent = false
+        digitInputMode = DigitInputMode.MANTISSA
 
         inputPositionMantissa = 10
 
@@ -63,7 +69,7 @@ class CalculatorInput(val state: CalculatorState,
      */
     fun endEditMode() {
         isEditMode = false
-        isEditExponent = false
+        digitInputMode = DigitInputMode.MANTISSA
         inputPositionMantissa = -1
 
         onEditModeEnd(Unit)
@@ -86,30 +92,81 @@ class CalculatorInput(val state: CalculatorState,
         if (!isEditMode)
             beginEditMode()
 
-        if (isEditExponent) {
-            display.displayExponent[1] = display.displayExponent[2]
-            display.displayExponent[2] = digitCh
-        } else {
-            if (inputPositionMantissa < 1)
-                return
-
-            val hasMinus = display.displayMantissa[inputPositionMantissa] == '-'
-
-            for (idx in inputPositionMantissa ..< NUM_MANTISSA_DIGITS - 1) {
-                display.displayMantissa[idx] = display.displayMantissa[idx + 1]
-            }
-            display.displayMantissa[NUM_MANTISSA_DIGITS - 1] = digitCh
-
-            inputPositionMantissa--
-
-            if (hasMinus)
-                display.displayMantissa[inputPositionMantissa] = '-'
-
-            if (display.displayDecimalPointPos != -1)
-                display.displayDecimalPointPos--
+        val inputHasChanged = when (digitInputMode) {
+            DigitInputMode.MANTISSA -> digitInputModeMantissa(digitCh)
+            DigitInputMode.EXPONENT -> digitInputModeExponent(digitCh)
+            DigitInputMode.FREQUENCY -> digitInputModeFrequency(digitCh)
         }
 
-        onEditInputChanged(Unit)
+        if (inputHasChanged) {
+            onEditInputChanged(Unit)
+        }
+    }
+
+    /**
+     * Inputs a digit into the mantissa, shifting all existing digits to the left.
+     * This method maintains the position of the minus sign if present and adjusts the
+     * decimal point position accordingly.
+     *
+     * @param digitCh The digit character to input.
+     * @return `true` if the digit was successfully added, `false` if no more space is available (inputPositionMantissa < 1).
+     */
+    private fun digitInputModeMantissa(digitCh: Char): Boolean {
+        if (inputPositionMantissa < 1)
+            return false
+
+        val hasMinus = display.displayMantissa[inputPositionMantissa] == '-'
+
+        for (idx in inputPositionMantissa..<NUM_MANTISSA_DIGITS - 1) {
+            display.displayMantissa[idx] = display.displayMantissa[idx + 1]
+        }
+
+        display.displayMantissa[NUM_MANTISSA_DIGITS - 1] = digitCh
+
+        inputPositionMantissa--
+
+        if (hasMinus)
+            display.displayMantissa[inputPositionMantissa] = '-'
+
+        if (display.displayDecimalPointPos != -1)
+            display.displayDecimalPointPos--
+
+        return true
+    }
+
+    /**
+     * Inputs a digit into the exponent, shifting existing digits to the left.
+     * Only decimal digits (0-9) are allowed.
+     *
+     * @param digitCh The digit character to input.
+     * @return `true` if the digit was successfully added.
+     * @throws IllegalArgumentException if the input is not a decimal digit.
+     */
+    private fun digitInputModeExponent(digitCh: Char) : Boolean {
+        require(digitCh.isDigit()) { "Invalid digit for exponent input: $digitCh" }
+
+        display.displayExponent[1] = display.displayExponent[2]
+        display.displayExponent[2] = digitCh
+
+        return true
+    }
+
+    /**
+     * Inputs a digit into the frequency display, shifting the previous digits to the left.
+     * The frequency display is used for statistic mode 1 and 2.
+     * @param digitCh The digit character to input (0-9).
+     */
+    private fun digitInputModeFrequency(digitCh: Char) : Boolean {
+        require(digitCh.isDigit()) { "Invalid digit for frequency input: $digitCh" }
+
+        val m = display.displayMantissa
+        require(m[8] == 'F' && m[9] == 'r' && m[10] == ' ' && m[11].isDigit() && m[12].isDigit())
+            { "Frequency input can only be used in statistic mode 1 and 2" }
+
+        display.displayMantissa[11] = display.displayMantissa[12]
+        display.displayMantissa[12] = digitCh
+
+        return true
     }
 
     /**
@@ -122,7 +179,7 @@ class CalculatorInput(val state: CalculatorState,
         if (!isEditMode)
             beginEditMode()
 
-        if (isEditExponent || (display.displayDecimalPointPos != -1))
+        if ((digitInputMode != DigitInputMode.MANTISSA) || (display.displayDecimalPointPos != -1))
             return
 
         if (inputPositionMantissa == NUM_MANTISSA_DIGITS - 1)
@@ -140,17 +197,23 @@ class CalculatorInput(val state: CalculatorState,
         if (!isEditMode)
             return
 
-        if (isEditExponent) {
-            when (display.displayExponent[0]) {
-                ' ' -> display.displayExponent[0] = '-'
-                '-' -> display.displayExponent[0] = ' '
-                else -> error("Invalid state: plus/minus can only be toggled on a space or a minus sign")
+        when (digitInputMode) {
+            DigitInputMode.MANTISSA -> {
+                when (display.displayMantissa[inputPositionMantissa]) {
+                    ' ' -> display.displayMantissa[inputPositionMantissa] = '-'
+                    '-' -> display.displayMantissa[inputPositionMantissa] = ' '
+                    else -> error("Invalid state: plus/minus can only be toggled on a space or a minus sign")
+                }
             }
-        } else {
-            when (display.displayMantissa[inputPositionMantissa]) {
-                ' ' -> display.displayMantissa[inputPositionMantissa] = '-'
-                '-' -> display.displayMantissa[inputPositionMantissa] = ' '
-                else -> error("Invalid state: plus/minus can only be toggled on a space or a minus sign")
+            DigitInputMode.EXPONENT -> {
+                when (display.displayExponent[0]) {
+                    ' ' -> display.displayExponent[0] = '-'
+                    '-' -> display.displayExponent[0] = ' '
+                    else -> error("Invalid state: plus/minus can only be toggled on a space or a minus sign")
+                }
+            }
+            else -> {
+                throw IllegalStateException("Plus/minus input is not supported in frequency input mode")
             }
         }
 
@@ -161,7 +224,7 @@ class CalculatorInput(val state: CalculatorState,
      * Removes the last entered digit from the mantissa, shifting the remaining digits to the right.
      */
     fun inputBack() {
-        if (!isEditMode || isEditExponent)
+        if (!isEditMode || (digitInputMode != DigitInputMode.MANTISSA))
             return
 
         if (inputPositionMantissa >= NUM_MANTISSA_DIGITS - 1)
@@ -192,10 +255,10 @@ class CalculatorInput(val state: CalculatorState,
      * The mantissa is not editable in this mode.
      */
     fun enterExponentEditMode() {
-        if (!isEditMode || isEditExponent)
+        if (!isEditMode || (digitInputMode != DigitInputMode.MANTISSA))
             return
 
-        isEditExponent = true
+        digitInputMode = DigitInputMode.EXPONENT
         " 00".toCharArray().copyInto(display.displayExponent)
 
         onEditInputChanged(Unit)

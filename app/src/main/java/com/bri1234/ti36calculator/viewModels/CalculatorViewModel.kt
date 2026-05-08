@@ -23,14 +23,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.bri1234.ti36calculator.CalculatorButton
 import com.bri1234.ti36calculator.CalculatorDisplayData
-import com.bri1234.ti36calculator.CalculatorSimulator
+import com.bri1234.ti36calculator.CalculatorCore
 
 /**
  * ViewModel for the TI-36 calculator app.
  * Manages the state of the calculator display and handles button presses.
  */
 class CalculatorViewModel(
-    val simulator: CalculatorSimulator = CalculatorSimulator()
+    val simulator: CalculatorCore = CalculatorCore()
 ) : ViewModel() {
     private val _displayState = mutableStateOf(CalculatorDisplayData())
     val displayState: State<CalculatorDisplayData> = _displayState

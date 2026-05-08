@@ -39,6 +39,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.bri1234.ti36calculator.CALCULATOR_BUTTON_LIST
+import com.bri1234.ti36calculator.CALCULATOR_SPECIAL_BUTTON_LIST
 
 /**
  * Displays a single calculator button with its properties.
@@ -152,9 +154,9 @@ fun CalculatorButtonsView(
             columns = 5,
             rows = 1,
             modifier = Modifier.fillMaxWidth().heightIn(30.dp, 40.dp),
-            gridCellInfos = _root_ide_package_.com.bri1234.ti36calculator.CALCULATOR_SPECIAL_BUTTON_LIST,
+            gridCellInfos = CALCULATOR_SPECIAL_BUTTON_LIST,
         ) {
-            _root_ide_package_.com.bri1234.ti36calculator.CALCULATOR_SPECIAL_BUTTON_LIST.forEach { buttonProperties ->
+            CALCULATOR_SPECIAL_BUTTON_LIST.forEach { buttonProperties ->
                 SimpleCalculatorButton(
                     buttonProperties = buttonProperties,
                     Modifier.padding(4.dp, 0.dp, 4.dp, 0.dp),
@@ -167,9 +169,9 @@ fun CalculatorButtonsView(
             columns = 5,
             rows = 8,
             modifier = Modifier.fillMaxSize(),
-            gridCellInfos = _root_ide_package_.com.bri1234.ti36calculator.CALCULATOR_BUTTON_LIST,
+            gridCellInfos = CALCULATOR_BUTTON_LIST,
         ) {
-            _root_ide_package_.com.bri1234.ti36calculator.CALCULATOR_BUTTON_LIST.forEach { buttonProperties ->
+            CALCULATOR_BUTTON_LIST.forEach { buttonProperties ->
                 CalculatorButton(
                     buttonProperties = buttonProperties,
                     Modifier.padding(4.dp).fillMaxSize(),

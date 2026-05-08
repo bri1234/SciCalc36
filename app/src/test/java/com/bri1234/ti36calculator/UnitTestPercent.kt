@@ -5,26 +5,26 @@ import org.junit.Test
 class UnitTestPercent {
     @Test
     fun testPercent() {
-        val sim = CalculatorSimulator()
+        val calc = CalculatorCore()
 
-        sim.input("AC/ON 2 5 0 * 5 %")
-        sim.assertDisplay("0.05", "")
-        sim.input("=")
-        sim.assertDisplay("12.5", "")
+        calc.input("AC/ON 2 5 0 * 5 %")
+        calc.assertDisplay("0.05", "")
+        calc.input("=")
+        calc.assertDisplay("12.5", "")
 
-        sim.input("AC/ON 2 5 0 / 5 %")
-        sim.assertDisplay("0.05", "")
-        sim.input("=")
-        sim.assertDisplay("5000.", "")
+        calc.input("AC/ON 2 5 0 / 5 %")
+        calc.assertDisplay("0.05", "")
+        calc.input("=")
+        calc.assertDisplay("5000.", "")
 
-        sim.input("2 5 0 + 5 %")
-        sim.assertDisplay("12.5", "")
-        sim.input("=")
-        sim.assertDisplay("262.5", "")
+        calc.input("2 5 0 + 5 %")
+        calc.assertDisplay("12.5", "")
+        calc.input("=")
+        calc.assertDisplay("262.5", "")
 
-        sim.input("2 5 0 - 5 %")
-        sim.assertDisplay("12.5", "")
-        sim.input("=")
-        sim.assertDisplay("237.5", "")
+        calc.input("2 5 0 - 5 %")
+        calc.assertDisplay("12.5", "")
+        calc.input("=")
+        calc.assertDisplay("237.5", "")
     }
 }

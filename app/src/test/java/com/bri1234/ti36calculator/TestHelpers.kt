@@ -147,7 +147,7 @@ private val strThirdFuncToButton = mapOf(
     "r>p" to CalculatorButton.PLUS_MINUS,
 )
 
-fun CalculatorSimulator.input(inputStr: String) {
+fun CalculatorCore.input(inputStr: String) {
     val tokenList = inputStr.lowercase().split(" ")
     for (token in tokenList) {
         val button1 = strFirstFuncToButton[token]
@@ -174,7 +174,7 @@ fun CalculatorSimulator.input(inputStr: String) {
     }
 }
 
-fun CalculatorSimulator.assertDisplay(mantissa: String, exponent: String) {
+fun CalculatorCore.assertDisplay(mantissa: String, exponent: String) {
     val count = if (mantissa.contains('.')) NUM_MANTISSA_DIGITS + 1 else NUM_MANTISSA_DIGITS
     val mantissaStr1 = mantissa.padStart(count, ' ')
     val exponentStr1 = exponent.padStart(NUM_EXPONENT_DIGITS, ' ')
@@ -194,7 +194,7 @@ fun CalculatorSimulator.assertDisplay(mantissa: String, exponent: String) {
         exponentStr1, exponentStr2)
 }
 
-fun CalculatorSimulator.assertDisplayLabel(displayLabel : DisplayLabels, isVisible: Boolean) {
+fun CalculatorCore.assertDisplayLabel(displayLabel : DisplayLabels, isVisible: Boolean) {
     val data = getDisplayData()
 
     assertEquals("Expected display label: $isVisible but is: ${data.displayLabels.contains(displayLabel)}",
