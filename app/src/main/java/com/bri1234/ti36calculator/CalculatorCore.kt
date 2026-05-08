@@ -249,6 +249,8 @@ class CalculatorCore {
      * @param button The [CalculatorButton] that was pressed.
      */
     private fun modeSecondFunction(button : CalculatorButton) {
+        state.calculatorFunction = CalculatorFunction.FIRST
+
         when (button) {
             CalculatorButton.HYP -> cycleAngleUnit(false)
             CalculatorButton.LOG -> functions.tenPowX()
@@ -302,6 +304,8 @@ class CalculatorCore {
      * @param button The [CalculatorButton] that was pressed.
      */
     private fun modeThirdFunction(button : CalculatorButton)  {
+        state.calculatorFunction = CalculatorFunction.FIRST
+
         when (button) {
             CalculatorButton.HYP -> cycleAngleUnit(true)
             CalculatorButton.LOG -> functions.factorial()
