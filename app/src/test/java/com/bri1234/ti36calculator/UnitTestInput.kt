@@ -1,6 +1,5 @@
 package com.bri1234.ti36calculator
 
-import com.bri1234.ti36calculator.views.DisplayLabels
 import org.junit.Test
 
 class UnitTestInput {
@@ -8,14 +7,10 @@ class UnitTestInput {
     fun testInput() {
         val calc = CalculatorCore()
 
-        calc.input("AC/ON")
-        calc.assertDisplay("0.", "")
-        calc.input("4")
-        calc.assertDisplay("4", "")
-        calc.input("2")
-        calc.assertDisplay("42", "")
-        calc.input("=")
-        calc.assertDisplay("42.", "")
+        calc.testStep("AC/ON", "0.", "", "DEG")
+        calc.testStep("4", "4", "", "DEG")
+        calc.testStep("2", "42", "", "DEG")
+        calc.testStep("=", "42.", "", "DEG")
 
     }
 
@@ -23,70 +18,19 @@ class UnitTestInput {
     fun testSecondThirdHyp() {
         val calc = CalculatorCore()
 
-        calc.assertDisplay("0.", "")
-
-        calc.assertDisplayLabel(DisplayLabels.SECOND, false)
-        calc.assertDisplayLabel(DisplayLabels.THIRD, false)
-        calc.assertDisplayLabel(DisplayLabels.HYP, false)
-
-        calc.input("2nd")
-        calc.assertDisplayLabel(DisplayLabels.SECOND, true)
-        calc.assertDisplayLabel(DisplayLabels.THIRD, false)
-        calc.assertDisplayLabel(DisplayLabels.HYP, false)
-
-        calc.input("3rd")
-        calc.assertDisplayLabel(DisplayLabels.SECOND, false)
-        calc.assertDisplayLabel(DisplayLabels.THIRD, true)
-        calc.assertDisplayLabel(DisplayLabels.HYP, false)
-
-        calc.input("2nd")
-        calc.assertDisplayLabel(DisplayLabels.SECOND, true)
-        calc.assertDisplayLabel(DisplayLabels.THIRD, false)
-        calc.assertDisplayLabel(DisplayLabels.HYP, false)
-
-        calc.input("2nd")
-        calc.assertDisplayLabel(DisplayLabels.SECOND, false)
-        calc.assertDisplayLabel(DisplayLabels.THIRD, false)
-        calc.assertDisplayLabel(DisplayLabels.HYP, false)
-
-        calc.input("3rd")
-        calc.assertDisplayLabel(DisplayLabels.SECOND, false)
-        calc.assertDisplayLabel(DisplayLabels.THIRD, true)
-        calc.assertDisplayLabel(DisplayLabels.HYP, false)
-
-        calc.input("3rd")
-        calc.assertDisplayLabel(DisplayLabels.SECOND, false)
-        calc.assertDisplayLabel(DisplayLabels.THIRD, false)
-        calc.assertDisplayLabel(DisplayLabels.HYP, false)
-
-        calc.input("HYP")
-        calc.assertDisplayLabel(DisplayLabels.SECOND, false)
-        calc.assertDisplayLabel(DisplayLabels.THIRD, false)
-        calc.assertDisplayLabel(DisplayLabels.HYP, true)
-
-        calc.input("HYP")
-        calc.assertDisplayLabel(DisplayLabels.SECOND, false)
-        calc.assertDisplayLabel(DisplayLabels.THIRD, false)
-        calc.assertDisplayLabel(DisplayLabels.HYP, false)
-
-        calc.input("HYP 3rd")
-        calc.assertDisplayLabel(DisplayLabels.SECOND, false)
-        calc.assertDisplayLabel(DisplayLabels.THIRD, true)
-        calc.assertDisplayLabel(DisplayLabels.HYP, true)
-        calc.input("2nd")
-        calc.assertDisplayLabel(DisplayLabels.SECOND, true)
-        calc.assertDisplayLabel(DisplayLabels.THIRD, false)
-        calc.assertDisplayLabel(DisplayLabels.HYP, true)
-
-        calc.input("AC/ON 2nd HYP")
-        calc.assertDisplayLabel(DisplayLabels.SECOND, false)
-        calc.assertDisplayLabel(DisplayLabels.THIRD, false)
-        calc.assertDisplayLabel(DisplayLabels.HYP, false)
-        
-        calc.input("3rd HYP")
-        calc.assertDisplayLabel(DisplayLabels.SECOND, false)
-        calc.assertDisplayLabel(DisplayLabels.THIRD, false)
-        calc.assertDisplayLabel(DisplayLabels.HYP, false)
+        calc.testStep("", "0.", "", "DEG")
+        calc.testStep("2nd", "0.", "", "2nd", "DEG")
+        calc.testStep("3rd", "0.", "", "3rd", "DEG")
+        calc.testStep("2nd", "0.", "", "2nd", "DEG")
+        calc.testStep("2nd", "0.", "", "DEG")
+        calc.testStep("3rd", "0.", "", "3rd", "DEG")
+        calc.testStep("3rd", "0.", "", "DEG")
+        calc.testStep("HYP", "0.", "", "HYP", "DEG")
+        calc.testStep("HYP", "0.", "", "DEG")
+        calc.testStep("HYP 3rd", "0.", "", "3rd", "HYP", "DEG")
+        calc.testStep("2nd", "0.", "", "2nd", "HYP", "DEG")
+        calc.testStep("AC/ON 2nd HYP", "0.", "", "RAD")
+        calc.testStep("3rd HYP", "0.", "", "GRAD")
 
     }
 
@@ -94,18 +38,14 @@ class UnitTestInput {
     fun testUnusualInput() {
         val calc = CalculatorCore()
 
-        calc.input("AC/ON 2")
-        calc.assertDisplay("2", "")
-        calc.input("*")
-        calc.assertDisplay("2.", "")
-        calc.input("*")
-        calc.assertDisplay("2.", "")
-        calc.input("*")
-        calc.assertDisplay("2.", "")
-        calc.input("5 =")
-        calc.assertDisplay("10.", "")
+        calc.testStep("AC/ON 2", "2", "", "DEG")
+        calc.testStep("*", "2.", "", "DEG")
+        calc.testStep("*", "2.", "", "DEG")
+        calc.testStep("*", "2.", "", "DEG")
+        calc.testStep("5 =", "10.", "", "DEG")
+        calc.testStep("AC/ON +/-", "0.", "", "DEG")
+        calc.testStep("AC/ON . +/-", "-0.", "", "DEG")
+        calc.testStep("AC/ON 3 +/-", "-0.", "", "DEG")
 
-        calc.input("AC/ON +/-")
-        calc.assertDisplay("0.", "")
     }
 }

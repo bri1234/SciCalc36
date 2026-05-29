@@ -321,7 +321,7 @@ class CalculatorCore {
             CalculatorButton.SQRT_X -> noOperation()
             CalculatorButton.DIVIDE -> pi()
             CalculatorButton.SUM_PLUS -> statistic.enableStatistic2()
-            CalculatorButton.EE -> selectNumberFormat(DisplayNumberFormat.FLOAT)
+            CalculatorButton.EE -> selectNumberMode(CalculatorNumberMode.DECIMAL)
             CalculatorButton.LEFT_PARENTHESES -> selectNumberMode(CalculatorNumberMode.HEXADECIMAL)
             CalculatorButton.RIGHT_PARENTHESES -> selectNumberMode(CalculatorNumberMode.OCTAL)
             CalculatorButton.MULTIPLY -> selectNumberMode(CalculatorNumberMode.BINARY)
@@ -724,14 +724,16 @@ class CalculatorCore {
         if (computation.hasParentheses())
             labels.add(DisplayLabels.PARENTHESES)
 
-        if (state.calculatorAngleUnit == CalculatorAngleUnit.DEG)
-            labels.add(DisplayLabels.DEG)
+        if (state.calculatorNumberMode == CalculatorNumberMode.DECIMAL) {
+            if (state.calculatorAngleUnit == CalculatorAngleUnit.DEG)
+                labels.add(DisplayLabels.DEG)
 
-        if (state.calculatorAngleUnit == CalculatorAngleUnit.RAD)
-            labels.add(DisplayLabels.RAD)
+            if (state.calculatorAngleUnit == CalculatorAngleUnit.RAD)
+                labels.add(DisplayLabels.RAD)
 
-        if (state.calculatorAngleUnit == CalculatorAngleUnit.GRAD)
-            labels.add(DisplayLabels.GRAD)
+            if (state.calculatorAngleUnit == CalculatorAngleUnit.GRAD)
+                labels.add(DisplayLabels.GRAD)
+        }
 
         if (state.calculatorHypMode == CalculatorHypMode.HYP)
             labels.add(DisplayLabels.HYP)

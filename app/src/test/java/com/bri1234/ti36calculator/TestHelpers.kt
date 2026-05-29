@@ -3,6 +3,23 @@ package com.bri1234.ti36calculator
 import com.bri1234.ti36calculator.views.DisplayLabels
 import org.junit.Assert.assertEquals
 
+val strToDisplayLabel = mapOf(
+    "M" to DisplayLabels.MEMORY,
+    "2nd" to DisplayLabels.SECOND,
+    "3rd" to DisplayLabels.THIRD,
+    "HYP" to DisplayLabels.HYP,
+    "BIN" to DisplayLabels.BIN,
+    "OCT" to DisplayLabels.OCT,
+    "HEX" to DisplayLabels.HEX,
+    "STAT" to DisplayLabels.STAT,
+    "DEG" to DisplayLabels.DEG,
+    "RAD" to DisplayLabels.RAD,
+    "GRAD" to DisplayLabels.GRAD,
+    "x" to DisplayLabels.X,
+    "r" to DisplayLabels.R,
+    "()" to DisplayLabels.PARENTHESES,
+)
+
 private val strFirstFuncToButton = mapOf(
     // row 1
     "ac/on" to CalculatorButton.AC_ON,
@@ -147,7 +164,18 @@ private val strThirdFuncToButton = mapOf(
     "r>p" to CalculatorButton.PLUS_MINUS,
 )
 
+/**
+ * Simulates a sequence of calculator button presses from a space-separated input string.
+ *
+ * Tokens are matched against the first, second, and third function labels. Second and third
+ * function tokens automatically press the corresponding modifier key before the target button.
+ *
+ * @param inputStr Space-separated button/function tokens to execute.
+ * @return Unit.
+ */
 fun CalculatorCore.input(inputStr: String) {
+    if (inputStr.isBlank()) return
+
     val tokenList = inputStr.lowercase().split(" ")
     for (token in tokenList) {
         val button1 = strFirstFuncToButton[token]
@@ -174,6 +202,15 @@ fun CalculatorCore.input(inputStr: String) {
     }
 }
 
+/**
+ * Asserts that the calculator display shows the expected mantissa and exponent strings.
+ *
+ * The expected values are padded to the display width before comparison.
+ *
+ * @param mantissa Expected mantissa string without leading display padding.
+ * @param exponent Expected exponent string without leading display padding.
+ * @return Unit.
+ */
 fun CalculatorCore.assertDisplay(mantissa: String, exponent: String) {
     val count = if (mantissa.contains('.')) NUM_MANTISSA_DIGITS + 1 else NUM_MANTISSA_DIGITS
     val mantissaStr1 = mantissa.padStart(count, ' ')
@@ -194,10 +231,40 @@ fun CalculatorCore.assertDisplay(mantissa: String, exponent: String) {
         exponentStr1, exponentStr2)
 }
 
-fun CalculatorCore.assertDisplayLabel(displayLabel : DisplayLabels, isVisible: Boolean) {
-    val data = getDisplayData()
+/**
+ * Asserts the complete set of currently visible display labels from string labels.
+ *
+ * Every provided label string must resolve to a display label. Labels listed in [displayLabels]
+ * are expected to be visible, and all other display labels are expected to be hidden.
+ *
+ * @param displayLabels String labels expected to be visible.
+ * @return Unit.
+ */
+fun CalculatorCore.assertDisplayLabels(vararg displayLabels: String) {
 
-    assertEquals("Expected display label: $isVisible but is: ${data.displayLabels.contains(displayLabel)}",
-        isVisible, data.displayLabels.contains(displayLabel))
+    val visibleDisplayLabels = displayLabels.map {
+        displayLabel -> strToDisplayLabel[displayLabel] ?: throw IllegalArgumentException("Unknown display label: $displayLabel")
+    }.toSet()
+
+    for (displayLabel in DisplayLabels.entries) {
+        val displayData = getDisplayData()
+        val isVisible = displayLabel in visibleDisplayLabels
+
+        assertEquals("Expected display label: $isVisible but is: ${displayData.displayLabels.contains(displayLabel)}",
+            isVisible, displayData.displayLabels.contains(displayLabel))
+    }
 }
 
+/**
+ * Executes a list of test steps and verifies the display state after each step.
+ *
+ * Each step sends its input sequence, checks the numeric display, and then checks every
+ * display label against the labels listed as visible for that step.
+ *
+ * @return Unit.
+ */
+fun CalculatorCore.testStep(input: String, mantissa: String, exponent: String, vararg displayLabels: String) {
+    input(input)
+    assertDisplay(mantissa, exponent)
+    assertDisplayLabels(*displayLabels)
+}

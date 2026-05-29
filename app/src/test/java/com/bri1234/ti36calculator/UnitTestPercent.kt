@@ -7,24 +7,14 @@ class UnitTestPercent {
     fun testPercent() {
         val calc = CalculatorCore()
 
-        calc.input("AC/ON 2 5 0 * 5 %")
-        calc.assertDisplay("0.05", "")
-        calc.input("=")
-        calc.assertDisplay("12.5", "")
+        calc.testStep("AC/ON 2 5 0 * 5 %", "0.05", "", "DEG")
+        calc.testStep("=", "12.5", "", "DEG")
+        calc.testStep("AC/ON 2 5 0 / 5 %", "0.05", "", "DEG")
+        calc.testStep("=", "5000.", "", "DEG")
+        calc.testStep("2 5 0 + 5 %", "12.5", "", "DEG")
+        calc.testStep("=", "262.5", "", "DEG")
+        calc.testStep("2 5 0 - 5 %", "12.5", "", "DEG")
+        calc.testStep("=", "237.5", "", "DEG")
 
-        calc.input("AC/ON 2 5 0 / 5 %")
-        calc.assertDisplay("0.05", "")
-        calc.input("=")
-        calc.assertDisplay("5000.", "")
-
-        calc.input("2 5 0 + 5 %")
-        calc.assertDisplay("12.5", "")
-        calc.input("=")
-        calc.assertDisplay("262.5", "")
-
-        calc.input("2 5 0 - 5 %")
-        calc.assertDisplay("12.5", "")
-        calc.input("=")
-        calc.assertDisplay("237.5", "")
     }
 }
