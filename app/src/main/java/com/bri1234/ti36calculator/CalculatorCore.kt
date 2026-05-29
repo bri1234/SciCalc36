@@ -769,16 +769,19 @@ class CalculatorCore {
         // do nothing
     }
 
-    /** Displays a "not implemented" message on the display. */
+    /**
+     * Displays a "not implemented" message on the display.
+     */
     private fun notImplemented(functionName: String) {
         Log.i("Ti36Simulator", "function $functionName is not implemented")
     }
 
+    /**
+     * Enters the frequency edit mode for the statistic input.
+     * Requires that a statistic mode is active.
+     */
     private fun enterFrequencyMode() {
         require(state.calculatorStatisticMode != CalculatorStatisticMode.OFF)
-
-        // notImplemented("FRQ")
-
-
+        input.enterFrequencyEditMode()
     }
 }

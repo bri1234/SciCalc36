@@ -264,4 +264,18 @@ class CalculatorInput(val state: CalculatorState,
         onEditInputChanged(Unit)
     }
 
+    /**
+     * Enters the edit mode for the frequency, allowing the user to input digits.
+     * The mantissa and exponent are not editable in this mode.
+     */
+    fun enterFrequencyEditMode() {
+        if (digitInputMode != DigitInputMode.MANTISSA)
+            return
+
+        digitInputMode = DigitInputMode.FREQUENCY
+        "      Fr 00".toCharArray().copyInto(display.displayMantissa, 8)
+        display.displayExponent.fill(' ')
+
+        onEditInputChanged(Unit)
+    }
 }
