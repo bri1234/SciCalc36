@@ -18,7 +18,6 @@
 
 package com.bri1234.ti36calculator
 
-import android.util.Log
 import com.bri1234.ti36calculator.views.DisplayLabels
 
 /*
@@ -34,7 +33,9 @@ Next features to implement:
 /**
  * A simulator class for the TI-36 calculator.
  */
-class CalculatorCore {
+class CalculatorCore(
+    private val logger: CalculatorLogger = NoOpCalculatorLogger,
+) {
 
     private val state = CalculatorState()
 
@@ -168,7 +169,7 @@ class CalculatorCore {
             }
 
         } catch (e: Exception) {
-            Log.e("Ti36Simulator", "Error during button press", e)
+            logger.error("Error during button press", e)
             isErrorState = true
             display.printError()
         }
@@ -775,7 +776,7 @@ class CalculatorCore {
      * Displays a "not implemented" message on the display.
      */
     private fun notImplemented(functionName: String) {
-        Log.i("Ti36Simulator", "function $functionName is not implemented")
+        logger.info("function $functionName is not implemented")
     }
 
     /**

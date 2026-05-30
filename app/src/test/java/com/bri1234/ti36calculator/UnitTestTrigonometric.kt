@@ -14,6 +14,11 @@ class UnitTestTrigonometric {
         calc.testStep("=", "0.133974596", "", "DEG")
         calc.testStep("1 asin", "90.", "", "DEG")
         calc.testStep("- . 5 =", "89.5", "", "DEG")
+    }
+
+    @Test
+    fun testTrigonometricSpecialCases() {
+        val calc = CalculatorCore()
 
         calc.testStep("AC/ON 0 sin", "0.", "", "DEG")
         calc.testStep("AC/ON 9 0 sin", "1.", "", "DEG")
@@ -32,6 +37,18 @@ class UnitTestTrigonometric {
         calc.testStep("AC/ON 1 8 0 tan", "0.", "", "DEG")
         calc.testStep("AC/ON 2 7 0 tan", "Error  ", "", "DEG")
         calc.testStep("AC/ON 3 6 0 tan", "0.", "", "DEG")
+
+        calc.testStep("AC/ON 1 +/- asin", "-90.", "", "DEG")
+        calc.testStep("AC/ON 0 asin", "0.", "", "DEG")
+        calc.testStep("AC/ON 1 asin", "90.", "", "DEG")
+
+        calc.testStep("AC/ON 1 +/- acos", "180.", "", "DEG")
+        calc.testStep("AC/ON 0 acos", "90.", "", "DEG")
+        calc.testStep("AC/ON 1 acos", "0.", "", "DEG")
+
+        calc.testStep("AC/ON 1 +/- atan", "-45.", "", "DEG")
+        calc.testStep("AC/ON 0 atan", "0.", "", "DEG")
+        calc.testStep("AC/ON 1 atan", "45.", "", "DEG")
     }
 
     @Test

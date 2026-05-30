@@ -21,6 +21,7 @@ package com.bri1234.ti36calculator.viewModels
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import com.bri1234.ti36calculator.AndroidCalculatorLogger
 import com.bri1234.ti36calculator.CalculatorButton
 import com.bri1234.ti36calculator.CalculatorDisplayData
 import com.bri1234.ti36calculator.CalculatorCore
@@ -30,7 +31,7 @@ import com.bri1234.ti36calculator.CalculatorCore
  * Manages the state of the calculator display and handles button presses.
  */
 class CalculatorViewModel(
-    val simulator: CalculatorCore = CalculatorCore()
+    val simulator: CalculatorCore = CalculatorCore(AndroidCalculatorLogger)
 ) : ViewModel() {
     private val _displayState = mutableStateOf(CalculatorDisplayData())
     val displayState: State<CalculatorDisplayData> = _displayState
