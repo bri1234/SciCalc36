@@ -630,6 +630,11 @@ class CalculatorCore(
         display.printValue(computation.getValue())
     }
 
+    /** Returns `true` if the current number mode is hexadecimal, `false` otherwise. */
+    fun isNumberModeHex() : Boolean{
+        return state.calculatorNumberMode == CalculatorNumberMode.HEXADECIMAL
+    }
+
     /** Toggles the sign: negates via input in edit mode, otherwise applies the negate function. */
     private fun functionPlusMinus() {
         if (!input.isEditMode

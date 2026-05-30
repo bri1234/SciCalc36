@@ -32,14 +32,20 @@ private val strFirstFuncToButton = mapOf(
     // row 3
     "2nd" to CalculatorButton.SECOND,
     "sin" to CalculatorButton.SIN,
+    "d" to CalculatorButton.SIN,
     "cos" to CalculatorButton.COS,
+    "e" to CalculatorButton.COS,
     "tan" to CalculatorButton.TAN,
+    "f" to CalculatorButton.TAN,
     "y^x" to CalculatorButton.Y_POW_X,
     // row 4
     "x<>y" to CalculatorButton.X_SWAP_Y,
     "1/x" to CalculatorButton.ONE_DIV_X,
+    "a" to CalculatorButton.ONE_DIV_X,
     "x^2" to CalculatorButton.X_SQUARED,
+    "b" to CalculatorButton.X_SQUARED,
     "sqrt" to CalculatorButton.SQRT_X,
+    "c" to CalculatorButton.SQRT_X,
     "/" to CalculatorButton.DIVIDE,
     // row 5
     "s+" to CalculatorButton.SUM_PLUS,
@@ -164,6 +170,15 @@ private val strThirdFuncToButton = mapOf(
     "r>p" to CalculatorButton.PLUS_MINUS,
 )
 
+private val strHexNumbers = mapOf(
+    "A" to CalculatorButton.ONE_DIV_X,
+    "B" to CalculatorButton.X_SQUARED,
+    "C" to CalculatorButton.SQRT_X,
+    "D" to CalculatorButton.SIN,
+    "E" to CalculatorButton.COS,
+    "F" to CalculatorButton.TAN,
+)
+
 /**
  * Simulates a sequence of calculator button presses from a space-separated input string.
  *
@@ -195,6 +210,13 @@ fun CalculatorCore.input(inputStr: String) {
         if (button3 != null) {
             buttonPressed(CalculatorButton.THIRD)
             buttonPressed(button3)
+            continue
+        }
+
+        val buttonHex = strHexNumbers[token]
+        if (buttonHex != null) {
+            check(isNumberModeHex()) { "Hexadecimal input is not allowed when not in HEX mode: $token" }
+            buttonPressed(buttonHex)
             continue
         }
 
