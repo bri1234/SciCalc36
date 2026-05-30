@@ -15,6 +15,23 @@ class UnitTestTrigonometric {
         calc.testStep("1 asin", "90.", "", "DEG")
         calc.testStep("- . 5 =", "89.5", "", "DEG")
 
+        calc.testStep("AC/ON 0 sin", "0.", "", "DEG")
+        calc.testStep("AC/ON 9 0 sin", "1.", "", "DEG")
+        calc.testStep("AC/ON 1 8 0 sin", "0.", "", "DEG")
+        calc.testStep("AC/ON 2 7 0 sin", "-1.", "", "DEG")
+        calc.testStep("AC/ON 3 6 0 sin", "0.", "", "DEG")
+
+        calc.testStep("AC/ON 0 cos", "1.", "", "DEG")
+        calc.testStep("AC/ON 9 0 cos", "0.", "", "DEG")
+        calc.testStep("AC/ON 1 8 0 cos", "-1.", "", "DEG")
+        calc.testStep("AC/ON 2 7 0 cos", "0.", "", "DEG")
+        calc.testStep("AC/ON 3 6 0 cos", "1.", "", "DEG")
+
+        calc.testStep("AC/ON 0 tan", "0.", "", "DEG")
+        calc.testStep("AC/ON 9 0 tan", "Error  ", "", "DEG")
+        calc.testStep("AC/ON 1 8 0 tan", "0.", "", "DEG")
+        calc.testStep("AC/ON 2 7 0 tan", "Error  ", "", "DEG")
+        calc.testStep("AC/ON 3 6 0 tan", "0.", "", "DEG")
     }
 
     @Test

@@ -107,15 +107,21 @@ class CalculatorComputation {
         return if (registerIndex == 0) registerArray[0] else registerArray[registerIndex - 1]
     }
 
+    private fun removeSignIfZero(value: Double): Double {
+        return if (value == -0.0) 0.0 else value
+    }
+
     /**
      * Sets the current top-of-stack register to [newValue].
      * @param newValue The value to store in the current register.
      */
     fun setValue(newValue: Double, updateDisplay: Boolean = true) {
-        registerArray[registerIndex] = newValue
+        val newVal = removeSignIfZero(newValue)
+
+        registerArray[registerIndex] = newVal
 
         if (updateDisplay)
-            onResultChanged(newValue)
+            onResultChanged(newVal)
     }
 
     /**
@@ -135,16 +141,19 @@ class CalculatorComputation {
      * and [second] being the previous register.
      */
     fun setTwoValues(first: Double, second: Double, updateDisplay: Boolean = true) {
+        val firstVal = removeSignIfZero(first)
+        val secondVal = removeSignIfZero(second)
+
         if (registerIndex == 0) {
-            registerArray[0] = first
-            registerArray[1] = second
+            registerArray[0] = firstVal
+            registerArray[1] = secondVal
         } else {
-            registerArray[registerIndex] = first
-            registerArray[registerIndex - 1] = second
+            registerArray[registerIndex] = firstVal
+            registerArray[registerIndex - 1] = secondVal
         }
 
         if (updateDisplay)
-            onResultChanged(first)
+            onResultChanged(firstVal)
     }
 
     /**

@@ -29,10 +29,106 @@ import kotlin.math.*
 class CalculatorFunctions(val state: CalculatorState,
                           val computation: CalculatorComputation) {
 
+    private val angleEpsilon = 1e-12
+
     private fun isFunctionHyp() = state.calculatorHypMode == CalculatorHypMode.HYP
     private fun isAngleDeg() = state.calculatorAngleUnit == CalculatorAngleUnit.DEG
     private fun isAngleRad() = state.calculatorAngleUnit == CalculatorAngleUnit.RAD
     private fun isAngleGrad() = state.calculatorAngleUnit == CalculatorAngleUnit.GRAD
+
+    private fun normalizeAngle(value: Double, period: Double) = Math.IEEEremainder(value, period)
+
+    private fun isAngleEqual(value: Double, expected: Double) = abs(value - expected) < angleEpsilon
+
+    private fun sinRad(value: Double): Double {
+        val angle = normalizeAngle(value, 2.0 * PI)
+        return when {
+            isAngleEqual(angle, 0.0) || isAngleEqual(abs(angle), PI) -> 0.0
+            isAngleEqual(angle, PI / 2.0) -> 1.0
+            isAngleEqual(angle, -PI / 2.0) -> -1.0
+            else -> sin(angle)
+        }
+    }
+
+    private fun sinDeg(value: Double): Double {
+        val angle = normalizeAngle(value, 360.0)
+        return when {
+            isAngleEqual(angle, 0.0) || isAngleEqual(abs(angle), 180.0) -> 0.0
+            isAngleEqual(angle, 90.0) -> 1.0
+            isAngleEqual(angle, -90.0) -> -1.0
+            else -> sin(Math.toRadians(angle))
+        }
+    }
+
+    private fun sinGrad(value: Double): Double {
+        val angle = normalizeAngle(value, 400.0)
+        return when {
+            isAngleEqual(angle, 0.0) || isAngleEqual(abs(angle), 200.0) -> 0.0
+            isAngleEqual(angle, 100.0) -> 1.0
+            isAngleEqual(angle, -100.0) -> -1.0
+            else -> sin(Math.toRadians(angle * 0.9))
+        }
+    }
+
+    private fun cosRad(value: Double): Double {
+        val angle = normalizeAngle(value, 2.0 * PI)
+        return when {
+            isAngleEqual(angle, 0.0) -> 1.0
+            isAngleEqual(abs(angle), PI / 2.0) -> 0.0
+            isAngleEqual(abs(angle), PI) -> -1.0
+            else -> cos(angle)
+        }
+    }
+
+    private fun cosDeg(value: Double): Double {
+        val angle = normalizeAngle(value, 360.0)
+        return when {
+            isAngleEqual(angle, 0.0) -> 1.0
+            isAngleEqual(abs(angle), 90.0) -> 0.0
+            isAngleEqual(abs(angle), 180.0) -> -1.0
+            else -> cos(Math.toRadians(angle))
+        }
+    }
+
+    private fun cosGrad(value: Double): Double {
+        val angle = normalizeAngle(value, 400.0)
+        return when {
+            isAngleEqual(angle, 0.0) -> 1.0
+            isAngleEqual(abs(angle), 100.0) -> 0.0
+            isAngleEqual(abs(angle), 200.0) -> -1.0
+            else -> cos(Math.toRadians(angle * 0.9))
+        }
+    }
+
+    private fun tanRad(value: Double): Double {
+        val angle = normalizeAngle(value, 2.0 * PI)
+        return when {
+            isAngleEqual(angle, 0.0) || isAngleEqual(abs(angle), PI) -> 0.0
+            isAngleEqual(abs(angle), PI / 2.0) ->
+                throw IllegalArgumentException("tan(): Undefined for this angle")
+            else -> tan(angle)
+        }
+    }
+
+    private fun tanDeg(value: Double): Double {
+        val angle = normalizeAngle(value, 360.0)
+        return when {
+            isAngleEqual(angle, 0.0) || isAngleEqual(abs(angle), 180.0) -> 0.0
+            isAngleEqual(abs(angle), 90.0) ->
+                throw IllegalArgumentException("tan(): Undefined for this angle")
+            else -> tan(Math.toRadians(angle))
+        }
+    }
+
+    private fun tanGrad(value: Double): Double {
+        val angle = normalizeAngle(value, 400.0)
+        return when {
+            isAngleEqual(angle, 0.0) || isAngleEqual(abs(angle), 200.0) -> 0.0
+            isAngleEqual(abs(angle), 100.0) ->
+                throw IllegalArgumentException("tan(): Undefined for this angle")
+            else -> tan(Math.toRadians(angle * 0.9))
+        }
+    }
 
     fun log() {
         val value = computation.getValue()
@@ -56,9 +152,9 @@ class CalculatorFunctions(val state: CalculatorState,
         val value = computation.getValue()
         val result = when {
             isFunctionHyp() -> sinh(value)
-            isAngleDeg() -> sin(Math.toRadians(value))
-            isAngleRad() -> sin(value)
-            isAngleGrad() -> sin(Math.toRadians(value * 0.9))
+            isAngleDeg() -> sinDeg(value)
+            isAngleRad() -> sinRad(value)
+            isAngleGrad() -> sinGrad(value)
             else -> throw IllegalStateException("sin(): No angle unit label found")
         }
         computation.setValue(result)
@@ -90,9 +186,9 @@ class CalculatorFunctions(val state: CalculatorState,
         val value = computation.getValue()
         val result = when {
             isFunctionHyp() -> cosh(value)
-            isAngleDeg() -> cos(Math.toRadians(value))
-            isAngleRad() -> cos(value)
-            isAngleGrad() -> cos(Math.toRadians(value * 0.9))
+            isAngleDeg() -> cosDeg(value)
+            isAngleRad() -> cosRad(value)
+            isAngleGrad() -> cosGrad(value)
             else -> throw IllegalStateException("cos(): No angle unit label found")
         }
         computation.setValue(result)
@@ -127,9 +223,9 @@ class CalculatorFunctions(val state: CalculatorState,
         val value = computation.getValue()
         val result = when {
             isFunctionHyp() -> tanh(value)
-            isAngleDeg() -> tan(Math.toRadians(value))
-            isAngleRad() -> tan(value)
-            isAngleGrad() -> tan(Math.toRadians(value * 0.9))
+            isAngleDeg() -> tanDeg(value)
+            isAngleRad() -> tanRad(value)
+            isAngleGrad() -> tanGrad(value)
             else -> throw IllegalStateException("tan(): No angle unit label found")
         }
         computation.setValue(result)

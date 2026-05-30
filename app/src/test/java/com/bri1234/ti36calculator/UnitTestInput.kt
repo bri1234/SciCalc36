@@ -43,9 +43,19 @@ class UnitTestInput {
         calc.testStep("*", "2.", "", "DEG")
         calc.testStep("*", "2.", "", "DEG")
         calc.testStep("5 =", "10.", "", "DEG")
+
+    }
+
+    @Test
+    fun testSign() {
+        val calc = CalculatorCore()
+
         calc.testStep("AC/ON +/-", "0.", "", "DEG")
         calc.testStep("AC/ON . +/-", "-0.", "", "DEG")
-        calc.testStep("AC/ON 3 +/-", "-0.", "", "DEG")
+        calc.testStep("AC/ON 3 +/-", "-3", "", "DEG")
+        calc.testStep("AC/ON 0 +/-", "-0", "", "DEG")
+        calc.testStep("AC/ON 1 8 0 sin +/-", "0.", "", "DEG")
 
+        calc.testStep("AC/ON HEX 2 5 +/-", "FFFFFFFFdb", "", "HEX")
     }
 }
