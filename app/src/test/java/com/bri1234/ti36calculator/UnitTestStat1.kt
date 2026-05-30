@@ -31,6 +31,11 @@ class UnitTestStat1 {
         calc.testStep("CSR Sx", "0.", "", "DEG", "STAT")
         calc.testStep("Sx2", "0.", "", "DEG", "STAT")
 
+        calc.testStep("AC/ON 5", "5", "", "DEG")
+        calc.testStep("STAT1", "5.", "", "DEG", "STAT")
+
+        calc.testStep("AC/ON 5", "5", "", "DEG")
+        calc.testStep("STAT2", "5.", "", "DEG", "STAT")
     }
 
     @Test

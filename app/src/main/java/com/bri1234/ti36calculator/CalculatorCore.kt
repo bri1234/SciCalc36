@@ -315,12 +315,12 @@ class CalculatorCore {
             CalculatorButton.COS -> noOperation()
             CalculatorButton.TAN -> noOperation()
             CalculatorButton.Y_POW_X -> functions.percent()
-            CalculatorButton.X_SWAP_Y -> statistic.enableStatistic1()
+            CalculatorButton.X_SWAP_Y -> enableStatistic1()
             CalculatorButton.ONE_DIV_X -> noOperation()
             CalculatorButton.X_SQUARED -> noOperation()
             CalculatorButton.SQRT_X -> noOperation()
             CalculatorButton.DIVIDE -> pi()
-            CalculatorButton.SUM_PLUS -> statistic.enableStatistic2()
+            CalculatorButton.SUM_PLUS -> enableStatistic2()
             CalculatorButton.EE -> selectNumberMode(CalculatorNumberMode.DECIMAL)
             CalculatorButton.LEFT_PARENTHESES -> selectNumberMode(CalculatorNumberMode.HEXADECIMAL)
             CalculatorButton.RIGHT_PARENTHESES -> selectNumberMode(CalculatorNumberMode.OCTAL)
@@ -785,5 +785,21 @@ class CalculatorCore {
     private fun enterFrequencyMode() {
         require(state.calculatorStatisticMode != CalculatorStatisticMode.OFF)
         input.enterFrequencyEditMode()
+    }
+
+    /**
+     * Enables the first statistic mode and updates the display with the current value.
+     */
+    private fun enableStatistic1() {
+        statistic.enableStatistic1()
+        display.printValue(computation.getValue())
+    }
+
+    /**
+     * Enables the second statistic mode and updates the display with the current value.
+     */
+    private fun enableStatistic2() {
+        statistic.enableStatistic2()
+        display.printValue(computation.getValue())
     }
 }

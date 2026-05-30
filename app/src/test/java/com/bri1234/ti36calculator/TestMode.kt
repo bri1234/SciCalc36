@@ -27,5 +27,23 @@ class TestMode {
         calc.testStep("DEC", "1.23", "-03", "DEG")
         calc.testStep("HEX", "0", "", "HEX")
         calc.testStep("DEC", "0.", "00", "DEG")
+
+        calc.testStep("AC/ON 1 2 3 0 0 0 ENG", "123.", "03", "DEG")
+        calc.testStep("DEC", "123.", "03", "DEG")
+        calc.testStep("HEX", "1E078", "", "HEX")
+        calc.testStep("DEC", "123.", "03", "DEG")
+
+        calc.testStep("AC/ON 0 . 7 HEX", "0", "", "HEX")
+        calc.testStep("AC/ON 1 . 7 HEX", "1", "", "HEX")
+        calc.testStep("AC/ON 1 . 7 BIN", "1", "", "BIN")
+        calc.testStep("AC/ON 1 . 7 OCT", "1", "", "OCT")
+
+        calc.testStep("AC/ON 1 . 7 +/- HEX", "FFFFFFFFFF", "", "HEX")
+        calc.testStep("DEC", "-1", "", "DEG")
+
+        calc.testStep("AC/ON 1 . 7 HEX FLO", "1", "", "HEX")
+        calc.testStep("AC/ON 1 . 7 HEX SCI", "1", "", "HEX")
+        calc.testStep("AC/ON 1 . 7 HEX ENG", "1", "", "HEX")
+
     }
 }
