@@ -41,4 +41,12 @@ class UnitTestMemory {
 
     }
 
+    @Test
+    fun testMemoryUnusual() {
+        val calc = CalculatorCore()
+
+        calc.testStep("1 . 1 STO 1 2 . 2 RCL STO 2", "2.2", "", "DEG M")
+        calc.testStep("RCL 1", "1.1", "", "DEG M")
+        calc.testStep("RCL 2", "2.2", "", "DEG M")
+    }
 }

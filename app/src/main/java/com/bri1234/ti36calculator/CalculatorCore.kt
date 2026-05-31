@@ -549,6 +549,18 @@ class CalculatorCore(
     private fun modeMemory(button : CalculatorButton): Boolean {
         require(currentMemoryOperation != MemoryOperation.NONE)
 
+        if (button == CalculatorButton.STORE) {
+            currentMemoryOperation = MemoryOperation.STORE
+            currentInputStateWasSet = true
+            return false
+        }
+
+        if (button == CalculatorButton.RECALL) {
+            currentMemoryOperation = MemoryOperation.RECALL
+            currentInputStateWasSet = true
+            return false
+        }
+
         try {
 
             val memoryCell = when (button) {

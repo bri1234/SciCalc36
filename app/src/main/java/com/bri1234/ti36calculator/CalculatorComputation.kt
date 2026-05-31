@@ -113,12 +113,21 @@ class CalculatorComputation(
         return if (value == -0.0) 0.0 else value
     }
 
+    private fun getIntValueIfHexOctBinMode(value: Double): Double {
+        return when (state.calculatorNumberMode) {
+            CalculatorNumberMode.HEXADECIMAL,
+            CalculatorNumberMode.OCTAL,
+            CalculatorNumberMode.BINARY -> value.toLong().toDouble()
+            else -> value
+        }
+    }
+
     /**
      * Sets the current top-of-stack register to [newValue].
      * @param newValue The value to store in the current register.
      */
     fun setValue(newValue: Double, updateDisplay: Boolean = true) {
-        val newVal = removeSignIfZero(newValue)
+        val newVal = getIntValueIfHexOctBinMode(removeSignIfZero(newValue))
 
         registerArray[registerIndex] = newVal
 
@@ -143,8 +152,8 @@ class CalculatorComputation(
      * and [second] being the previous register.
      */
     fun setTwoValues(first: Double, second: Double, updateDisplay: Boolean = true) {
-        val firstVal = removeSignIfZero(first)
-        val secondVal = removeSignIfZero(second)
+        val firstVal = getIntValueIfHexOctBinMode(removeSignIfZero(first))
+        val secondVal = getIntValueIfHexOctBinMode(removeSignIfZero(second))
 
         if (registerIndex == 0) {
             registerArray[0] = firstVal
