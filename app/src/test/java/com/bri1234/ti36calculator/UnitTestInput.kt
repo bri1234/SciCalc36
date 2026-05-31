@@ -15,20 +15,37 @@ class UnitTestInput {
     }
 
     @Test
+    fun testBack() {
+        val calc = CalculatorCore()
+
+        calc.testStep("0", "0", "", "DEG")
+        calc.testStep(".", "0.", "", "DEG")
+        calc.testStep("0", "0.0", "", "DEG")
+        calc.testStep("0", "0.00", "", "DEG")
+        calc.testStep("1", "0.001", "", "DEG")
+        calc.testStep("->", "0.00", "", "DEG")
+        calc.testStep("->", "0.0", "", "DEG")
+        calc.testStep("->", "0.", "", "DEG")
+        calc.testStep("->", "0", "", "DEG")
+        calc.testStep("->", "0", "", "DEG")
+
+    }
+
+    @Test
     fun testSecondThirdHyp() {
         val calc = CalculatorCore()
 
         calc.testStep("", "0.", "", "DEG")
-        calc.testStep("2nd", "0.", "", "2nd", "DEG")
-        calc.testStep("3rd", "0.", "", "3rd", "DEG")
-        calc.testStep("2nd", "0.", "", "2nd", "DEG")
+        calc.testStep("2nd", "0.", "", "2nd DEG")
+        calc.testStep("3rd", "0.", "", "3rd DEG")
+        calc.testStep("2nd", "0.", "", "2nd DEG")
         calc.testStep("2nd", "0.", "", "DEG")
-        calc.testStep("3rd", "0.", "", "3rd", "DEG")
+        calc.testStep("3rd", "0.", "", "3rd DEG")
         calc.testStep("3rd", "0.", "", "DEG")
-        calc.testStep("HYP", "0.", "", "HYP", "DEG")
+        calc.testStep("HYP", "0.", "", "HYP DEG")
         calc.testStep("HYP", "0.", "", "DEG")
-        calc.testStep("HYP 3rd", "0.", "", "3rd", "HYP", "DEG")
-        calc.testStep("2nd", "0.", "", "2nd", "HYP", "DEG")
+        calc.testStep("HYP 3rd", "0.", "", "3rd HYP DEG")
+        calc.testStep("2nd", "0.", "", "2nd HYP DEG")
         calc.testStep("AC/ON 2nd HYP", "0.", "", "RAD")
         calc.testStep("3rd HYP", "0.", "", "GRAD")
 

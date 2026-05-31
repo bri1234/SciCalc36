@@ -259,12 +259,13 @@ fun CalculatorCore.assertDisplay(mantissa: String, exponent: String) {
  * Every provided label string must resolve to a display label. Labels listed in [displayLabels]
  * are expected to be visible, and all other display labels are expected to be hidden.
  *
- * @param displayLabels String labels expected to be visible.
+ * @param displayLabels Space-separated string labels expected to be visible.
  * @return Unit.
  */
-fun CalculatorCore.assertDisplayLabels(vararg displayLabels: String) {
+fun CalculatorCore.assertDisplayLabels(displayLabels: String) {
+    val displayLabelsList = displayLabels.split(" ").filter { it.isNotBlank() }
 
-    val visibleDisplayLabels = displayLabels.map {
+    val visibleDisplayLabels = displayLabelsList.map {
         displayLabel -> strToDisplayLabel[displayLabel] ?: throw IllegalArgumentException("Unknown display label: $displayLabel")
     }.toSet()
 
@@ -285,8 +286,8 @@ fun CalculatorCore.assertDisplayLabels(vararg displayLabels: String) {
  *
  * @return Unit.
  */
-fun CalculatorCore.testStep(input: String, mantissa: String, exponent: String, vararg displayLabels: String) {
+fun CalculatorCore.testStep(input: String, mantissa: String, exponent: String, displayLabels: String) {
     input(input)
     assertDisplay(mantissa, exponent)
-    assertDisplayLabels(*displayLabels)
+    assertDisplayLabels(displayLabels)
 }
