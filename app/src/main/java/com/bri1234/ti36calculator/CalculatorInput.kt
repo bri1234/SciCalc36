@@ -230,6 +230,18 @@ class CalculatorInput(val state: CalculatorState,
         if (inputPositionMantissa >= NUM_MANTISSA_DIGITS - 1)
             return
 
+        if (inputPositionMantissa == NUM_MANTISSA_DIGITS - 2) {
+            // is last digit
+            if (display.displayDecimalPointPos == NUM_MANTISSA_DIGITS - 1) {
+                display.displayDecimalPointPos = -1
+                return
+            }
+
+            // set last digit to 0
+            display.displayMantissa[NUM_MANTISSA_DIGITS - 1] = '0'
+            return
+        }
+
         val hasMinus = display.displayMantissa[inputPositionMantissa] == '-'
         if (hasMinus)
             display.displayMantissa[inputPositionMantissa] = ' '

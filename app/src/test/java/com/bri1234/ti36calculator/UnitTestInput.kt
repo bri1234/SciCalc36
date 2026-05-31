@@ -12,6 +12,10 @@ class UnitTestInput {
         calc.testStep("2", "42", "", "DEG")
         calc.testStep("=", "42.", "", "DEG")
 
+        calc.testStep("AC/ON 1 2 3 4 5 6 7 8 9 0", "1234567890", "", "DEG")
+        calc.testStep("1 2 3 4 5 6 7 8 9 0", "1234567890", "", "DEG")
+        calc.testStep("AC/ON 1 +/- 2 3 4 5 6 7 8 9 0", "-1234567890", "", "DEG")
+        calc.testStep("1 2 3 4 5 6 7 8 9 0", "-1234567890", "", "DEG")
     }
 
     @Test
@@ -29,6 +33,12 @@ class UnitTestInput {
         calc.testStep("->", "0", "", "DEG")
         calc.testStep("->", "0", "", "DEG")
 
+        calc.testStep("AC/ON 0 . ->", "0", "", "DEG")
+        calc.testStep("AC/ON 5 . ->", "5", "", "DEG")
+        calc.testStep("->", "0", "", "DEG")
+        calc.testStep("->", "0", "", "DEG")
+
+        calc.testStep("AC/ON 0 . ->", "0", "", "DEG")
     }
 
     @Test
