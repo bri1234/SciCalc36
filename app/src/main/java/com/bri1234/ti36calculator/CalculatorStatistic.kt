@@ -35,16 +35,16 @@ class CalculatorStatistic(val state: CalculatorState,
         currentStatistic.clearStatistic()
     }
 
-    fun addValue() {
+    fun addValue(frequency: Int = 1) {
         val count = when (state.calculatorStatisticMode) {
             CalculatorStatisticMode.STAT1 -> {
                 val x = computation.getValue()
-                statistic1.add(x)
+                statistic1.add(x, frequency)
                 statistic1.count
             }
             CalculatorStatisticMode.STAT2 -> {
                 val (x, y) = computation.getTwoValues()
-                statistic2.add(x, y)
+                statistic2.add(x, y, frequency)
                 statistic2.count
             }
             else -> throw IllegalStateException("statisticAddValue called while statistic mode is off")
@@ -53,16 +53,16 @@ class CalculatorStatistic(val state: CalculatorState,
         computation.setValue(count.toDouble())
     }
 
-    fun subtractValue() {
+    fun subtractValue(frequency: Int = 1) {
         val count = when (state.calculatorStatisticMode) {
             CalculatorStatisticMode.STAT1 -> {
                 val x = computation.getValue()
-                statistic1.subtract(x)
+                statistic1.subtract(x, frequency)
                 statistic1.count
             }
             CalculatorStatisticMode.STAT2 -> {
                 val (x, y) = computation.getTwoValues()
-                statistic2.subtract(x, y)
+                statistic2.subtract(x, y, frequency)
                 statistic2.count
             }
             else -> throw IllegalStateException("statisticSubtractValue called while statistic mode is off")
@@ -182,4 +182,3 @@ class CalculatorStatistic(val state: CalculatorState,
         computation.setValue(predictedY)
     }
 }
-

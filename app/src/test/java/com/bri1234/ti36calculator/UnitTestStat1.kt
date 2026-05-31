@@ -60,6 +60,7 @@ class UnitTestStat1 {
         calc.testStep("AC/ON STAT1 3 . 1 4 FRQ 8 6 SIN", "0.05477591", "", "DEG STAT")
         calc.testStep("AC/ON STAT1 FRQ +/-", "0.", "", "DEG STAT")
         calc.testStep("AC/ON FRQ", "Error  ", "", "DEG")
+
         calc.testStep("AC/ON", "0.", "", "DEG")
         calc.testStep("STAT1", "0.", "", "DEG STAT")
         calc.testStep("1", "1", "", "DEG STAT")
@@ -72,5 +73,33 @@ class UnitTestStat1 {
         calc.testStep("S+", "5.", "", "DEG STAT")
         calc.testStep("Sx", "6000.", "", "DEG STAT")
 
+    }
+    @Test
+    fun testStat1Invalid() {
+        val calc = CalculatorCore()
+
+        calc.testStep("STAT1 1 . 1 FRQ 1 1 S+", "11.", "", "DEG STAT")
+        calc.testStep("2", "2", "", "DEG STAT")
+        calc.testStep(". 2 FRQ 3 S-", "8.", "", "DEG STAT")
+        calc.testStep("3 . 3 FRQ 1 3 S-", "Error  ", "", "DEG STAT")
+    }
+
+    @Test
+    fun testStat1DefaultFrequency() {
+        val calc = CalculatorCore()
+
+        calc.testStep("AC/ON STAT1 4 S+", "1.", "", "DEG STAT")
+        calc.testStep("Sx", "4.", "", "DEG STAT")
+    }
+
+    @Test
+    fun testStat1ZeroFrequency() {
+        val calc = CalculatorCore()
+
+        calc.testStep("AC/ON STAT1 4 S+", "1.", "", "DEG STAT")
+        calc.testStep("5 FRQ 0 S+", "Error  ", "", "DEG STAT")
+
+        calc.testStep("AC/ON STAT1 4 S+", "1.", "", "DEG STAT")
+        calc.testStep("4 FRQ 0 S-", "Error  ", "", "DEG STAT")
     }
 }

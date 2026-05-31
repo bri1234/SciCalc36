@@ -160,13 +160,40 @@ class CalculatorInput(val state: CalculatorState,
         require(digitCh.isDigit()) { "Invalid digit for frequency input: $digitCh" }
 
         val m = display.displayMantissa
-        require(m[8] == 'F' && m[9] == 'r' && m[10] == ' ' && m[11].isDigit() && m[12].isDigit())
+        val o = NUM_MANTISSA_DIGITS - 5
+        require(m[o] == 'F' && m[o + 1] == 'r' && m[o + 2] == ' ' && m[o + 3].isDigit() && m[o + 4].isDigit())
             { "Frequency input can only be used in statistic mode 1 and 2" }
 
-        display.displayMantissa[11] = display.displayMantissa[12]
-        display.displayMantissa[12] = digitCh
+        display.displayMantissa[o + 3] = display.displayMantissa[o + 4]
+        display.displayMantissa[o + 4] = digitCh
 
         return true
+    }
+
+    /**
+     * Returns the entered statistic frequency, or 1 when frequency input is not active.
+     *
+     * @return The entered two-digit statistic frequency, or 1 outside frequency input mode.
+     */
+    fun getFrequency(): Int {
+        if (digitInputMode != DigitInputMode.FREQUENCY)
+            return 1
+
+        val m = display.displayMantissa
+        val o = NUM_MANTISSA_DIGITS - 5
+        require(m[o] == 'F' && m[o + 1] == 'r' && m[o + 2] == ' ' && m[o + 3].isDigit() && m[o + 4].isDigit())
+            { "Frequency input can only be used in statistic mode 1 and 2" }
+
+        return "${m[o + 3]}${m[o + 4]}".toInt()
+    }
+
+    /**
+     * Returns whether statistic frequency input is currently active.
+     *
+     * @return `true` while frequency input is active, otherwise `false`.
+     */
+    fun isFrequencyEditMode(): Boolean {
+        return digitInputMode == DigitInputMode.FREQUENCY
     }
 
     /**
@@ -281,12 +308,15 @@ class CalculatorInput(val state: CalculatorState,
      * The mantissa and exponent are not editable in this mode.
      */
     fun enterFrequencyEditMode() {
-        if (digitInputMode != DigitInputMode.MANTISSA)
+        if (digitInputMode == DigitInputMode.FREQUENCY)
             return
 
         digitInputMode = DigitInputMode.FREQUENCY
-        "      Fr 00".toCharArray().copyInto(display.displayMantissa, 8)
+
+        display.displayMantissa.fill(' ')
+        "Fr 00".toCharArray().copyInto(display.displayMantissa, NUM_MANTISSA_DIGITS - 4 - 1)
         display.displayExponent.fill(' ')
+        display.displayDecimalPointPos = -1
 
         onEditInputChanged(Unit)
     }

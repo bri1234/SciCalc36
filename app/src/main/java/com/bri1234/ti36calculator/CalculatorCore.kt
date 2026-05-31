@@ -211,7 +211,7 @@ class CalculatorCore(
             CalculatorButton.X_SQUARED -> functions.xSquared()
             CalculatorButton.SQRT_X -> functions.squareRootX()
             CalculatorButton.DIVIDE -> computation.division()
-            CalculatorButton.SUM_PLUS -> statistic.addValue()
+            CalculatorButton.SUM_PLUS -> statistic.addValue(input.getFrequency())
             CalculatorButton.EE -> input.enterExponentEditMode()
             CalculatorButton.LEFT_PARENTHESES -> computation.leftParentheses()
             CalculatorButton.RIGHT_PARENTHESES -> computation.rightParentheses()
@@ -266,7 +266,7 @@ class CalculatorCore(
             CalculatorButton.X_SQUARED -> statistic.printMeanX()
             CalculatorButton.SQRT_X -> statistic.printSampleStandardDeviationX()
             CalculatorButton.DIVIDE -> statistic.printPopulationStandardDeviationX()
-            CalculatorButton.SUM_PLUS -> statistic.subtractValue()
+            CalculatorButton.SUM_PLUS -> statistic.subtractValue(input.getFrequency())
             CalculatorButton.EE -> statistic.printCount()
             CalculatorButton.LEFT_PARENTHESES -> statistic.printMeanY()
             CalculatorButton.RIGHT_PARENTHESES -> statistic.printSampleStandardDeviationY()
@@ -673,6 +673,9 @@ class CalculatorCore(
 
     /** Called when the displayed input changes; converts the display value to a number and updates the computation. */
     private fun onEditInputChanged() {
+        if (input.isFrequencyEditMode())
+            return
+
         val inputValue = display.convertDisplayValueToNumeric()
         computation.setValue(inputValue, false)
     }

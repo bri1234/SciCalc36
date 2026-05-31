@@ -30,18 +30,21 @@ class Statistic1: IStatistic {
         sumX2 = 0.0
     }
 
-    fun add(value: Double) {
-        count++
-        sumX += value
-        sumX2 += value * value
+    fun add(value: Double, frequency: Int = 1) {
+        require(frequency > 0) { "Frequency must be positive" }
+
+        count += frequency
+        sumX += value * frequency
+        sumX2 += value * value * frequency
     }
 
-    fun subtract(value: Double) {
-        check(count > 0) { "No data to subtract" }
+    fun subtract(value: Double, frequency: Int = 1) {
+        require(frequency > 0) { "Frequency must be positive" }
+        check(count >= frequency) { "Not enough data to subtract" }
 
-        count--
-        sumX -= value
-        sumX2 -= value * value
+        count -= frequency
+        sumX -= value * frequency
+        sumX2 -= value * value * frequency
     }
 
     override fun correlationCoefficient(): Double {
