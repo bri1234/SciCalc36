@@ -256,25 +256,25 @@ fun CalculatorCore.assertDisplay(mantissa: String, exponent: String) {
 /**
  * Asserts the complete set of currently visible display labels from string labels.
  *
- * Every provided label string must resolve to a display label. Labels listed in [displayLabels]
+ * Every provided label string must resolve to a display label. Labels listed in [expectedDisplayLabelsStr]
  * are expected to be visible, and all other display labels are expected to be hidden.
  *
- * @param displayLabels Space-separated string labels expected to be visible.
+ * @param expectedDisplayLabelsStr Space-separated string labels expected to be visible.
  * @return Unit.
  */
-fun CalculatorCore.assertDisplayLabels(displayLabels: String) {
-    val displayLabelsList = displayLabels.split(" ").filter { it.isNotBlank() }
+fun CalculatorCore.assertDisplayLabels(expectedDisplayLabelsStr: String) {
+    val displayData = getDisplayData()
 
-    val visibleDisplayLabels = displayLabelsList.map {
-        displayLabel -> strToDisplayLabel[displayLabel] ?: throw IllegalArgumentException("Unknown display label: $displayLabel")
+    val expectedDisplayLabels = expectedDisplayLabelsStr.split(" ").map {
+        expectedDisplayLabel -> strToDisplayLabel[expectedDisplayLabel] ?: throw IllegalArgumentException("Unknown display label: $expectedDisplayLabel")
     }.toSet()
 
     for (displayLabel in DisplayLabels.entries) {
-        val displayData = getDisplayData()
-        val isVisible = displayLabel in visibleDisplayLabels
+        val shallBeVisible = displayLabel in expectedDisplayLabels
+        val isVisible = displayLabel in displayData.displayLabels
 
-        assertEquals("Expected display label: $isVisible but is: ${displayData.displayLabels.contains(displayLabel)}",
-            isVisible, displayData.displayLabels.contains(displayLabel))
+        assertEquals("Expected display label: $shallBeVisible but is: $isVisible",
+            shallBeVisible, isVisible)
     }
 }
 

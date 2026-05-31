@@ -486,7 +486,7 @@ class CalculatorCore(
      * @param memoryOperation The [MemoryOperation] to perform.
      */
     private fun buttonPressedMemory(memoryOperation: MemoryOperation) {
-        currentInputState = CalculatorInputState.CONSTANT
+        currentInputState = CalculatorInputState.MEMORY
         currentInputStateWasSet = true
         currentMemoryOperation = memoryOperation
 
@@ -627,6 +627,17 @@ class CalculatorCore(
     private fun selectNumberMode(numberMode: CalculatorNumberMode) {
         state.calculatorNumberMode = numberMode
         state.calculatorStatisticMode = CalculatorStatisticMode.OFF
+
+        when (numberMode) {
+            CalculatorNumberMode.HEXADECIMAL,
+            CalculatorNumberMode.OCTAL,
+            CalculatorNumberMode.BINARY -> {
+                val intValue = computation.getValue().toLong()
+                computation.setValue(intValue.toDouble())
+            }
+            else -> { }
+        }
+
         display.printValue(computation.getValue())
     }
 
