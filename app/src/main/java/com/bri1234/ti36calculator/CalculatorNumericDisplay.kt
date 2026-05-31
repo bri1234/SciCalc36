@@ -28,6 +28,10 @@ import kotlin.math.pow
 const val NUM_MANTISSA_DIGITS = 11
 const val NUM_EXPONENT_DIGITS = 3
 
+private const val NUM_HEX_BITS = 40
+private const val NUM_OCT_BITS = 30
+private const val NUM_BIN_BITS = 10
+
 /**
  * Enum representing the numeric output format.
  */
@@ -89,6 +93,15 @@ class CalculatorNumericDisplay(val state: CalculatorState)  {
      * @return The numeric value represented by the current display state.
      */
     fun convertDisplayValueToNumeric(): Double {
+        return when (state.calculatorNumberMode) {
+            CalculatorNumberMode.HEXADECIMAL -> parseIntegerInput(16, NUM_HEX_BITS)
+            CalculatorNumberMode.OCTAL -> parseIntegerInput(8, NUM_OCT_BITS)
+            CalculatorNumberMode.BINARY -> parseIntegerInput(2, NUM_BIN_BITS)
+            CalculatorNumberMode.DECIMAL -> parseDecimalInput()
+        }
+    }
+
+    private fun parseDecimalInput(): Double {
         var mantissaStr = displayMantissa.concatToString()
         val exponentStr = displayExponent.concatToString()
 
@@ -101,6 +114,17 @@ class CalculatorNumericDisplay(val state: CalculatorState)  {
         val exponent = exponentStr.trim().toIntOrNull() ?: 0
 
         return mantissa * 10.0.pow(exponent.toDouble())
+    }
+
+    private fun parseIntegerInput(radix: Int, numBits: Int): Double {
+        val inputStr = displayMantissa.concatToString().trim()
+        val value = inputStr.toLongOrNull(radix)
+            ?: throw IllegalArgumentException("Invalid input for radix $radix: $inputStr")
+        val maxVal = 1L shl numBits
+        val signBit = 1L shl (numBits - 1)
+        val signedValue = if ((value and signBit) != 0L) value - maxVal else value
+
+        return signedValue.toDouble()
     }
 
     /**
@@ -180,19 +204,19 @@ class CalculatorNumericDisplay(val state: CalculatorState)  {
     /** Prints a double value in binary format with radix 2 and 10 bits for the integer part.
      * The value is treated as a signed integer, so it can represent values from -512 to 511. */
     private fun printValueBin(value: Double) {
-        printInteger(value, 2, 10)
+        printInteger(value, 2, NUM_BIN_BITS)
     }
 
     /** Prints a double value in octal format with radix 8 and 30 bits for the integer part.
      * The value is treated as a signed integer, so it can represent values from -2^29 to 2^29 - 1. */
     private fun printValueOct(value: Double) {
-        printInteger(value, 8, 30)
+        printInteger(value, 8, NUM_OCT_BITS)
     }
 
     /** Prints a double value in octal format with radix 16 and 40 bits for the integer part.
      * The value is treated as a signed integer, so it can represent values from -2^39 to 2^39 - 1. */
     private fun printValueHex(value: Double) {
-        printInteger(value, 16, 40)
+        printInteger(value, 16, NUM_HEX_BITS)
     }
 
     /**
@@ -211,7 +235,10 @@ class CalculatorNumericDisplay(val state: CalculatorState)  {
 
         check(valueInt >= 0)
 
-        var valueStr = valueInt.toString(radix).uppercase(Locale.ROOT)
+        var valueStr = valueInt.toString(radix)
+            .uppercase(Locale.ROOT)
+            .replace('B', 'b')
+            .replace('D', 'd')
         if (valueStr.length >= NUM_MANTISSA_DIGITS)
             throw IllegalArgumentException("Value is too large to display as integer")
 
@@ -382,5 +409,3 @@ class CalculatorNumericDisplay(val state: CalculatorState)  {
     }
 
 }
-
-

@@ -52,7 +52,9 @@ private enum class StackEvaluationMode {
  * Manages the computation stack for the TI-36 calculator, including registers and operations.
  * It supports basic arithmetic, exponentiation, roots, and bitwise operations.
  */
-class CalculatorComputation {
+class CalculatorComputation(
+    private val state: CalculatorState,
+) {
 
     val onResultChanged: ObserverSubject<Double> = ObserverSubject()
 
@@ -200,7 +202,14 @@ class CalculatorComputation {
         if (right == 0.0)
             throw IllegalArgumentException("Division by zero")
 
-        return left / right
+        val result = left / right
+
+        return when (state.calculatorNumberMode) {
+            CalculatorNumberMode.DECIMAL -> result
+            CalculatorNumberMode.HEXADECIMAL,
+            CalculatorNumberMode.OCTAL,
+            CalculatorNumberMode.BINARY -> result.toLong().toDouble()
+        }
     }
 
     /**
@@ -409,4 +418,3 @@ private fun <T> removeElementAt(array: Array<T>, index: Int, defaultValue: T) {
 
     array[array.size - 1] = defaultValue
 }
-

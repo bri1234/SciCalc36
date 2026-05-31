@@ -41,7 +41,7 @@ class CalculatorCore(
 
     val display = CalculatorNumericDisplay(state)
     private val input = CalculatorInput(state, display)
-    private val computation = CalculatorComputation()
+    private val computation = CalculatorComputation(state)
     private val functions = CalculatorFunctions(state, computation)
     private val functions2 = CalculatorFunctions2(state, computation)
     private val memory = CalculatorMemory(computation)
