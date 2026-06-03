@@ -2,15 +2,15 @@ package com.bri1234.ti36calculator
 
 import org.junit.Test
 
-class UnitTestFractions {
+class UnitTestErrorConditions {
 
     @Test
-    fun testFractions() {
+    fun testErrorConditions() {
         val calc = CalculatorCore()
 
         calc.testStep("AC/ON", "0.", "", "DEG")
 
-        // TODO: add tests for fractions
+        // TODO: add tests
     }
 }
 
