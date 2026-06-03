@@ -43,7 +43,7 @@ class CalculatorStatistic(val state: CalculatorState,
                 statistic1.count
             }
             CalculatorStatisticMode.STAT2 -> {
-                val (x, y) = computation.getTwoValues()
+                val (y, x) = computation.getTwoValues()
                 statistic2.add(x, y, frequency)
                 statistic2.count
             }
@@ -61,7 +61,7 @@ class CalculatorStatistic(val state: CalculatorState,
                 statistic1.count
             }
             CalculatorStatisticMode.STAT2 -> {
-                val (x, y) = computation.getTwoValues()
+                val (y, x) = computation.getTwoValues()
                 statistic2.subtract(x, y, frequency)
                 statistic2.count
             }

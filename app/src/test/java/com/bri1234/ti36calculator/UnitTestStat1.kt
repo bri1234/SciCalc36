@@ -102,4 +102,24 @@ class UnitTestStat1 {
         calc.testStep("AC/ON STAT1 4 S+", "1.", "", "DEG STAT")
         calc.testStep("4 FRQ 0 S-", "Error  ", "", "DEG STAT")
     }
+
+    @Test
+    fun testStat1FromManual() {
+        val calc = CalculatorCore()
+
+        calc.testStep("STAT1", "0.", "", "DEG STAT")
+        calc.testStep("CSR", "0.", "", "DEG STAT")
+        calc.testStep("4 5 S+", "1.", "", "DEG STAT")
+        calc.testStep("5 5 FRQ 3 S+", "4.", "", "DEG STAT")
+        calc.testStep("6 0 S+", "5.", "", "DEG STAT")
+        calc.testStep("8 S+", "6.", "", "DEG STAT")
+        calc.testStep("8 S-", "5.", "", "DEG STAT")
+        calc.testStep("8 0 S+", "6.", "", "DEG STAT")
+        calc.testStep("Sx", "350.", "", "DEG STAT")
+        calc.testStep("x_", "58.33333333", "", "DEG STAT")
+        calc.testStep("Sx2", "21100.", "", "DEG STAT")
+        calc.testStep("Sxn", "10.67187373", "", "DEG STAT")
+        calc.testStep("Sxn-1", "11.69045194", "", "DEG STAT")
+
+    }
 }
