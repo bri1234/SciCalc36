@@ -26,18 +26,24 @@ class UnitTestConversions {
     fun testMetricToEnglish() {
         val calc = CalculatorCore()
 
-        calc.testStep("AC/ON", "0.", "", "DEG")
-
-        // TODO: add tests
+        calc.testStep("AC/ON 2 . 5 4 >in", "1.", "", "DEG")
+        calc.testStep("AC/ON 3 . 7 8 5 4 1 1 7 8 4 >gal", "1.", "", "DEG")
+        calc.testStep("AC/ON . 4 5 3 5 9 2 3 7 >lb", "1.", "", "DEG")
+        calc.testStep("AC/ON 1 0 0 0 >lb", "2204.622622", "", "DEG")
+        calc.testStep("AC/ON 1 >oz", "0.035273962", "", "DEG")
+        calc.testStep("AC/ON 0 >°F", "32.", "", "DEG")
+        calc.testStep("AC/ON 1 0 0 >°F", "212.", "", "DEG")
     }
 
     @Test
     fun testEnglishToMetric() {
         val calc = CalculatorCore()
 
-        calc.testStep("AC/ON", "0.", "", "DEG")
-
-        // TODO: add tests
+        calc.testStep("1 >cm", "2.54", "", "DEG")
+        calc.testStep("1 >l", "3.785411784", "", "DEG")
+        calc.testStep("1 >kg", "0.45359237", "", "DEG")
+        calc.testStep("1 >g", "28.34952313", "", "DEG")
+        calc.testStep("3 2 >°C", "0.", "", "DEG")
+        calc.testStep("AC/ON 2 1 2 >°C", "100.", "", "DEG")
     }
 }
-
