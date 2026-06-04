@@ -18,6 +18,8 @@
 
 package com.bri1234.ti36calculator
 
+import com.bri1234.ti36calculator.enums.CalculatorNumberMode
+import com.bri1234.ti36calculator.enums.Operation
 import com.bri1234.ti36calculator.utils.ObserverSubject
 import kotlin.math.pow
 import kotlin.math.round
@@ -25,22 +27,6 @@ import kotlin.math.round
 private const val REGISTER_COUNT = 64
 private const val OPERATION_COUNT = 256
 
-/**
- * These are the supported stack operations, ordered by precedence (lower order means higher precedence).
- */
-enum class Operation(val order: Int, val caption: String) {
-    NONE(-1, "none"),
-    Y_POW_X(3, "^"),
-    Y_ROOT_X(3, "sqrt"),
-    MULTIPLICATION(4, "*"),
-    DIVISION(4, "/"),
-    ADDITION(5, "+"),
-    SUBTRACTION(5, "-"),
-    BITWISE_AND(6, "and"),
-    BITWISE_OR(7, "or"),
-    BITWISE_XOR(7, "xor"),
-    BITWISE_XNOR(7, "xnor"),
-}
 
 private enum class StackEvaluationMode {
     PARTIAL, // evaluates the stack until the next operation with higher precedence is encountered

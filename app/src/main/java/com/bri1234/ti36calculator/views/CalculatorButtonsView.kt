@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.bri1234.ti36calculator.CALCULATOR_BUTTON_LIST
 import com.bri1234.ti36calculator.CALCULATOR_SPECIAL_BUTTON_LIST
+import com.bri1234.ti36calculator.enums.CalculatorButton
 
 /**
  * Displays a single calculator button with its properties.
@@ -54,7 +55,7 @@ import com.bri1234.ti36calculator.CALCULATOR_SPECIAL_BUTTON_LIST
 private fun CalculatorButton(
     buttonProperties : com.bri1234.ti36calculator.CalculatorButtonProperties,
     modifier: Modifier,
-    onButtonPressed: (com.bri1234.ti36calculator.CalculatorButton) -> Unit
+    onButtonPressed: (CalculatorButton) -> Unit
 ) {
     Column(
         modifier = modifier,
@@ -147,7 +148,7 @@ private fun CalculatorButtonHeading(buttonProperties: com.bri1234.ti36calculator
 @Composable
 fun CalculatorButtonsView(
     modifier: Modifier = Modifier,
-    onButtonPressed: (com.bri1234.ti36calculator.CalculatorButton) -> Unit
+    onButtonPressed: (CalculatorButton) -> Unit
 ) {
     Column (modifier = modifier) {
         GridLayout(
@@ -186,7 +187,7 @@ fun CalculatorButtonsView(
 private fun SimpleCalculatorButton(
     buttonProperties : com.bri1234.ti36calculator.CalculatorButtonProperties,
     modifier: Modifier,
-    onButtonPressed: (com.bri1234.ti36calculator.CalculatorButton) -> Unit
+    onButtonPressed: (CalculatorButton) -> Unit
 ) {
     Column(
         modifier = modifier,

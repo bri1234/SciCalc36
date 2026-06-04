@@ -1,5 +1,6 @@
 package com.bri1234.ti36calculator
 
+import com.bri1234.ti36calculator.enums.CalculatorButton
 import com.bri1234.ti36calculator.views.DisplayLabels
 import org.junit.Assert.assertEquals
 

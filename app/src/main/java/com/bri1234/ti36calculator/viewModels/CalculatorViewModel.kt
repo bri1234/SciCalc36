@@ -22,7 +22,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.bri1234.ti36calculator.AndroidCalculatorLogger
-import com.bri1234.ti36calculator.CalculatorButton
+import com.bri1234.ti36calculator.enums.CalculatorButton
 import com.bri1234.ti36calculator.CalculatorDisplayData
 import com.bri1234.ti36calculator.CalculatorCore
 

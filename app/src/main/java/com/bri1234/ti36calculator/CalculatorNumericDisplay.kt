@@ -18,6 +18,9 @@
 
 package com.bri1234.ti36calculator
 
+import com.bri1234.ti36calculator.enums.CalculatorNumberMode
+import com.bri1234.ti36calculator.enums.DisplayNumberFormat
+import com.bri1234.ti36calculator.enums.RectangularPolarView
 import com.bri1234.ti36calculator.utils.ObserverSubject
 import java.util.Locale
 import kotlin.math.floor
@@ -31,15 +34,6 @@ const val NUM_EXPONENT_DIGITS = 3
 private const val NUM_HEX_BITS = 40
 private const val NUM_OCT_BITS = 30
 private const val NUM_BIN_BITS = 10
-
-/**
- * Enum representing the numeric output format.
- */
-enum class DisplayNumberFormat {
-    FLOAT,
-    SCIENTIFIC,
-    ENGINEERING,
-}
 
 /**
  * Class representing the numeric display of the TI-36 calculator. It manages the mantissa, exponent,
@@ -66,6 +60,11 @@ class CalculatorNumericDisplay(val state: CalculatorState)  {
     private var displayNumberFormat: DisplayNumberFormat = DisplayNumberFormat.FLOAT
 
     /**
+     * The current rectangular polar view mode for conversions between rectangular and polar coordinates.
+     */
+    private var rectangularPolarView: RectangularPolarView = RectangularPolarView.OFF
+
+    /**
      * Resets the display to its default state, clearing all labels and setting the numeric value to 0.
      * The default label is DEG for angle unit.
      */
@@ -76,6 +75,8 @@ class CalculatorNumericDisplay(val state: CalculatorState)  {
 
         displayNumberFormat = DisplayNumberFormat.FLOAT
         numberOfDigitsAfterDecimalPoint = -1
+
+        rectangularPolarView = RectangularPolarView.OFF
     }
 
     /**

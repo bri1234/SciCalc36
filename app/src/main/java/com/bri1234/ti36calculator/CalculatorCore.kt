@@ -18,6 +18,15 @@
 
 package com.bri1234.ti36calculator
 
+import com.bri1234.ti36calculator.enums.CalculatorAngleUnit
+import com.bri1234.ti36calculator.enums.CalculatorButton
+import com.bri1234.ti36calculator.enums.CalculatorFunction
+import com.bri1234.ti36calculator.enums.CalculatorHypMode
+import com.bri1234.ti36calculator.enums.CalculatorInputState
+import com.bri1234.ti36calculator.enums.CalculatorNumberMode
+import com.bri1234.ti36calculator.enums.CalculatorStatisticMode
+import com.bri1234.ti36calculator.enums.DisplayNumberFormat
+import com.bri1234.ti36calculator.enums.MemoryOperation
 import com.bri1234.ti36calculator.views.DisplayLabels
 
 /*
@@ -114,7 +123,7 @@ class CalculatorCore(
      * If an error occurs during the processing of the button press, it will set the error state
      * and display an error message.
      *
-     * @param button The [CalculatorButton] that was pressed.
+     * @param button The [com.bri1234.ti36calculator.enums.CalculatorButton] that was pressed.
      */
     fun buttonPressed(button: CalculatorButton) {
 

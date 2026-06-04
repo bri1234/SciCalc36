@@ -18,6 +18,7 @@
 
 package com.bri1234.ti36calculator
 
+import com.bri1234.ti36calculator.enums.CalculatorAngleUnit
 import com.bri1234.ti36calculator.utils.factorial
 import com.bri1234.ti36calculator.utils.getIntFromDouble
 import kotlin.math.atan2
@@ -94,4 +95,3 @@ class CalculatorFunctions2(val state: CalculatorState,
         computation.setTwoValues(x, y)
     }
 }
-

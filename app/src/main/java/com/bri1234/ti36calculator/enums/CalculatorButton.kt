@@ -16,42 +16,19 @@
  * along with this program.  If not, see <http://gnu.org>.
  */
 
-package com.bri1234.ti36calculator
+package com.bri1234.ti36calculator.enums
 
-enum class CalculatorInputState {
-    NONE,
-    CONSTANT,
-    MEMORY,
-    FIXED_NUMBER_FORMAT,
+/**
+ * Enum class representing the different buttons on the calculator.
+ */
+enum class CalculatorButton {
+    AC_ON,
+    THIRD, HYP, LOG, LN, CE_C,
+    SECOND, SIN, COS, TAN, Y_POW_X,
+    X_SWAP_Y, ONE_DIV_X, X_SQUARED, SQRT_X, DIVIDE,
+    SUM_PLUS, EE, LEFT_PARENTHESES, RIGHT_PARENTHESES, MULTIPLY,
+    STORE, SEVEN, EIGHT, NINE, MINUS,
+    RECALL, FOUR, FIVE, SIX, PLUS,
+    A_B_C, ONE, TWO, THREE, EQUAL,
+    BACK, ZERO, DOT, PLUS_MINUS,
 }
-
-enum class CalculatorAngleUnit {
-    DEG,
-    RAD,
-    GRAD,
-}
-
-enum class CalculatorFunction {
-    FIRST,
-    SECOND,
-    THIRD,
-}
-
-enum class CalculatorStatisticMode {
-    OFF,
-    STAT1,
-    STAT2,
-}
-
-enum class CalculatorHypMode {
-    OFF,
-    HYP,
-}
-
-enum class CalculatorNumberMode {
-    DECIMAL,
-    HEXADECIMAL,
-    OCTAL,
-    BINARY,
-}
-

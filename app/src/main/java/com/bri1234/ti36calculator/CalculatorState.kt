@@ -18,6 +18,12 @@
 
 package com.bri1234.ti36calculator
 
+import com.bri1234.ti36calculator.enums.CalculatorAngleUnit
+import com.bri1234.ti36calculator.enums.CalculatorFunction
+import com.bri1234.ti36calculator.enums.CalculatorHypMode
+import com.bri1234.ti36calculator.enums.CalculatorNumberMode
+import com.bri1234.ti36calculator.enums.CalculatorStatisticMode
+
 /**
  * A class to hold the state of the calculator, including the current angle unit, function,
  * statistic mode, hyp mode, and number mode.

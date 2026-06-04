@@ -1,6 +1,8 @@
 package com.bri1234.ti36calculator
 
 import com.bri1234.ti36calculator.contracts.IStatistic
+import com.bri1234.ti36calculator.enums.CalculatorNumberMode
+import com.bri1234.ti36calculator.enums.CalculatorStatisticMode
 import kotlin.math.sqrt
 
 class CalculatorStatistic(val state: CalculatorState,

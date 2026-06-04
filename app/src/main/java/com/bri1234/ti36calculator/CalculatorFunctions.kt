@@ -18,6 +18,9 @@
 
 package com.bri1234.ti36calculator
 
+import com.bri1234.ti36calculator.enums.CalculatorAngleUnit
+import com.bri1234.ti36calculator.enums.CalculatorHypMode
+import com.bri1234.ti36calculator.enums.Operation
 import com.bri1234.ti36calculator.utils.factorial as mathUtilsFactorial
 import com.bri1234.ti36calculator.utils.getIntFromDouble
 

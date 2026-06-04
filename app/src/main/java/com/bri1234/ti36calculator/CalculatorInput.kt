@@ -18,10 +18,11 @@
 
 package com.bri1234.ti36calculator
 
+import com.bri1234.ti36calculator.enums.CalculatorNumberMode
 import com.bri1234.ti36calculator.utils.ObserverSubject
 import java.util.Locale
 
-enum class DigitInputMode {
+private enum class DigitInputMode {
     MANTISSA,
     EXPONENT,
     FREQUENCY

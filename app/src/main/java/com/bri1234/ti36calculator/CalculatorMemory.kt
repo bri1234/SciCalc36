@@ -18,15 +18,8 @@
 
 package com.bri1234.ti36calculator
 
+import com.bri1234.ti36calculator.enums.MemoryOperation
 import com.bri1234.ti36calculator.utils.ObserverSubject
-
-enum class MemoryOperation {
-    NONE,
-    STORE,
-    RECALL,
-    EXCHANGE,
-    SUM,
-}
 
 class CalculatorMemory(val computation: CalculatorComputation) {
 

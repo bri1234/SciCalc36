@@ -19,6 +19,7 @@
 package com.bri1234.ti36calculator
 
 import androidx.compose.ui.graphics.Color
+import com.bri1234.ti36calculator.enums.CalculatorButton
 import com.bri1234.ti36calculator.views.BUTTON_COLOR_1
 import com.bri1234.ti36calculator.views.BUTTON_COLOR_2
 import com.bri1234.ti36calculator.views.BUTTON_COLOR_3
