@@ -36,6 +36,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.platform.LocalDensity
 import com.bri1234.ti36calculator.CalculatorDisplayData
+import com.bri1234.ti36calculator.enums.DisplayLabels
 
 @Composable
 fun CalculatorDisplayView(

@@ -1,4 +1,4 @@
-package com.bri1234.ti36calculator.views
+package com.bri1234.ti36calculator.enums
 
 /**
  * Enum class representing the various labels that can be displayed on the calculator screen.
@@ -21,4 +21,3 @@ enum class DisplayLabels(val caption: String) {
     R("r"),
     PARENTHESES("()"),
 }
-

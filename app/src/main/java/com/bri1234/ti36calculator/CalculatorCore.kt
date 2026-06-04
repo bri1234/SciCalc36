@@ -28,12 +28,11 @@ import com.bri1234.ti36calculator.enums.CalculatorStatisticMode
 import com.bri1234.ti36calculator.enums.DisplayNumberFormat
 import com.bri1234.ti36calculator.enums.MemoryOperation
 import com.bri1234.ti36calculator.enums.RectangularPolarView
-import com.bri1234.ti36calculator.views.DisplayLabels
+import com.bri1234.ti36calculator.enums.DisplayLabels
 
 /*
 Next features to implement:
 
-- P->R, R->P buttons (Polar/Rectangular conversion)
 - A B/C button (Fractions)
 - d/c button (Fractions)
 - F<->D button (Fractions)
