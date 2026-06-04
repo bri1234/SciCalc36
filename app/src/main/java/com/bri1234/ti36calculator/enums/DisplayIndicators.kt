@@ -5,7 +5,7 @@ package com.bri1234.ti36calculator.enums
  *
  * @property caption The text caption for the label as it should appear on the display.
  */
-enum class DisplayLabels(val caption: String) {
+enum class DisplayIndicators(val caption: String) {
     MEMORY("M"),
     SECOND("2nd"),
     THIRD("3rd"),

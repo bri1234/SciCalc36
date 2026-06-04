@@ -18,7 +18,7 @@
 
 package com.bri1234.ti36calculator
 
-import com.bri1234.ti36calculator.enums.DisplayLabels
+import com.bri1234.ti36calculator.enums.DisplayIndicators
 
 /**
  * Represents the state of the calculator display, including the digits shown and any labels.
@@ -26,13 +26,13 @@ import com.bri1234.ti36calculator.enums.DisplayLabels
  * @property digitsLarge An array of characters representing the large digits on the display.
  * @property decimalPointIndex The index of the decimal point in the large digits array, or -1 if not present.
  * @property digitsSmall An array of characters representing the small digits on the display.
- * @property displayLabels A set of labels that are currently displayed (e.g., "M", "E", "A", etc.).
+ * @property displayIndicators A set of labels that are currently displayed (e.g., "M", "E", "A", etc.).
  */
 data class CalculatorDisplayData (
     val digitsLarge: CharArray = charArrayOf(' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '0'),
     val decimalPointIndex: Int = 10,
     val digitsSmall: CharArray = charArrayOf(' ', ' ', ' '),
-    val displayLabels: Set<DisplayLabels> = setOf(DisplayLabels.DEG),
+    val displayIndicators: Set<DisplayIndicators> = setOf(DisplayIndicators.DEG),
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -43,7 +43,7 @@ data class CalculatorDisplayData (
         if (decimalPointIndex != other.decimalPointIndex) return false
         if (!digitsLarge.contentEquals(other.digitsLarge)) return false
         if (!digitsSmall.contentEquals(other.digitsSmall)) return false
-        if (displayLabels != other.displayLabels) return false
+        if (displayIndicators != other.displayIndicators) return false
 
         return true
     }
@@ -52,7 +52,7 @@ data class CalculatorDisplayData (
         var result = decimalPointIndex
         result = 31 * result + digitsLarge.contentHashCode()
         result = 31 * result + digitsSmall.contentHashCode()
-        result = 31 * result + displayLabels.hashCode()
+        result = 31 * result + displayIndicators.hashCode()
         return result
     }
 }

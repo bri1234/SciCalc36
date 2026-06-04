@@ -19,24 +19,24 @@
 package com.bri1234.ti36calculator
 
 import com.bri1234.ti36calculator.enums.CalculatorButton
-import com.bri1234.ti36calculator.enums.DisplayLabels
+import com.bri1234.ti36calculator.enums.DisplayIndicators
 import org.junit.Assert.assertEquals
 
 val strToDisplayLabel = mapOf(
-    "M" to DisplayLabels.MEMORY,
-    "2nd" to DisplayLabels.SECOND,
-    "3rd" to DisplayLabels.THIRD,
-    "HYP" to DisplayLabels.HYP,
-    "BIN" to DisplayLabels.BIN,
-    "OCT" to DisplayLabels.OCT,
-    "HEX" to DisplayLabels.HEX,
-    "STAT" to DisplayLabels.STAT,
-    "DEG" to DisplayLabels.DEG,
-    "RAD" to DisplayLabels.RAD,
-    "GRAD" to DisplayLabels.GRAD,
-    "x" to DisplayLabels.X,
-    "r" to DisplayLabels.R,
-    "()" to DisplayLabels.PARENTHESES,
+    "M" to DisplayIndicators.MEMORY,
+    "2nd" to DisplayIndicators.SECOND,
+    "3rd" to DisplayIndicators.THIRD,
+    "HYP" to DisplayIndicators.HYP,
+    "BIN" to DisplayIndicators.BIN,
+    "OCT" to DisplayIndicators.OCT,
+    "HEX" to DisplayIndicators.HEX,
+    "STAT" to DisplayIndicators.STAT,
+    "DEG" to DisplayIndicators.DEG,
+    "RAD" to DisplayIndicators.RAD,
+    "GRAD" to DisplayIndicators.GRAD,
+    "x" to DisplayIndicators.X,
+    "r" to DisplayIndicators.R,
+    "()" to DisplayIndicators.PARENTHESES,
 )
 
 private val strFirstFuncToButton = mapOf(
@@ -288,9 +288,9 @@ fun CalculatorCore.assertDisplayLabels(expectedDisplayLabelsStr: String) {
         expectedDisplayLabel -> strToDisplayLabel[expectedDisplayLabel] ?: throw IllegalArgumentException("Unknown display label: $expectedDisplayLabel")
     }.toSet()
 
-    for (displayLabel in DisplayLabels.entries) {
-        val shallBeVisible = displayLabel in expectedDisplayLabels
-        val isVisible = displayLabel in displayData.displayLabels
+    for (displayIndicator in DisplayIndicators.entries) {
+        val shallBeVisible = displayIndicator in expectedDisplayLabels
+        val isVisible = displayIndicator in displayData.displayIndicators
 
         assertEquals("Expected display label: $shallBeVisible but is: $isVisible",
             shallBeVisible, isVisible)

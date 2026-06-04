@@ -36,7 +36,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.platform.LocalDensity
 import com.bri1234.ti36calculator.CalculatorDisplayData
-import com.bri1234.ti36calculator.enums.DisplayLabels
+import com.bri1234.ti36calculator.enums.DisplayIndicators
 
 @Composable
 fun CalculatorDisplayView(
@@ -70,7 +70,7 @@ fun CalculatorDisplayView(
 
         drawSunkenFrame(5.dp.toPx())
 
-        drawDisplayLabels(calculatorDisplayData.displayLabels, textMeasurer, 8.dp.toPx())
+        drawDisplayIndicators(calculatorDisplayData.displayIndicators, textMeasurer, 8.dp.toPx())
 
         drawDigits(calculatorDisplayData,
             segmentsLargePath, segmentsSmallPath, segmentsLargeSizeX, segmentsSmallSizeSmallX, 8.dp.toPx())
@@ -152,20 +152,20 @@ private fun DrawScope.drawSunkenFrame(thickness: Float) {
  * List of labels to be displayed on the calculator display at the bottom, such as "2nd", "3rd", "BIN", etc.
  * These labels are drawn at the bottom of the display and are spaced evenly across the width of the display.
  */
-private val displayLabelsBottom = listOf(
-    DisplayLabels.SECOND,
-    DisplayLabels.THIRD,
-    DisplayLabels.HYP,
-    DisplayLabels.BIN,
-    DisplayLabels.OCT,
-    DisplayLabels.HEX,
-    DisplayLabels.STAT,
-    DisplayLabels.DEG,
-    DisplayLabels.RAD,
-    DisplayLabels.GRAD,
-    DisplayLabels.X,
-    DisplayLabels.R,
-    DisplayLabels.PARENTHESES
+private val displayIndicatorsBottoms = listOf(
+    DisplayIndicators.SECOND,
+    DisplayIndicators.THIRD,
+    DisplayIndicators.HYP,
+    DisplayIndicators.BIN,
+    DisplayIndicators.OCT,
+    DisplayIndicators.HEX,
+    DisplayIndicators.STAT,
+    DisplayIndicators.DEG,
+    DisplayIndicators.RAD,
+    DisplayIndicators.GRAD,
+    DisplayIndicators.X,
+    DisplayIndicators.R,
+    DisplayIndicators.PARENTHESES
 )
 
 /**
@@ -174,26 +174,26 @@ private val displayLabelsBottom = listOf(
  * @param textMeasurer The TextMeasurer used to measure the text for each label and calculate the layout.
  * @param frameThickness The thickness of the sunken frame, used to calculate the starting position for the labels.
  */
-private fun DrawScope.drawDisplayLabels(displayLabels: Set<DisplayLabels>,
-                                        textMeasurer: TextMeasurer, frameThickness: Float) {
+private fun DrawScope.drawDisplayIndicators(displayIndicators: Set<DisplayIndicators>,
+                                            textMeasurer: TextMeasurer, frameThickness: Float) {
     val textStyle = TextStyle(
         color = Color.Black,
         fontSize = 16.sp,
         fontWeight = FontWeight.Bold
     )
 
-    val textLayoutResultList = displayLabelsBottom.map { textMeasurer.measure(AnnotatedString(it.caption), textStyle) }
+    val textLayoutResultList = displayIndicatorsBottoms.map { textMeasurer.measure(AnnotatedString(it.caption), textStyle) }
     val totalTextWidth = textLayoutResultList.sumOf { it.size.width }
 
     var x = frameThickness
     val y = size.height - frameThickness - 2.dp.toPx()
-    val spaceX = (size.width - 2 * frameThickness - totalTextWidth) / (displayLabelsBottom.size - 1)
+    val spaceX = (size.width - 2 * frameThickness - totalTextWidth) / (displayIndicatorsBottoms.size - 1)
 
     // display labels bottom
-    for (idx in displayLabelsBottom.indices) {
+    for (idx in displayIndicatorsBottoms.indices) {
         val textLayoutResult = textLayoutResultList[idx]
 
-        if (displayLabelsBottom[idx] in displayLabels) {
+        if (displayIndicatorsBottoms[idx] in displayIndicators) {
             drawText(
                 textLayoutResult = textLayoutResult,
                 topLeft = Offset(x, y - textLayoutResult.firstBaseline)
@@ -204,8 +204,8 @@ private fun DrawScope.drawDisplayLabels(displayLabels: Set<DisplayLabels>,
     }
 
     // display label left (M)
-    if (DisplayLabels.MEMORY in displayLabels) {
-        val textLayoutResult = textMeasurer.measure(AnnotatedString(DisplayLabels.MEMORY.caption), textStyle)
+    if (DisplayIndicators.MEMORY in displayIndicators) {
+        val textLayoutResult = textMeasurer.measure(AnnotatedString(DisplayIndicators.MEMORY.caption), textStyle)
         drawText(
             textLayoutResult = textLayoutResult,
             topLeft = Offset(10.dp.toPx(), 45.dp.toPx())

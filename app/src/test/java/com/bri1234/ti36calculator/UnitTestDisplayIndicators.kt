@@ -27,8 +27,19 @@ class UnitTestDisplayIndicators {
         val calc = CalculatorCore()
 
         calc.testStep("AC/ON", "0.", "", "DEG")
-
-        // TODO: add tests
+        calc.testStep("4 2 STO 1", "42.", "", "DEG M")
+        calc.testStep("AC/ON 2nd", "0.", "", "DEG 2nd")
+        calc.testStep("AC/ON 3rd", "0.", "", "DEG 3rd")
+        calc.testStep("AC/ON hyp", "0.", "", "DEG HYP")
+        calc.testStep("AC/ON HEX", "0", "", "HEX")
+        calc.testStep("AC/ON OCT", "0", "", "OCT")
+        calc.testStep("AC/ON BIN", "0", "", "BIN")
+        calc.testStep("AC/ON STAT1", "0.", "", "DEG STAT")
+        calc.testStep("AC/ON STAT2", "0.", "", "DEG STAT")
+        calc.testStep("AC/ON DRG", "0.", "", "RAD")
+        calc.testStep("AC/ON DRG DRG", "0.", "", "GRAD")
+        calc.testStep("AC/ON 5 x<>y 3 0 P>R", "4.330127019", "", "DEG x")
+        calc.testStep("AC/ON 1 0 x<>y 8 R>P", "12.80624847", "", "DEG r")
+        calc.testStep("AC/ON (", "0.", "", "DEG ()")
     }
 }
-

@@ -28,7 +28,7 @@ import com.bri1234.ti36calculator.enums.CalculatorStatisticMode
 import com.bri1234.ti36calculator.enums.DisplayNumberFormat
 import com.bri1234.ti36calculator.enums.MemoryOperation
 import com.bri1234.ti36calculator.enums.RectangularPolarView
-import com.bri1234.ti36calculator.enums.DisplayLabels
+import com.bri1234.ti36calculator.enums.DisplayIndicators
 
 /*
 Next features to implement:
@@ -763,60 +763,60 @@ class CalculatorCore(
      */
     fun getDisplayData(): CalculatorDisplayData {
 
-        val labels = mutableSetOf<DisplayLabels>()
+        val indicators = mutableSetOf<DisplayIndicators>()
 
         if (memory.hasNonZeroMemory())
-            labels.add(DisplayLabels.MEMORY)
+            indicators.add(DisplayIndicators.MEMORY)
 
         if (computation.hasParentheses())
-            labels.add(DisplayLabels.PARENTHESES)
+            indicators.add(DisplayIndicators.PARENTHESES)
 
         if (state.calculatorNumberMode == CalculatorNumberMode.DECIMAL) {
             if (state.calculatorAngleUnit == CalculatorAngleUnit.DEG)
-                labels.add(DisplayLabels.DEG)
+                indicators.add(DisplayIndicators.DEG)
 
             if (state.calculatorAngleUnit == CalculatorAngleUnit.RAD)
-                labels.add(DisplayLabels.RAD)
+                indicators.add(DisplayIndicators.RAD)
 
             if (state.calculatorAngleUnit == CalculatorAngleUnit.GRAD)
-                labels.add(DisplayLabels.GRAD)
+                indicators.add(DisplayIndicators.GRAD)
         }
 
         if (state.calculatorHypMode == CalculatorHypMode.HYP)
-            labels.add(DisplayLabels.HYP)
+            indicators.add(DisplayIndicators.HYP)
 
         if (state.calculatorStatisticMode == CalculatorStatisticMode.STAT1)
-            labels.add(DisplayLabels.STAT)
+            indicators.add(DisplayIndicators.STAT)
 
         if (state.calculatorStatisticMode == CalculatorStatisticMode.STAT2)
-            labels.add(DisplayLabels.STAT)
+            indicators.add(DisplayIndicators.STAT)
 
         if (state.calculatorNumberMode == CalculatorNumberMode.HEXADECIMAL)
-            labels.add(DisplayLabels.HEX)
+            indicators.add(DisplayIndicators.HEX)
 
         if (state.calculatorNumberMode == CalculatorNumberMode.OCTAL)
-            labels.add(DisplayLabels.OCT)
+            indicators.add(DisplayIndicators.OCT)
 
         if (state.calculatorNumberMode == CalculatorNumberMode.BINARY)
-            labels.add(DisplayLabels.BIN)
+            indicators.add(DisplayIndicators.BIN)
 
         if (state.calculatorFunction == CalculatorFunction.SECOND)
-            labels.add(DisplayLabels.SECOND)
+            indicators.add(DisplayIndicators.SECOND)
 
         if (state.calculatorFunction == CalculatorFunction.THIRD)
-            labels.add(DisplayLabels.THIRD)
+            indicators.add(DisplayIndicators.THIRD)
 
         if (state.rectangularPolarView == RectangularPolarView.RECTANGULAR_X)
-            labels.add(DisplayLabels.X)
+            indicators.add(DisplayIndicators.X)
 
         if (state.rectangularPolarView == RectangularPolarView.POLAR_R)
-            labels.add(DisplayLabels.R)
+            indicators.add(DisplayIndicators.R)
 
         return CalculatorDisplayData(
             digitsLarge = display.displayMantissa.copyOf(),
             decimalPointIndex = display.displayDecimalPointPos,
             digitsSmall = display.displayExponent.copyOf(),
-            displayLabels = labels.toSet(),
+            displayIndicators = indicators.toSet(),
         )
     }
 
