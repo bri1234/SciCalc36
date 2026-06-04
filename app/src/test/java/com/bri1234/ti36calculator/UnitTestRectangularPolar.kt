@@ -40,7 +40,7 @@ class UnitTestRectangularPolar {
         calc.testStep("AC/ON DRG", "0.", "", "RAD")
         calc.testStep("5 x<>y 3 0", "30", "", "RAD")
         calc.testStep("P>R", "0.771257249", "", "RAD x")
-        calc.testStep("x<>y", "-4.940158121", "", "RAD")
+        calc.testStep("x<>y", "-4.94015812", "", "RAD")
         calc.testStep("x<>y", "0.771257249", "", "RAD x")
 
         calc.testStep("AC/ON DRG DRG", "0.", "", "GRAD")

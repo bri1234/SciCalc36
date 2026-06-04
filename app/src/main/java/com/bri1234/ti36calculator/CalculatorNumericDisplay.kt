@@ -60,11 +60,6 @@ class CalculatorNumericDisplay(val state: CalculatorState)  {
     private var displayNumberFormat: DisplayNumberFormat = DisplayNumberFormat.FLOAT
 
     /**
-     * The current rectangular polar view mode for conversions between rectangular and polar coordinates.
-     */
-    private var rectangularPolarView: RectangularPolarView = RectangularPolarView.OFF
-
-    /**
      * Resets the display to its default state, clearing all labels and setting the numeric value to 0.
      * The default label is DEG for angle unit.
      */
@@ -76,7 +71,6 @@ class CalculatorNumericDisplay(val state: CalculatorState)  {
         displayNumberFormat = DisplayNumberFormat.FLOAT
         numberOfDigitsAfterDecimalPoint = -1
 
-        rectangularPolarView = RectangularPolarView.OFF
     }
 
     /**

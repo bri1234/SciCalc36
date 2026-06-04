@@ -23,6 +23,7 @@ import com.bri1234.ti36calculator.enums.CalculatorFunction
 import com.bri1234.ti36calculator.enums.CalculatorHypMode
 import com.bri1234.ti36calculator.enums.CalculatorNumberMode
 import com.bri1234.ti36calculator.enums.CalculatorStatisticMode
+import com.bri1234.ti36calculator.enums.RectangularPolarView
 
 /**
  * A class to hold the state of the calculator, including the current angle unit, function,
@@ -41,6 +42,11 @@ class CalculatorState {
     var calculatorNumberMode: CalculatorNumberMode = CalculatorNumberMode.DECIMAL
 
     /**
+     * The current rectangular polar view mode for conversions between rectangular and polar coordinates.
+     */
+    var rectangularPolarView: RectangularPolarView = RectangularPolarView.OFF
+
+    /**
      * Resets the calculator state to the default values.
      */
     fun reset() {
@@ -49,5 +55,6 @@ class CalculatorState {
         calculatorStatisticMode = CalculatorStatisticMode.OFF
         calculatorHypMode = CalculatorHypMode.OFF
         calculatorNumberMode = CalculatorNumberMode.DECIMAL
+        rectangularPolarView = RectangularPolarView.OFF
     }
 }

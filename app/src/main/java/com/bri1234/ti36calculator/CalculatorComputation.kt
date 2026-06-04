@@ -20,6 +20,7 @@ package com.bri1234.ti36calculator
 
 import com.bri1234.ti36calculator.enums.CalculatorNumberMode
 import com.bri1234.ti36calculator.enums.Operation
+import com.bri1234.ti36calculator.enums.RectangularPolarView
 import com.bri1234.ti36calculator.utils.ObserverSubject
 import kotlin.math.pow
 import kotlin.math.round

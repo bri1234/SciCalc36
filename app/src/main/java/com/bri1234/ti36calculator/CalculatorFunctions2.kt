@@ -19,6 +19,7 @@
 package com.bri1234.ti36calculator
 
 import com.bri1234.ti36calculator.enums.CalculatorAngleUnit
+import com.bri1234.ti36calculator.enums.RectangularPolarView
 import com.bri1234.ti36calculator.utils.factorial
 import com.bri1234.ti36calculator.utils.getIntFromDouble
 import kotlin.math.atan2
@@ -77,6 +78,7 @@ class CalculatorFunctions2(val state: CalculatorState,
         }
 
         computation.setTwoValues(r, phi)
+        state.rectangularPolarView = RectangularPolarView.POLAR_R
     }
 
     fun polarToRectangular() {
@@ -93,5 +95,6 @@ class CalculatorFunctions2(val state: CalculatorState,
         val y = r * sin(rad)
 
         computation.setTwoValues(x, y)
+        state.rectangularPolarView = RectangularPolarView.RECTANGULAR_X
     }
 }

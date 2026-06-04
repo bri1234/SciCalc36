@@ -27,6 +27,7 @@ import com.bri1234.ti36calculator.enums.CalculatorNumberMode
 import com.bri1234.ti36calculator.enums.CalculatorStatisticMode
 import com.bri1234.ti36calculator.enums.DisplayNumberFormat
 import com.bri1234.ti36calculator.enums.MemoryOperation
+import com.bri1234.ti36calculator.enums.RectangularPolarView
 import com.bri1234.ti36calculator.views.DisplayLabels
 
 /*
@@ -63,6 +64,7 @@ class CalculatorCore(
     private var currentMemoryOperation: MemoryOperation = MemoryOperation.NONE
 
     private var calculatorHypModeWasSet: Boolean = false
+
 
     // Sets up event listeners for input changes, edit mode, print events,
     // result changes, and memory content changes. Also resets the calculator to its initial state.
@@ -138,6 +140,11 @@ class CalculatorCore(
 
         currentInputStateWasSet = false
         calculatorHypModeWasSet = false
+
+        // clear the rectangular/polar view mode if a button other than the swap button is pressed, since all other buttons exit the view mode
+        if ((button != CalculatorButton.X_SWAP_Y) && (state.rectangularPolarView != RectangularPolarView.OFF)) {
+            state.rectangularPolarView = RectangularPolarView.OFF
+        }
 
         try {
             when (button) {
@@ -215,7 +222,7 @@ class CalculatorCore(
             CalculatorButton.COS -> functions.cos()
             CalculatorButton.TAN -> functions.tan()
             CalculatorButton.Y_POW_X -> computation.yPowerX()
-            CalculatorButton.X_SWAP_Y -> functions2.swap()
+            CalculatorButton.X_SWAP_Y -> swap()
             CalculatorButton.ONE_DIV_X -> functions.oneDivX()
             CalculatorButton.X_SQUARED -> functions.xSquared()
             CalculatorButton.SQRT_X -> functions.squareRootX()
@@ -800,6 +807,12 @@ class CalculatorCore(
         if (state.calculatorFunction == CalculatorFunction.THIRD)
             labels.add(DisplayLabels.THIRD)
 
+        if (state.rectangularPolarView == RectangularPolarView.RECTANGULAR_X)
+            labels.add(DisplayLabels.X)
+
+        if (state.rectangularPolarView == RectangularPolarView.POLAR_R)
+            labels.add(DisplayLabels.R)
+
         return CalculatorDisplayData(
             digitsLarge = display.displayMantissa.copyOf(),
             decimalPointIndex = display.displayDecimalPointPos,
@@ -842,5 +855,17 @@ class CalculatorCore(
     private fun enableStatistic2() {
         statistic.enableStatistic2()
         display.printValue(computation.getValue())
+    }
+
+    private fun swap() {
+        when (state.rectangularPolarView) {
+            RectangularPolarView.POLAR_R -> state.rectangularPolarView = RectangularPolarView.POLAR_PHI
+            RectangularPolarView.POLAR_PHI -> state.rectangularPolarView = RectangularPolarView.POLAR_R
+            RectangularPolarView.RECTANGULAR_X -> state.rectangularPolarView = RectangularPolarView.RECTANGULAR_Y
+            RectangularPolarView.RECTANGULAR_Y -> state.rectangularPolarView = RectangularPolarView.RECTANGULAR_X
+            else -> { /* do nothing */ }
+        }
+
+        functions2.swap()
     }
 }
