@@ -23,12 +23,54 @@ import org.junit.Test
 class UnitTestRepeat {
 
     @Test
-    fun testRepeat() {
+    fun testRepeat1() {
         val calc = CalculatorCore()
 
         calc.testStep("AC/ON", "0.", "", "DEG")
+        calc.testStep("2 * PI =", "6.283185307", "", "DEG")
+        calc.testStep("4 =", "12.56637061", "", "DEG")
+        calc.testStep("8 =", "25.13274123", "", "DEG")
 
-        // TODO: add tests
+        calc.testStep("AC/ON", "0.", "", "DEG")
+        calc.testStep("2 / 6 =", "0.333333333", "", "DEG")
+        calc.testStep("4 =", "0.666666667", "", "DEG")
+        calc.testStep("8 =", "1.333333333", "", "DEG")
+
+        calc.testStep("AC/ON", "0.", "", "DEG")
+        calc.testStep("5 + 7 =", "12.", "", "DEG")
+        calc.testStep("3 =", "10.", "", "DEG")
+        calc.testStep("9 =", "16.", "", "DEG")
+
+        calc.testStep("AC/ON", "0.", "", "DEG")
+        calc.testStep("5 - 7 =", "-2.", "", "DEG")
+        calc.testStep("3 =", "-4.", "", "DEG")
+        calc.testStep("9 =", "2.", "", "DEG")
+    }
+
+    @Test
+    fun testRepeat2() {
+        val calc = CalculatorCore()
+
+        calc.testStep("AC/ON", "0.", "", "DEG")
+        calc.testStep("5 + 6 =", "11.", "", "DEG")
+        calc.testStep("=", "17.", "", "DEG")
+        calc.testStep("=", "23.", "", "DEG")
+
+        calc.testStep("AC/ON", "0.", "", "DEG")
+        calc.testStep("2 3 - 5 =", "18.", "", "DEG")
+        calc.testStep("=", "13.", "", "DEG")
+        calc.testStep("=", "8.", "", "DEG")
+
+        calc.testStep("AC/ON", "0.", "", "DEG")
+        calc.testStep("5 * 3 =", "15.", "", "DEG")
+        calc.testStep("=", "45.", "", "DEG")
+        calc.testStep("=", "135.", "", "DEG")
+
+        calc.testStep("AC/ON", "0.", "", "DEG")
+        calc.testStep("2 / 4 =", "0.5", "", "DEG")
+        calc.testStep("=", "0.125", "", "DEG")
+        calc.testStep("=", "0.03125", "", "DEG")
+
     }
 
 }
