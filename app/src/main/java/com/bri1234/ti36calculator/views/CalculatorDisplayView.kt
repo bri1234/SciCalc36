@@ -19,6 +19,9 @@
 package com.bri1234.ti36calculator.views
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -26,6 +29,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.TextStyle
@@ -35,13 +39,17 @@ import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.testTag
 import com.bri1234.ti36calculator.CalculatorDisplayData
 import com.bri1234.ti36calculator.enums.DisplayIndicators
+
+const val CALCULATOR_DISPLAY_TEST_TAG = "calculator_display"
 
 @Composable
 fun CalculatorDisplayView(
     calculatorDisplayData: CalculatorDisplayData,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onLongPress: (String) -> Unit = {}
 ) {
     val textMeasurer = rememberTextMeasurer()
 
@@ -65,15 +73,25 @@ fun CalculatorDisplayView(
         )
     }
 
-    Canvas(modifier = modifier) {
-        drawRect(DISPLAY_BACKGROUND_COLOR)
+    Box(
+        modifier = modifier
+            .testTag(CALCULATOR_DISPLAY_TEST_TAG)
+            .pointerInput(calculatorDisplayData) {
+                detectTapGestures(
+                    onLongPress = { onLongPress(calculatorDisplayData.toClipboardText()) }
+                )
+            }
+    ) {
+        Canvas(modifier = Modifier.fillMaxSize()) {
+            drawRect(DISPLAY_BACKGROUND_COLOR)
 
-        drawSunkenFrame(5.dp.toPx())
+            drawSunkenFrame(5.dp.toPx())
 
-        drawDisplayIndicators(calculatorDisplayData.displayIndicators, textMeasurer, 8.dp.toPx())
+            drawDisplayIndicators(calculatorDisplayData.displayIndicators, textMeasurer, 8.dp.toPx())
 
-        drawDigits(calculatorDisplayData,
-            segmentsLargePath, segmentsSmallPath, segmentsLargeSizeX, segmentsSmallSizeSmallX, 8.dp.toPx())
+            drawDigits(calculatorDisplayData,
+                segmentsLargePath, segmentsSmallPath, segmentsLargeSizeX, segmentsSmallSizeSmallX, 8.dp.toPx())
+        }
     }
 
 }

@@ -18,17 +18,26 @@
 
 package com.bri1234.ti36calculator.views
 
+import android.content.ClipData
+import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalClipboard
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.bri1234.ti36calculator.R
 import com.bri1234.ti36calculator.viewModels.CalculatorViewModel
 
 @Composable
 fun CalculatorView(calculatorViewModel: CalculatorViewModel) {
+    val clipboard = LocalClipboard.current
+    val context = LocalContext.current
+    val displayCopiedText = stringResource(R.string.display_copied_to_clipboard)
 
     Column(modifier = Modifier.fillMaxSize()) {
 
@@ -36,7 +45,13 @@ fun CalculatorView(calculatorViewModel: CalculatorViewModel) {
             calculatorViewModel.displayState.value,
             Modifier.fillMaxWidth()
                 .weight(1.5f)
-                .padding(12.dp, 12.dp, 12.dp, 12.dp)
+                .padding(12.dp, 12.dp, 12.dp, 12.dp),
+            onLongPress = { displayText ->
+                clipboard.nativeClipboard.setPrimaryClip(
+                    ClipData.newPlainText("display", displayText)
+                )
+                Toast.makeText(context, displayCopiedText, Toast.LENGTH_SHORT).show()
+            }
         )
 
         CalculatorButtonsView(

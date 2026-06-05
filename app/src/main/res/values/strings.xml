@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Ti36Calculator</string>
+    <string name="display_copied_to_clipboard">Display copied to clipboard</string>
 </resources>

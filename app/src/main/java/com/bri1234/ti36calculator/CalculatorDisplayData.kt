@@ -34,6 +34,33 @@ data class CalculatorDisplayData (
     val digitsSmall: CharArray = charArrayOf(' ', ' ', ' '),
     val displayIndicators: Set<DisplayIndicators> = setOf(DisplayIndicators.DEG),
 ) {
+    /**
+     * Returns the visible numeric display content as plain text for clipboard use.
+     *
+     * The large display digits are copied as the mantissa, including the decimal point when it is
+     * visible. The small display digits are appended as an exponent in E notation when present.
+     */
+    fun toClipboardText(): String {
+        var mantissa = digitsLarge.concatToString()
+
+        if (decimalPointIndex >= 0) {
+            val decimalPointInsertIndex = decimalPointIndex + 1
+            if (decimalPointInsertIndex in 0..mantissa.length) {
+                mantissa = mantissa.substring(0, decimalPointInsertIndex) +
+                        "." +
+                        mantissa.substring(decimalPointInsertIndex)
+            }
+        }
+
+        val trimmedMantissa = mantissa.trim().removeSuffix(".")
+        val exponent = digitsSmall.concatToString().trim()
+        return if (exponent.isEmpty()) {
+            trimmedMantissa
+        } else {
+            "${trimmedMantissa}E$exponent"
+        }
+    }
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -56,4 +83,3 @@ data class CalculatorDisplayData (
         return result
     }
 }
-
