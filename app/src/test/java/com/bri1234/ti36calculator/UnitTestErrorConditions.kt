@@ -26,9 +26,32 @@ class UnitTestErrorConditions {
     fun testErrorConditions() {
         val calc = CalculatorCore()
 
-        calc.testStep("AC/ON", "0.", "", "DEG")
+        calc.testStep("AC/ON 9 . 9 EE 9 9 * 1 EE 1 0 =", "Error  ", "", "DEG")
 
-        // TODO: add tests
+        calc.testStep("AC/ON 9 / 0 =", "Error  ", "", "DEG")
+
+        calc.testStep("AC/ON 0 log", "Error  ", "", "DEG")
+        calc.testStep("AC/ON 0 ln", "Error  ", "", "DEG")
+        calc.testStep("AC/ON 0 1/x", "Error  ", "", "DEG")
+
+        calc.testStep("AC/ON 2 +/- log", "Error  ", "", "DEG")
+        calc.testStep("AC/ON 2 +/- ln", "Error  ", "", "DEG")
+        calc.testStep("AC/ON 2 +/- sqrt", "Error  ", "", "DEG")
+        calc.testStep("AC/ON 2 +/- yrootx 4 =", "Error  ", "", "DEG")
+        calc.testStep("AC/ON 2 +/- y^x 4 1/x =", "Error  ", "", "DEG")
+
+        calc.testStep("AC/ON 0 y^x 0 =", "1.", "", "DEG")
+        calc.testStep("AC/ON 8 yrootx 0 =", "Error  ", "", "DEG")
+
+        calc.testStep("AC/ON 9 0 tan", "Error  ", "", "DEG")
+        calc.testStep("AC/ON 2 asin", "Error  ", "", "DEG")
+        calc.testStep("AC/ON 2 acos", "Error  ", "", "DEG")
+        calc.testStep("AC/ON 2 hyp atan", "Error  ", "", "DEG HYP")
+
+        calc.testStep("AC/ON 2 +/- x!", "Error  ", "", "DEG")
+
+        calc.testStep("AC/ON 2 +/- x<>y 3 +/- nPr", "Error  ", "", "DEG")
+        calc.testStep("AC/ON 2 +/- x<>y 3 +/- nCr", "Error  ", "", "DEG")
     }
 }
 
