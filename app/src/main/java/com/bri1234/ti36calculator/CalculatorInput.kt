@@ -267,6 +267,8 @@ class CalculatorInput(val state: CalculatorState,
 
             // set last digit to 0
             display.displayMantissa[NUM_MANTISSA_DIGITS - 1] = '0'
+            inputPositionMantissa = NUM_MANTISSA_DIGITS - 1
+            onEditInputChanged(Unit)
             return
         }
 

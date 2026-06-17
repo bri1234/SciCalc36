@@ -99,18 +99,28 @@ class CalculatorCore(
         statistic.reset()
     }
 
-    /** Handles the CE/C button press. */
-    private fun buttonPressedCeC() {
-        // TODO: distinguish CE and C based on current input state (CE in edit mode, C otherwise)
-
+    /** Handles the CE/C button press.
+     *
+     * CE/C CE/C (double):
+     * Clears display and all pending operations.
+     *
+     * CE/C (single):
+     * Clears value (before pressing operation key), display, errors, all pending
+     * operations. Does not affect mode, display format, angle units, memory, or
+     * statistical data.
+     * CE/C after (, ), y^x, x root y, *, /, + or - clears the calculator as if
+     * you had pressed CE/C CE/C.
+     */
+    private fun buttonPressedCeC(forceClearPendingOperations: Boolean = false) {
         isErrorState = false
 
         currentInputState = CalculatorInputState.NONE
         currentInputStateWasSet = false
-
         currentMemoryOperation = MemoryOperation.NONE
-
         calculatorHypModeWasSet = false
+
+        if (forceClearPendingOperations || !input.isEditMode)
+            computation.reset()
 
         computation.setValue(0.0)
         input.reset()
@@ -130,9 +140,13 @@ class CalculatorCore(
 
         if (BuildConfig.DEBUG) computation.printInfo()
 
+        val isFirstFunc = state.calculatorFunction == CalculatorFunction.FIRST
+
         if (isErrorState) {
-            if (button == CalculatorButton.AC_ON) {
-                buttonPressedAcOn()
+            when (button) {
+                CalculatorButton.AC_ON -> buttonPressedAcOn()
+                CalculatorButton.CE_C if isFirstFunc -> buttonPressedCeC(true)
+                else -> {}
             }
             return
         }
@@ -150,6 +164,7 @@ class CalculatorCore(
                 CalculatorButton.AC_ON -> buttonPressedAcOn()
                 CalculatorButton.SECOND -> buttonPressedSecond()
                 CalculatorButton.THIRD -> buttonPressedThird()
+                CalculatorButton.CE_C if isFirstFunc -> buttonPressedCeC()
 
                 else -> {
                     when (currentInputState) {
