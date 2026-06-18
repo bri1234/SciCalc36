@@ -35,6 +35,15 @@ class UnitTestFractions {
 
         calc.testStep("AC/ON 6 ab/c 4 ab/c 6", "6_4;6", "", "DEG")
         calc.testStep("=", "6_2;3", "", "DEG")
+        calc.testStep("+/-", "-6_2;3", "", "DEG")
+
+        calc.testStep("AC/ON 6 ab/c 4 ab/c 6 +/-", "-6_4;6", "", "DEG")
+        calc.testStep("=", "-6_2;3", "", "DEG")
+
+        calc.testStep("AC/ON 6 ab/c 4", "6;4", "", "DEG")
+        calc.testStep("+/-", "-6;4", "", "DEG")
+        calc.testStep("ab/c", "-6_4;", "", "DEG")
+        calc.testStep("8", "-6_4;8", "", "DEG")
     }
 
     @Test
@@ -77,7 +86,38 @@ class UnitTestFractions {
         val calc = CalculatorCore()
 
         calc.testStep("AC/ON 1 ab/c 2", "1;2", "", "DEG")
-        calc.testStep("x^2", "0.25", "", "DEG")
+        calc.testStep("* 3", "3", "", "DEG")
+        calc.testStep("=", "1_1;2", "", "DEG")
+
+        calc.testStep("AC/ON 1 ab/c 2", "1;2", "", "DEG")
+        calc.testStep("* 3 ab/c 4", "3;4", "", "DEG")
+        calc.testStep("=", "3;8", "", "DEG")
+
+        calc.testStep("AC/ON 1 ab/c 2", "1;2", "", "DEG")
+        calc.testStep("/ 3", "3", "", "DEG")
+        calc.testStep("=", "1;6", "", "DEG")
+
+        calc.testStep("AC/ON 1 ab/c 2", "1;2", "", "DEG")
+        calc.testStep("/ 3 ab/c 4", "3;4", "", "DEG")
+        calc.testStep("=", "2;3", "", "DEG")
+
+        calc.testStep("AC/ON 1 ab/c 2", "1;2", "", "DEG")
+        calc.testStep("+ 3", "3", "", "DEG")
+        calc.testStep("=", "3_1;2", "", "DEG")
+
+        calc.testStep("AC/ON 1 ab/c 2", "1;2", "", "DEG")
+        calc.testStep("+ 3 ab/c 4", "3;4", "", "DEG")
+        calc.testStep("=", "1_1;4", "", "DEG")
+
+        calc.testStep("AC/ON 1 ab/c 2", "1;2", "", "DEG")
+        calc.testStep("- 3", "3", "", "DEG")
+        calc.testStep("=", "-2_1;2", "", "DEG")
+
+        calc.testStep("AC/ON 1 ab/c 2", "1;2", "", "DEG")
+        calc.testStep("- 3 ab/c 4", "3;4", "", "DEG")
+        calc.testStep("=", "-1;4", "", "DEG")
+
+        // mit klammern
     }
 
     @Test
