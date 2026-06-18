@@ -177,7 +177,7 @@ private val strThirdFuncToButton = mapOf(
     "sci" to CalculatorButton.SIX,
     "eng" to CalculatorButton.PLUS,
     // row 8
-    "f<>dc" to CalculatorButton.A_B_C,
+    "F<>D" to CalculatorButton.A_B_C,
     ">cm" to CalculatorButton.ONE,
     ">l" to CalculatorButton.TWO,
     ">kg" to CalculatorButton.THREE,
