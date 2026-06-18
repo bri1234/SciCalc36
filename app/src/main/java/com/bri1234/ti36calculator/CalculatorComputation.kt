@@ -20,7 +20,6 @@ package com.bri1234.ti36calculator
 
 import com.bri1234.ti36calculator.enums.CalculatorNumberMode
 import com.bri1234.ti36calculator.enums.Operation
-import com.bri1234.ti36calculator.enums.RectangularPolarView
 import com.bri1234.ti36calculator.utils.ObserverSubject
 import kotlin.math.pow
 import kotlin.math.round
@@ -236,7 +235,7 @@ class CalculatorComputation(
      * Evaluates the operation at [idx] using the values in the register array and updates the stack accordingly.
      * @param idx The index of the operation to evaluate.
      */
-    private fun calculateStackAtIndex(idx : Int) {
+    private fun calculateStackAtIndex(idx : Int): Double {
 
         val leftValue = registerArray[idx]
         val rightValue = registerArray[idx + 1]
@@ -253,6 +252,8 @@ class CalculatorComputation(
         operationIndex--
         registerIndex--
         check(operationIndex >= 0 && registerIndex >= 0)
+
+        return leftValue
     }
 
     /**
@@ -262,9 +263,10 @@ class CalculatorComputation(
        - PARENTHESES: Evaluates until the next left parentheses is encountered.
        - FULL: Evaluates the entire stack to a single result.
      */
-    private fun evaluateStack(mode : StackEvaluationMode) {
+    private fun evaluateStack(mode : StackEvaluationMode): Double? {
 
         var forceEvaluation = (mode == StackEvaluationMode.PARENTHESES) || (mode == StackEvaluationMode.FULL)
+        var lastLeftOperand: Double? = null
 
         var done = false
         while (!done && (operationIndex > 0)) {
@@ -281,7 +283,7 @@ class CalculatorComputation(
                 if ((operationArray[idx].order <= operationArray[idx + 1].order)
                     || (forceEvaluation && (idx == operationIndex - 1))) {
 
-                    calculateStackAtIndex(idx)
+                    lastLeftOperand = calculateStackAtIndex(idx)
 
                     done = false
                     break
@@ -300,6 +302,7 @@ class CalculatorComputation(
         }
 
         onResultChanged(registerArray[registerIndex])
+        return lastLeftOperand
     }
 
     /**
@@ -379,7 +382,23 @@ class CalculatorComputation(
     }
 
     fun rightParentheses() {
-        evaluateStack(StackEvaluationMode.PARENTHESES)
+        if (parenthesesArray[operationIndex] > 0) {
+            parenthesesArray[operationIndex]--
+            clearRepeatOperationIfNoPendingExpression()
+            onResultChanged(registerArray[registerIndex])
+            return
+        }
+
+        val leftOperand = evaluateStack(StackEvaluationMode.PARENTHESES)
+        clearRepeatOperationIfNoPendingExpression(leftOperand)
+    }
+
+    private fun clearRepeatOperationIfNoPendingExpression(leftOperand: Double? = null) {
+        if ((operationIndex == 0) && !hasParentheses()) {
+            operationArray[0] = Operation.NONE
+            if (leftOperand != null)
+                registerArray[1] = leftOperand
+        }
     }
 
     fun addition() = operation(Operation.ADDITION)
