@@ -20,8 +20,6 @@ package com.bri1234.ti36calculator
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNull
-import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -29,51 +27,32 @@ class UnitTestCalculatorValue {
 
     @Test
     fun testDecimalValue() {
-        val value = CalculatorValue.decimal(1.25)
+        val value = CalculatorValue(1.25)
 
-        assertEquals(1.25, value.toDouble(), 0.0)
-        assertNull(value.rationalOrNull())
-        assertEquals(CalculatorValue.Presentation.DECIMAL, value.presentation)
-        assertFalse(value.isFractionDisplayed())
+        assertEquals(1.25, value.getDouble(), 0.0)
+
+        value.setDouble(-3.5)
+        assertEquals(-3.5, value.getDouble(), 0.0)
     }
 
     @Test
     fun testFractionValue() {
-        val rational = Rational(3, 4)
-        val value = CalculatorValue.fraction(rational)
+        val fraction = Fraction(3, 4)
+        val value = CalculatorValue(fraction)
 
-        assertEquals(0.75, value.toDouble(), 0.0)
-        assertEquals(rational, value.rationalOrNull())
-        assertEquals(CalculatorValue.Presentation.FRACTION_MIXED, value.presentation)
-        assertTrue(value.isFractionDisplayed())
+        assertEquals(0.75, value.getDouble(), 0.0)
     }
 
     @Test
-    fun testFractionRetainedInDecimalPresentation() {
-        val rational = Rational(55, 24)
-        val fraction = CalculatorValue.fraction(rational)
-        val decimal = fraction.withPresentation(CalculatorValue.Presentation.DECIMAL)
-        val restored = decimal.withPresentation(CalculatorValue.Presentation.FRACTION_IMPROPER)
+    fun testIsInteger() {
+        assertTrue(CalculatorValue(0.0).isInteger)
+        assertTrue(CalculatorValue(42.0).isInteger)
+        assertTrue(CalculatorValue(-3.0).isInteger)
+        assertFalse(CalculatorValue(1.25).isInteger)
+        assertFalse(CalculatorValue(Double.NaN).isInteger)
+        assertFalse(CalculatorValue(Double.POSITIVE_INFINITY).isInteger)
 
-        assertFalse(decimal.isFractionDisplayed())
-        assertEquals(rational, decimal.rationalOrNull())
-        assertEquals(rational, restored.rationalOrNull())
-        assertTrue(restored.isFractionDisplayed())
-    }
-
-    @Test
-    fun testDecimalCannotUseFractionPresentation() {
-        assertThrows(IllegalArgumentException::class.java) {
-            CalculatorValue(
-                CalculatorValue.INumericValue.Decimal(0.5),
-                CalculatorValue.Presentation.FRACTION_MIXED,
-            )
-        }
-    }
-
-    @Test
-    fun testConstants() {
-        assertEquals(0.0, CalculatorValue.ZERO.toDouble(), 0.0)
-        assertEquals(1.0, CalculatorValue.ONE.toDouble(), 0.0)
+        assertTrue(CalculatorValue(Fraction(4, 2)).isInteger)
+        assertFalse(CalculatorValue(Fraction(3, 2)).isInteger)
     }
 }

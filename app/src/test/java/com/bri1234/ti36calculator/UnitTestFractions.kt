@@ -155,5 +155,14 @@ class UnitTestFractions {
         calc.testStep("F<>D =", "218_56;113", "", "DEG")
 
     }
-}
 
+    @Test
+    fun testFractionsMisc() {
+        val calc = CalculatorCore()
+
+        calc.testStep("AC/ON 8 ab/c 1 0 x^2", "16;25", "", "DEG")
+        calc.testStep("AC/ON 3 ab/c 4 1/x", "1_1;3", "", "DEG")
+
+    }
+
+}
