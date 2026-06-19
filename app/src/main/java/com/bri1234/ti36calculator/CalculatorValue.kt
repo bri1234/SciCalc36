@@ -57,6 +57,29 @@ class CalculatorValue() {
     }
 
     /**
+     * Creates an independent copy of this calculator value.
+     *
+     * The decimal value, exact fraction, and presentation mode are copied. [Fraction] is immutable,
+     * so its instance can be shared safely between the two [CalculatorValue] objects. Subsequent
+     * mutations of either calculator value do not affect the other.
+     *
+     * @return A new [CalculatorValue] with the same value and presentation.
+     */
+    fun copy(): CalculatorValue {
+        val result = CalculatorValue()
+        result._valueDouble = _valueDouble
+        result._valueFraction = _valueFraction
+        result._presentation = _presentation
+        return result
+    }
+
+    fun copy(other: CalculatorValue) {
+        _valueDouble = other._valueDouble
+        _valueFraction = other._valueFraction
+        _presentation = other._presentation
+    }
+
+    /**
      * Returns whether the current calculator value represents an integer.
      *
      * Decimal values must be finite and have no fractional part. Fraction values are checked using
@@ -71,6 +94,13 @@ class CalculatorValue() {
 
     /** Returns whether the current value is stored and presented as a fraction. */
     val isFraction: Boolean get() = _presentation != Presentation.DECIMAL
+
+    /** Resets the value to zero and the presentation to [Presentation.DECIMAL]. */
+    fun clear() {
+        _valueDouble = 0.0
+        _valueFraction = Fraction(0)
+        _presentation = Presentation.DECIMAL
+    }
 
     /**
      * Returns the current value as a [Double].
@@ -257,7 +287,12 @@ class CalculatorValue() {
                 _presentation = DEFAULT_FRACTION_PRESENTATION
             }
             else -> {
-                _valueDouble = getDouble() / other.getDouble()
+                val d = other.getDouble()
+                if (d == 0.0) {
+                    throw ArithmeticException("Division by zero")
+                }
+
+                _valueDouble = getDouble() / d
                 _presentation = Presentation.DECIMAL
             }
         }

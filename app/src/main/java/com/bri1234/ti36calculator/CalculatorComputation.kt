@@ -44,7 +44,7 @@ class CalculatorComputation(
 
     val onResultChanged: ObserverSubject<Double> = ObserverSubject()
 
-    private val registerArray: Array<Double> = Array(REGISTER_COUNT) { 0.0 }
+    private val registerArray: Array<CalculatorValue> = Array(REGISTER_COUNT) { CalculatorValue() }
     private var registerIndex: Int = 0
     private val operationArray: Array<Operation> = Array(OPERATION_COUNT) { Operation.NONE }
     private var operationIndex: Int = 0
@@ -54,7 +54,9 @@ class CalculatorComputation(
 
     /** Resets all registers and operations to their initial state. */
     fun reset() {
-        registerArray.fill(0.0)
+        for (register in registerArray)
+            register.clear()
+
         registerIndex = 0
 
         operationArray.fill(Operation.NONE)
@@ -64,8 +66,8 @@ class CalculatorComputation(
     }
 
     /**
-     * Returns the last operation on the stack, or Operation.NONE if the stack is empty.
-      * @return The last enqueued operation, or Operation.NONE if no operations are on the stack.
+     * Returns the last operation on the stack, or NONE if the stack is empty.
+      * @return The last enqueued operation, or NONE if no operations are on the stack.
      */
     fun getLastOperation() : Operation {
         return if (operationIndex > 0) operationArray[operationIndex - 1] else Operation.NONE
@@ -80,10 +82,10 @@ class CalculatorComputation(
             check(operationIndex >= 1 && registerIndex == operationIndex - 1)
 
             registerIndex = operationIndex
-            registerArray[registerIndex] = registerArray[registerIndex - 1]
+            registerArray[registerIndex].copy(registerArray[registerIndex - 1])
         }
 
-        return registerArray[registerIndex]
+        return registerArray[registerIndex].getDouble()
     }
 
     /**
@@ -92,7 +94,7 @@ class CalculatorComputation(
       * @return The value stored in the previous register slot, or the current slot if at the bottom of the stack.
      */
     fun getPreviousValue() : Double {
-        return if (registerIndex == 0) registerArray[0] else registerArray[registerIndex - 1]
+        return if (registerIndex == 0) registerArray[0].getDouble() else registerArray[registerIndex - 1].getDouble()
     }
 
     private fun removeSignIfZero(value: Double): Double {
@@ -115,7 +117,7 @@ class CalculatorComputation(
     fun setValue(newValue: Double, updateDisplay: Boolean = true) {
         val newVal = getIntValueIfHexOctBinMode(removeSignIfZero(newValue))
 
-        registerArray[registerIndex] = newVal
+        registerArray[registerIndex].setDouble(newVal)
 
         if (updateDisplay)
             onResultChanged(newVal)
@@ -126,10 +128,11 @@ class CalculatorComputation(
      * and the previous register as the second.
      */
     fun getTwoValues(): Pair<Double, Double> {
-        if (registerIndex == 0) {
-            return Pair(registerArray[0], registerArray[1])
+
+        return if (registerIndex == 0) {
+            Pair(registerArray[0].getDouble(), registerArray[1].getDouble())
         } else {
-            return Pair(registerArray[registerIndex], registerArray[registerIndex - 1])
+            Pair(registerArray[registerIndex].getDouble(), registerArray[registerIndex - 1].getDouble())
         }
     }
 
@@ -142,11 +145,11 @@ class CalculatorComputation(
         val secondVal = getIntValueIfHexOctBinMode(removeSignIfZero(second))
 
         if (registerIndex == 0) {
-            registerArray[0] = firstVal
-            registerArray[1] = secondVal
+            registerArray[0].setDouble(firstVal)
+            registerArray[1].setDouble(secondVal)
         } else {
-            registerArray[registerIndex] = firstVal
-            registerArray[registerIndex - 1] = secondVal
+            registerArray[registerIndex].setDouble(firstVal)
+            registerArray[registerIndex - 1].setDouble(secondVal)
         }
 
         if (updateDisplay)
@@ -160,12 +163,12 @@ class CalculatorComputation(
      * @return base ^ exponent.
      * @throws IllegalArgumentException if the result is NaN or infinite.
      */
-    private fun yPowerX(base: Double, exponent: Double): Double {
-        val result = base.pow(exponent)
-        if (result.isNaN() || result.isInfinite())
-            throw IllegalArgumentException("Invalid result for y ^ x: $result")
+    private fun yPowerX(result: CalculatorValue, base: CalculatorValue, exponent: CalculatorValue) {
+        val res = base.getDouble().pow(exponent.getDouble())
+        if (res.isNaN() || res.isInfinite())
+            throw IllegalArgumentException("Invalid result for y ^ x: $res")
 
-        return result
+        result.setDouble(res)
     }
 
     /**
@@ -175,15 +178,16 @@ class CalculatorComputation(
      * @return The [exponent]-th root of [base].
      * @throws IllegalArgumentException if [exponent] is 0 or the result is invalid.
      */
-    private fun yRootX(base: Double, exponent: Double): Double {
-        if (exponent == 0.0)
+    private fun yRootX(result: CalculatorValue, base: CalculatorValue, exponent: CalculatorValue) {
+        val e = exponent.getDouble()
+        if (e == 0.0)
             throw IllegalArgumentException("Cannot take root with exponent 0")
 
-        val result = base.pow(1.0 / exponent)
-        if (result.isNaN() || result.isInfinite())
-            throw IllegalArgumentException("Invalid result for y root x: $result")
+        val res = base.getDouble().pow(1.0 / e)
+        if (res.isNaN() || res.isInfinite())
+            throw IllegalArgumentException("Invalid result for y root x: $res")
 
-        return result
+        result.setDouble(res)
     }
 
     /**
@@ -193,17 +197,16 @@ class CalculatorComputation(
      * @return The quotient left / right.
      * @throws IllegalArgumentException if [right] is 0.
      */
-    private fun divide(left: Double, right: Double): Double {
-        if (right == 0.0)
-            throw IllegalArgumentException("Division by zero")
+    private fun divide(result: CalculatorValue, left: CalculatorValue, right: CalculatorValue) {
 
-        val result = left / right
+        result.copy(left)
+        result.divide(right)
 
-        return when (state.calculatorNumberMode) {
-            CalculatorNumberMode.DECIMAL -> result
+        when (state.calculatorNumberMode) {
+            CalculatorNumberMode.DECIMAL -> { }
             CalculatorNumberMode.HEXADECIMAL,
             CalculatorNumberMode.OCTAL,
-            CalculatorNumberMode.BINARY -> result.toLong().toDouble()
+            CalculatorNumberMode.BINARY -> result.setDouble(result.getDouble().toLong().toDouble())
         }
     }
 
@@ -215,39 +218,53 @@ class CalculatorComputation(
      * @return The computed result.
      * @throws IllegalArgumentException for unsupported operations.
      */
-    private fun calculate(operation: Operation, left: Double, right: Double): Double {
-        return when (operation) {
-            Operation.ADDITION -> left + right
-            Operation.SUBTRACTION -> left - right
-            Operation.MULTIPLICATION -> left * right
-            Operation.DIVISION -> divide(left, right)
-            Operation.Y_POW_X -> yPowerX(left, right)
-            Operation.Y_ROOT_X -> yRootX(left, right)
-            Operation.BITWISE_AND -> (round(left).toLong() and round(right).toLong()).toDouble()
-            Operation.BITWISE_OR -> (round(left).toLong() or round(right).toLong()).toDouble()
-            Operation.BITWISE_XOR -> (round(left).toLong() xor round(right).toLong()).toDouble()
-            Operation.BITWISE_XNOR -> (round(left).toLong() xor round(right).toLong()).inv().toDouble()
-            else -> throw IllegalArgumentException("Unsupported operation: $operation")
+    private fun calculate(operation: Operation, left: CalculatorValue, right: CalculatorValue): CalculatorValue {
+        val result = left.copy()
+
+        when (operation) {
+            Operation.ADDITION -> result.add(right)
+            Operation.SUBTRACTION -> result.subtract(right)
+            Operation.MULTIPLICATION -> result.multiply(right)
+            Operation.DIVISION -> divide(result, left, right)
+            Operation.Y_POW_X -> yPowerX(result, left, right)
+            Operation.Y_ROOT_X -> yRootX(result, left, right)
+            else -> {
+                val l = round(left.getDouble()).toLong()
+                val r = round(right.getDouble()).toLong()
+
+                val res = when (operation) {
+                    Operation.BITWISE_AND -> l and r
+                    Operation.BITWISE_OR -> l or r
+                    Operation.BITWISE_XOR -> l xor r
+                    Operation.BITWISE_XNOR -> (l xor r).inv()
+
+                    else -> throw IllegalArgumentException("Unsupported operation: $operation")
+                }
+
+                result.setDouble(res.toDouble())
+            }
         }
+
+        return result
     }
 
     /**
      * Evaluates the operation at [idx] using the values in the register array and updates the stack accordingly.
      * @param idx The index of the operation to evaluate.
      */
-    private fun calculateStackAtIndex(idx : Int): Double {
+    private fun calculateStackAtIndex(idx : Int): CalculatorValue {
 
-        val leftValue = registerArray[idx]
-        val rightValue = registerArray[idx + 1]
+        val leftValue = registerArray[idx].copy()
+        val rightValue = registerArray[idx + 1].copy()
 
         val result = calculate(operationArray[idx], leftValue, rightValue)
 
         if (operationIndex > 1) { // to keep the last operation in memory for repeated evaluation
-            removeElementAt(operationArray, idx, Operation.NONE)
-            removeElementAt(registerArray, idx, 0.0)
+            removeElementAt(operationArray, idx) { Operation.NONE }
+            removeElementAt(registerArray, idx) { CalculatorValue() }
         }
 
-        registerArray[idx] = result
+        registerArray[idx].copy(result)
 
         operationIndex--
         registerIndex--
@@ -263,10 +280,10 @@ class CalculatorComputation(
        - PARENTHESES: Evaluates until the next left parentheses is encountered.
        - FULL: Evaluates the entire stack to a single result.
      */
-    private fun evaluateStack(mode : StackEvaluationMode): Double? {
+    private fun evaluateStack(mode : StackEvaluationMode): CalculatorValue? {
 
         var forceEvaluation = (mode == StackEvaluationMode.PARENTHESES) || (mode == StackEvaluationMode.FULL)
-        var lastLeftOperand: Double? = null
+        var lastLeftOperand: CalculatorValue? = null
 
         var done = false
         while (!done && (operationIndex > 0)) {
@@ -283,7 +300,7 @@ class CalculatorComputation(
                 if ((operationArray[idx].order <= operationArray[idx + 1].order)
                     || (forceEvaluation && (idx == operationIndex - 1))) {
 
-                    lastLeftOperand = calculateStackAtIndex(idx)
+                    lastLeftOperand = calculateStackAtIndex(idx).copy()
 
                     done = false
                     break
@@ -301,7 +318,7 @@ class CalculatorComputation(
 
         }
 
-        onResultChanged(registerArray[registerIndex])
+        onResultChanged(registerArray[registerIndex].getDouble())
         return lastLeftOperand
     }
 
@@ -362,7 +379,7 @@ class CalculatorComputation(
 
         while (idx <= registerIndex || idx <= operationIndex) {
             val str = "%02d:  %02d  %4s  %g".format(idx,
-                parenthesesArray[idx], operationArray[idx].caption, registerArray[idx])
+                parenthesesArray[idx], operationArray[idx].caption, registerArray[idx].getDouble())
 
             println(str)
             idx++
@@ -378,14 +395,14 @@ class CalculatorComputation(
 
         parenthesesArray[operationIndex]++
 
-        onResultChanged(registerArray[registerIndex])
+        onResultChanged(registerArray[registerIndex].getDouble())
     }
 
     fun rightParentheses() {
         if (parenthesesArray[operationIndex] > 0) {
             parenthesesArray[operationIndex]--
             clearRepeatOperationIfNoPendingExpression()
-            onResultChanged(registerArray[registerIndex])
+            onResultChanged(registerArray[registerIndex].getDouble())
             return
         }
 
@@ -393,11 +410,11 @@ class CalculatorComputation(
         clearRepeatOperationIfNoPendingExpression(leftOperand)
     }
 
-    private fun clearRepeatOperationIfNoPendingExpression(leftOperand: Double? = null) {
+    private fun clearRepeatOperationIfNoPendingExpression(leftOperand: CalculatorValue? = null) {
         if ((operationIndex == 0) && !hasParentheses()) {
             operationArray[0] = Operation.NONE
             if (leftOperand != null)
-                registerArray[1] = leftOperand
+                registerArray[1].copy(leftOperand)
         }
     }
 
@@ -425,11 +442,11 @@ class CalculatorComputation(
  * Removes the element at [index] from [array], shifting remaining elements left.
  * @param array The array to modify.
  * @param index The index of the element to remove.
- * @param defaultValue Value written to the last slot after shifting.
+ * @param defaultValue Factory that creates the value written to the last slot after shifting.
  */
-private fun <T> removeElementAt(array: Array<T>, index: Int, defaultValue: T) {
+private fun <T> removeElementAt(array: Array<T>, index: Int, defaultValue: () -> T) {
     for (idx in index until array.size - 1)
         array[idx] = array[idx + 1]
 
-    array[array.size - 1] = defaultValue
+    array[array.size - 1] = defaultValue()
 }

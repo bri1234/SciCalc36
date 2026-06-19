@@ -111,10 +111,27 @@ class Fraction(numerator: Int, denominator: Int = 1) : Comparable<Fraction> {
      * whole-number part is combined with a negative numerator.
      * @throws ArithmeticException If the resulting numerator exceeds the [Int] range.
      */
-    constructor(parts: MixedFractionParts)
-            : this(parts.wholePart, parts.numerator, parts.denominator)
-    {
-    }
+    constructor(parts: MixedFractionParts) : this(
+        when {
+            parts.denominator <= 0 ->
+                throw IllegalArgumentException("Denominator of a mixed fraction must be positive")
+            parts.wholePart != 0 && parts.numerator < 0 ->
+                throw IllegalArgumentException(
+                    "Numerator of a mixed fraction must not be negative when the whole part is non-zero",
+                )
+            parts.wholePart < 0 ->
+                Math.subtractExact(
+                    Math.multiplyExact(parts.wholePart, parts.denominator),
+                    parts.numerator,
+                )
+            else ->
+                Math.addExact(
+                    Math.multiplyExact(parts.wholePart, parts.denominator),
+                    parts.numerator,
+                )
+        },
+        parts.denominator,
+    )
 
     /**
      * Returns this fraction with its sign reversed.

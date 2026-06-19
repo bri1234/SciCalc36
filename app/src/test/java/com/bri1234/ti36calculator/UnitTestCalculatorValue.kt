@@ -20,6 +20,7 @@ package com.bri1234.ti36calculator
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotSame
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -54,5 +55,27 @@ class UnitTestCalculatorValue {
 
         assertTrue(CalculatorValue(Fraction(4, 2)).isInteger)
         assertFalse(CalculatorValue(Fraction(3, 2)).isInteger)
+    }
+
+    @Test
+    fun testCopy() {
+        val decimalOriginal = CalculatorValue(1.25)
+        val decimalCopy = decimalOriginal.copy()
+
+        assertNotSame(decimalOriginal, decimalCopy)
+        assertEquals(1.25, decimalCopy.getDouble(), 0.0)
+
+        decimalOriginal.setDouble(2.5)
+        assertEquals(1.25, decimalCopy.getDouble(), 0.0)
+
+        val fractionOriginal = CalculatorValue(Fraction(3, 4))
+        val fractionCopy = fractionOriginal.copy()
+
+        assertNotSame(fractionOriginal, fractionCopy)
+        assertTrue(fractionCopy.isFraction)
+        assertEquals(0.75, fractionCopy.getDouble(), 0.0)
+
+        fractionOriginal.negate()
+        assertEquals(0.75, fractionCopy.getDouble(), 0.0)
     }
 }
