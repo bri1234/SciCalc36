@@ -23,6 +23,15 @@ import com.bri1234.ti36calculator.enums.CalculatorNumberMode
 import com.bri1234.ti36calculator.enums.CalculatorStatisticMode
 import kotlin.math.sqrt
 
+/**
+ * Coordinates one-variable and paired-variable statistical calculations for the calculator.
+ *
+ * Statistical input is read from [computation], accumulated in the selected statistic model, and
+ * requested results are written back to the current computation register.
+ *
+ * @property state The calculator state that selects the active statistic and number modes.
+ * @property computation The computation stack used to read samples and publish results.
+ */
 class CalculatorStatistic(val state: CalculatorState,
                           val computation: CalculatorComputation) {
 
@@ -30,12 +39,20 @@ class CalculatorStatistic(val state: CalculatorState,
     private val statistic2 = Statistic2()
     private var currentStatistic: IStatistic = statistic1
 
+    /**
+     * Clears both statistic data sets and selects the one-variable model as the internal default.
+     *
+     * This function does not change the statistic mode stored in [state].
+     */
     fun reset() {
         statistic1.clearStatistic()
         statistic2.clearStatistic()
         currentStatistic = statistic1
     }
 
+    /**
+     * Enables one-variable statistics, switches to decimal number mode, and clears its data set.
+     */
     fun enableStatistic1() {
         state.calculatorStatisticMode = CalculatorStatisticMode.STAT1
         state.calculatorNumberMode = CalculatorNumberMode.DECIMAL
@@ -43,6 +60,9 @@ class CalculatorStatistic(val state: CalculatorState,
         currentStatistic.clearStatistic()
     }
 
+    /**
+     * Enables paired-variable statistics, switches to decimal number mode, and clears its data set.
+     */
     fun enableStatistic2() {
         state.calculatorStatisticMode = CalculatorStatisticMode.STAT2
         state.calculatorNumberMode = CalculatorNumberMode.DECIMAL
@@ -50,11 +70,26 @@ class CalculatorStatistic(val state: CalculatorState,
         currentStatistic.clearStatistic()
     }
 
+    /**
+     * Clears the currently selected statistic data set.
+     *
+     * @throws IllegalStateException If statistic mode is off.
+     */
     fun clearStatistic() {
         check(state.calculatorStatisticMode != CalculatorStatisticMode.OFF)
         currentStatistic.clearStatistic()
     }
 
+    /**
+     * Adds the current sample to the active statistic data set and displays the new sample count.
+     *
+     * In one-variable mode the current register supplies `x`. In paired-variable mode the previous
+     * register supplies `x` and the current register supplies `y`.
+     *
+     * @param frequency The positive number of occurrences represented by the sample.
+     * @throws IllegalArgumentException If [frequency] is not positive.
+     * @throws IllegalStateException If statistic mode is off.
+     */
     fun addValue(frequency: Int = 1) {
         val count = when (state.calculatorStatisticMode) {
             CalculatorStatisticMode.STAT1 -> {
@@ -73,6 +108,17 @@ class CalculatorStatistic(val state: CalculatorState,
         computation.setValue(count.toDouble())
     }
 
+    /**
+     * Removes the current sample from the active statistic data set and displays the new count.
+     *
+     * In one-variable mode the current register supplies `x`. In paired-variable mode the previous
+     * register supplies `x` and the current register supplies `y`.
+     *
+     * @param frequency The positive number of occurrences to remove.
+     * @throws IllegalArgumentException If [frequency] is not positive.
+     * @throws IllegalStateException If statistic mode is off or fewer than [frequency] samples are
+     * stored.
+     */
     fun subtractValue(frequency: Int = 1) {
         val count = when (state.calculatorStatisticMode) {
             CalculatorStatisticMode.STAT1 -> {
@@ -91,36 +137,74 @@ class CalculatorStatistic(val state: CalculatorState,
         computation.setValue(count.toDouble())
     }
 
+    /**
+     * Replaces the current value with the sum of all `x` samples.
+     *
+     * @throws IllegalStateException If statistic mode is off.
+     */
     fun printSumX() {
         check(state.calculatorStatisticMode != CalculatorStatisticMode.OFF)
         computation.setValue(currentStatistic.sumX)
     }
 
+    /**
+     * Replaces the current value with the sum of the squared `x` samples.
+     *
+     * @throws IllegalStateException If statistic mode is off.
+     */
     fun printSumX2() {
         check(state.calculatorStatisticMode != CalculatorStatisticMode.OFF)
         computation.setValue(currentStatistic.sumX2)
     }
 
+    /**
+     * Replaces the current value with the sum of all `y` samples.
+     *
+     * @throws IllegalStateException If statistic mode is off.
+     * @throws UnsupportedOperationException If one-variable statistic mode is active.
+     */
     fun printSumY() {
         check(state.calculatorStatisticMode != CalculatorStatisticMode.OFF)
         computation.setValue(currentStatistic.sumY)
     }
 
+    /**
+     * Replaces the current value with the sum of the squared `y` samples.
+     *
+     * @throws IllegalStateException If statistic mode is off.
+     * @throws UnsupportedOperationException If one-variable statistic mode is active.
+     */
     fun printSumY2() {
         check(state.calculatorStatisticMode != CalculatorStatisticMode.OFF)
         computation.setValue(currentStatistic.sumY2)
     }
 
+    /**
+     * Replaces the current value with the sum of all `x * y` products.
+     *
+     * @throws IllegalStateException If statistic mode is off.
+     * @throws UnsupportedOperationException If one-variable statistic mode is active.
+     */
     fun printSumXY() {
         check(state.calculatorStatisticMode != CalculatorStatisticMode.OFF)
         computation.setValue(currentStatistic.sumXY)
     }
 
+    /**
+     * Replaces the current value with the number of accumulated samples including frequencies.
+     *
+     * @throws IllegalStateException If statistic mode is off.
+     */
     fun printCount() {
         check(state.calculatorStatisticMode != CalculatorStatisticMode.OFF)
         computation.setValue(currentStatistic.count.toDouble())
     }
 
+    /**
+     * Replaces the current value with the arithmetic mean of all `x` samples.
+     *
+     * @throws IllegalStateException If statistic mode is off or no samples are stored.
+     */
     fun printMeanX() {
         check(state.calculatorStatisticMode != CalculatorStatisticMode.OFF)
         check(currentStatistic.count > 0)
@@ -128,6 +212,12 @@ class CalculatorStatistic(val state: CalculatorState,
         computation.setValue(currentStatistic.sumX / currentStatistic.count)
     }
 
+    /**
+     * Replaces the current value with the arithmetic mean of all `y` samples.
+     *
+     * @throws IllegalStateException If statistic mode is off or no samples are stored.
+     * @throws UnsupportedOperationException If one-variable statistic mode is active.
+     */
     fun printMeanY() {
         check(state.calculatorStatisticMode != CalculatorStatisticMode.OFF)
         check(currentStatistic.count > 0)
@@ -135,6 +225,11 @@ class CalculatorStatistic(val state: CalculatorState,
         computation.setValue(currentStatistic.sumY / currentStatistic.count)
     }
 
+    /**
+     * Replaces the current value with the population standard deviation of the `x` samples.
+     *
+     * @throws IllegalStateException If statistic mode is off or no samples are stored.
+     */
     fun printPopulationStandardDeviationX() {
         check(state.calculatorStatisticMode != CalculatorStatisticMode.OFF)
         check(currentStatistic.count > 0)
@@ -144,6 +239,12 @@ class CalculatorStatistic(val state: CalculatorState,
         computation.setValue(sqrt(varianceX))
     }
 
+    /**
+     * Replaces the current value with the population standard deviation of the `y` samples.
+     *
+     * @throws IllegalStateException If statistic mode is off or no samples are stored.
+     * @throws UnsupportedOperationException If one-variable statistic mode is active.
+     */
     fun printPopulationStandardDeviationY() {
         check(state.calculatorStatisticMode != CalculatorStatisticMode.OFF)
         check(currentStatistic.count > 0)
@@ -153,6 +254,11 @@ class CalculatorStatistic(val state: CalculatorState,
         computation.setValue(sqrt(varianceY))
     }
 
+    /**
+     * Replaces the current value with the sample standard deviation of the `x` samples.
+     *
+     * @throws IllegalStateException If statistic mode is off or fewer than two samples are stored.
+     */
     fun printSampleStandardDeviationX() {
         check(state.calculatorStatisticMode != CalculatorStatisticMode.OFF)
         check(currentStatistic.count > 1)
@@ -162,6 +268,12 @@ class CalculatorStatistic(val state: CalculatorState,
         computation.setValue(sqrt(varianceX))
     }
 
+    /**
+     * Replaces the current value with the sample standard deviation of the `y` samples.
+     *
+     * @throws IllegalStateException If statistic mode is off or fewer than two samples are stored.
+     * @throws UnsupportedOperationException If one-variable statistic mode is active.
+     */
     fun printSampleStandardDeviationY() {
         check(state.calculatorStatisticMode != CalculatorStatisticMode.OFF)
         check(currentStatistic.count > 1)
@@ -171,21 +283,45 @@ class CalculatorStatistic(val state: CalculatorState,
         computation.setValue(sqrt(varianceY))
     }
 
+    /**
+     * Replaces the current value with the Pearson correlation coefficient of paired samples.
+     *
+     * @throws IllegalStateException If paired-variable mode is inactive, no samples are stored, or
+     * the coefficient is undefined because its denominator is zero.
+     */
     fun printCorrelationCoefficient() {
         check(state.calculatorStatisticMode == CalculatorStatisticMode.STAT2)
         computation.setValue(currentStatistic.correlationCoefficient())
     }
 
+    /**
+     * Replaces the current value with the intercept of the least-squares regression line.
+     *
+     * @throws IllegalStateException If paired-variable mode is inactive, no samples are stored, or
+     * the regression slope is undefined.
+     */
     fun printIntercept() {
         check(state.calculatorStatisticMode == CalculatorStatisticMode.STAT2)
         computation.setValue(currentStatistic.intercept())
     }
 
+    /**
+     * Replaces the current value with the slope of the least-squares regression line.
+     *
+     * @throws IllegalStateException If paired-variable mode is inactive, no samples are stored, or
+     * the slope is undefined because its denominator is zero.
+     */
     fun printSlope() {
         check(state.calculatorStatisticMode == CalculatorStatisticMode.STAT2)
         computation.setValue(currentStatistic.slope())
     }
 
+    /**
+     * Predicts `x` from the current `y` value using the least-squares regression line.
+     *
+     * @throws IllegalStateException If paired-variable mode is inactive or the regression line
+     * cannot be calculated.
+     */
     fun printPredictedX() {
         check(state.calculatorStatisticMode == CalculatorStatisticMode.STAT2)
 
@@ -194,6 +330,12 @@ class CalculatorStatistic(val state: CalculatorState,
         computation.setValue(predictedX)
     }
 
+    /**
+     * Predicts `y` from the current `x` value using the least-squares regression line.
+     *
+     * @throws IllegalStateException If paired-variable mode is inactive or the regression line
+     * cannot be calculated.
+     */
     fun printPredictedY() {
         check(state.calculatorStatisticMode == CalculatorStatisticMode.STAT2)
         

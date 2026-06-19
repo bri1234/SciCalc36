@@ -142,5 +142,18 @@ class UnitTestFractions {
         calc.testStep("RCL 1", "1;2", "", "DEG M")
         calc.testStep("RCL 2", "3;4", "", "DEG M")
     }
+
+    @Test
+    fun testFractionsOverflow() {
+        val calc = CalculatorCore()
+
+        calc.testStep("AC/ON 1 2 3 4 5 ab/c 6 7 8 9", "12345;678", "", "DEG")
+        calc.testStep("=", "18_47;226", "", "DEG")
+        calc.testStep("* 1 2 =", "218_56;113", "", "DEG")
+        calc.testStep("* 1 2 =", "2621.946903", "", "DEG")
+        calc.testStep("/ 1 2 =", "218.4955752", "", "DEG")
+        calc.testStep("F<>D =", "218_56;113", "", "DEG")
+
+    }
 }
 

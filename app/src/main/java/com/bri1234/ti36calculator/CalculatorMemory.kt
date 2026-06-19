@@ -21,12 +21,36 @@ package com.bri1234.ti36calculator
 import com.bri1234.ti36calculator.enums.MemoryOperation
 import com.bri1234.ti36calculator.utils.ObserverSubject
 
+/**
+ * Manages the calculator's ten independent memory cells.
+ *
+ * Memory operations exchange values with the current register of [computation]. After every
+ * operation and reset, observers are informed whether at least one memory cell is non-zero.
+ *
+ * @property computation The computation stack used as the source or destination of memory values.
+ */
 class CalculatorMemory(val computation: CalculatorComputation) {
 
+    /**
+     * Notifies observers after memory content may have changed.
+     *
+     * The emitted value is `true` when at least one memory cell contains a non-zero value.
+     */
     val onContentChanged: ObserverSubject<Boolean> = ObserverSubject()
 
     private val memoryArray = DoubleArray(10)
 
+    /**
+     * Performs [operation] on the selected [memoryCell].
+     *
+     * Supported operations store the current value, recall a stored value, exchange both values,
+     * or add the current value to the stored value. [MemoryOperation.NONE] leaves the values
+     * unchanged. Observers are notified after the operation.
+     *
+     * @param operation The memory operation to execute.
+     * @param memoryCell The memory cell index in the range `0..9`.
+     * @throws IllegalArgumentException If [memoryCell] is outside `0..9`.
+     */
     fun performOperation(operation: MemoryOperation, memoryCell : Int) {
         require(memoryCell in 0..9)
 
@@ -45,10 +69,16 @@ class CalculatorMemory(val computation: CalculatorComputation) {
         onContentChanged(hasNonZeroMemory())
     }
 
+    /**
+     * Returns whether any memory cell contains a non-zero value.
+     *
+     * @return `true` if at least one cell is non-zero, otherwise `false`.
+     */
     fun hasNonZeroMemory(): Boolean {
         return memoryArray.any { it != 0.0 }
     }
 
+    /** Clears all memory cells to zero and notifies observers of the empty memory state. */
     fun reset() {
         memoryArray.fill(0.0)
         onContentChanged(hasNonZeroMemory())

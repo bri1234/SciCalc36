@@ -29,19 +29,37 @@ import kotlin.math.sin
 
 /**
  * This class implements the two parameter functions of the TI-36 calculator.
+ *
+ * @property state The calculator mode state used for angle conversions and coordinate views.
+ * @property computation The computation stack that supplies operands and receives results.
  */
 class CalculatorFunctions2(val state: CalculatorState,
                            val computation: CalculatorComputation) {
 
+    /** Returns whether angles are currently interpreted as degrees. */
     private fun isAngleDeg() = state.calculatorAngleUnit == CalculatorAngleUnit.DEG
+
+    /** Returns whether angles are currently interpreted as radians. */
     private fun isAngleRad() = state.calculatorAngleUnit == CalculatorAngleUnit.RAD
+
+    /** Returns whether angles are currently interpreted as gradians. */
     private fun isAngleGrad() = state.calculatorAngleUnit == CalculatorAngleUnit.GRAD
 
+    /** Exchanges the current register value with the preceding register value. */
     fun swap() {
         val (first, second) = computation.getTwoValues()
         computation.setTwoValues(second, first)
     }
 
+    /**
+     * Calculates the number of combinations `n choose r` from the top two register values.
+     *
+     * The previous value is interpreted as `n`, the current value as `r`, and the result replaces
+     * the current value.
+     *
+     * @throws IllegalArgumentException If an operand is not an integer.
+     * @throws IllegalStateException If either operand is negative or `n < r`.
+     */
     fun nCr() {
         val (rd, nd) = computation.getTwoValues()
         val n = getIntFromDouble(nd)
@@ -53,6 +71,15 @@ class CalculatorFunctions2(val state: CalculatorState,
         computation.setValue(result)
     }
 
+    /**
+     * Calculates the number of permutations of `r` elements selected from `n` elements.
+     *
+     * The previous value is interpreted as `n`, the current value as `r`, and the result replaces
+     * the current value.
+     *
+     * @throws IllegalArgumentException If an operand is not an integer.
+     * @throws IllegalStateException If either operand is negative or `n < r`.
+     */
     fun nPr() {
         val (rd, nd) = computation.getTwoValues()
         val n = getIntFromDouble(nd)
@@ -64,6 +91,15 @@ class CalculatorFunctions2(val state: CalculatorState,
         computation.setValue(result)
     }
 
+    /**
+     * Converts rectangular coordinates `(x, y)` from the top two registers to `(r, phi)`.
+     *
+     * The previous value is interpreted as `x` and the current value as `y`. The radius becomes
+     * the current displayed value, the angle uses the configured angle unit, and the calculator
+     * enters the polar-coordinate view.
+     *
+     * @throws IllegalStateException If no supported angle unit is active.
+     */
     fun rectangularToPolar() {
         val (y, x) = computation.getTwoValues()
 
@@ -81,6 +117,15 @@ class CalculatorFunctions2(val state: CalculatorState,
         state.rectangularPolarView = RectangularPolarView.POLAR_R
     }
 
+    /**
+     * Converts polar coordinates `(r, phi)` from the top two registers to `(x, y)`.
+     *
+     * The previous value is interpreted as `r` and the current value as `phi`. The angle uses the
+     * configured angle unit, `x` becomes the current displayed value, and the calculator enters
+     * the rectangular-coordinate view.
+     *
+     * @throws IllegalStateException If no supported angle unit is active.
+     */
     fun polarToRectangular() {
         val (phi, r) = computation.getTwoValues()
 

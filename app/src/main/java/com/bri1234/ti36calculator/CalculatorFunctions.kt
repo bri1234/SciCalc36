@@ -28,21 +28,40 @@ import kotlin.math.*
 
 /**
  * This class implements the one parameter functions of the TI-36 calculator.
+ *
+ * @property state The calculator mode state used to select angle and hyperbolic behavior.
+ * @property computation The computation stack whose current value is read and replaced.
  */
 class CalculatorFunctions(val state: CalculatorState,
                           val computation: CalculatorComputation) {
 
     private val angleEpsilon = 1e-12
 
+    /** Returns whether hyperbolic function mode is active. */
     private fun isFunctionHyp() = state.calculatorHypMode == CalculatorHypMode.HYP
+
+    /** Returns whether angles are currently interpreted as degrees. */
     private fun isAngleDeg() = state.calculatorAngleUnit == CalculatorAngleUnit.DEG
+
+    /** Returns whether angles are currently interpreted as radians. */
     private fun isAngleRad() = state.calculatorAngleUnit == CalculatorAngleUnit.RAD
+
+    /** Returns whether angles are currently interpreted as gradians. */
     private fun isAngleGrad() = state.calculatorAngleUnit == CalculatorAngleUnit.GRAD
 
+    /**
+     * Reduces [value] to the symmetric interval around zero for the supplied [period].
+     *
+     * @param value The angle to normalize.
+     * @param period The full period of the angle unit.
+     * @return The IEEE remainder of [value] divided by [period].
+     */
     private fun normalizeAngle(value: Double, period: Double) = Math.IEEEremainder(value, period)
 
+    /** Returns whether [value] is equal to [expected] within the angle tolerance. */
     private fun isAngleEqual(value: Double, expected: Double) = abs(value - expected) < angleEpsilon
 
+    /** Calculates sine for a radian angle, returning exact values at quadrant boundaries. */
     private fun sinRad(value: Double): Double {
         val angle = normalizeAngle(value, 2.0 * PI)
         return when {
@@ -53,6 +72,7 @@ class CalculatorFunctions(val state: CalculatorState,
         }
     }
 
+    /** Calculates sine for a degree angle, returning exact values at quadrant boundaries. */
     private fun sinDeg(value: Double): Double {
         val angle = normalizeAngle(value, 360.0)
         return when {
@@ -63,6 +83,7 @@ class CalculatorFunctions(val state: CalculatorState,
         }
     }
 
+    /** Calculates sine for a gradian angle, returning exact values at quadrant boundaries. */
     private fun sinGrad(value: Double): Double {
         val angle = normalizeAngle(value, 400.0)
         return when {
@@ -73,6 +94,7 @@ class CalculatorFunctions(val state: CalculatorState,
         }
     }
 
+    /** Calculates cosine for a radian angle, returning exact values at quadrant boundaries. */
     private fun cosRad(value: Double): Double {
         val angle = normalizeAngle(value, 2.0 * PI)
         return when {
@@ -83,6 +105,7 @@ class CalculatorFunctions(val state: CalculatorState,
         }
     }
 
+    /** Calculates cosine for a degree angle, returning exact values at quadrant boundaries. */
     private fun cosDeg(value: Double): Double {
         val angle = normalizeAngle(value, 360.0)
         return when {
@@ -93,6 +116,7 @@ class CalculatorFunctions(val state: CalculatorState,
         }
     }
 
+    /** Calculates cosine for a gradian angle, returning exact values at quadrant boundaries. */
     private fun cosGrad(value: Double): Double {
         val angle = normalizeAngle(value, 400.0)
         return when {
@@ -103,6 +127,11 @@ class CalculatorFunctions(val state: CalculatorState,
         }
     }
 
+    /**
+     * Calculates tangent for a radian angle, returning exact zeroes at half-turn boundaries.
+     *
+     * @throws IllegalArgumentException If tangent is undefined for the normalized angle.
+     */
     private fun tanRad(value: Double): Double {
         val angle = normalizeAngle(value, 2.0 * PI)
         return when {
@@ -113,6 +142,11 @@ class CalculatorFunctions(val state: CalculatorState,
         }
     }
 
+    /**
+     * Calculates tangent for a degree angle, returning exact zeroes at half-turn boundaries.
+     *
+     * @throws IllegalArgumentException If tangent is undefined for the normalized angle.
+     */
     private fun tanDeg(value: Double): Double {
         val angle = normalizeAngle(value, 360.0)
         return when {
@@ -123,6 +157,11 @@ class CalculatorFunctions(val state: CalculatorState,
         }
     }
 
+    /**
+     * Calculates tangent for a gradian angle, returning exact zeroes at half-turn boundaries.
+     *
+     * @throws IllegalArgumentException If tangent is undefined for the normalized angle.
+     */
     private fun tanGrad(value: Double): Double {
         val angle = normalizeAngle(value, 400.0)
         return when {
@@ -133,6 +172,11 @@ class CalculatorFunctions(val state: CalculatorState,
         }
     }
 
+    /**
+     * Replaces the current value with its base-10 logarithm.
+     *
+     * @throws IllegalArgumentException If the current value is not greater than zero.
+     */
     fun log() {
         val value = computation.getValue()
         if (value <= 0.0)
@@ -142,6 +186,11 @@ class CalculatorFunctions(val state: CalculatorState,
         computation.setValue(result)
     }
 
+    /**
+     * Replaces the current value with its natural logarithm.
+     *
+     * @throws IllegalArgumentException If the current value is not greater than zero.
+     */
     fun ln() {
         val value = computation.getValue()
         if (value <= 0.0)
@@ -151,6 +200,13 @@ class CalculatorFunctions(val state: CalculatorState,
         computation.setValue(result)
     }
 
+    /**
+     * Replaces the current value with its sine or hyperbolic sine.
+     *
+     * Normal sine uses the configured angle unit; hyperbolic mode ignores the angle unit.
+     *
+     * @throws IllegalStateException If no supported angle unit is active.
+     */
     fun sin() {
         val value = computation.getValue()
         val result = when {
@@ -163,6 +219,14 @@ class CalculatorFunctions(val state: CalculatorState,
         computation.setValue(result)
     }
 
+    /**
+     * Replaces the current value with its inverse sine or inverse hyperbolic sine.
+     *
+     * The inverse sine result is converted to the configured angle unit.
+     *
+     * @throws IllegalArgumentException If inverse sine is requested outside `[-1, 1]`.
+     * @throws IllegalStateException If no supported angle unit is active.
+     */
     fun asin() {
         val value = computation.getValue()
 
@@ -185,6 +249,13 @@ class CalculatorFunctions(val state: CalculatorState,
         computation.setValue(result)
     }
 
+    /**
+     * Replaces the current value with its cosine or hyperbolic cosine.
+     *
+     * Normal cosine uses the configured angle unit; hyperbolic mode ignores the angle unit.
+     *
+     * @throws IllegalStateException If no supported angle unit is active.
+     */
     fun cos() {
         val value = computation.getValue()
         val result = when {
@@ -197,6 +268,14 @@ class CalculatorFunctions(val state: CalculatorState,
         computation.setValue(result)
     }
 
+    /**
+     * Replaces the current value with its inverse cosine or inverse hyperbolic cosine.
+     *
+     * The inverse cosine result is converted to the configured angle unit.
+     *
+     * @throws IllegalArgumentException If the value is outside the selected function's domain.
+     * @throws IllegalStateException If no supported angle unit is active.
+     */
     fun acos() {
         val value = computation.getValue()
 
@@ -222,6 +301,14 @@ class CalculatorFunctions(val state: CalculatorState,
         computation.setValue(result)
     }
 
+    /**
+     * Replaces the current value with its tangent or hyperbolic tangent.
+     *
+     * Normal tangent uses the configured angle unit; hyperbolic mode ignores the angle unit.
+     *
+     * @throws IllegalArgumentException If tangent is undefined for the current angle.
+     * @throws IllegalStateException If no supported angle unit is active.
+     */
     fun tan() {
         val value = computation.getValue()
         val result = when {
@@ -234,6 +321,15 @@ class CalculatorFunctions(val state: CalculatorState,
         computation.setValue(result)
     }
 
+    /**
+     * Replaces the current value with its inverse tangent or inverse hyperbolic tangent.
+     *
+     * The inverse tangent result is converted to the configured angle unit.
+     *
+     * @throws IllegalArgumentException If inverse hyperbolic tangent is requested outside
+     * `(-1, 1)`.
+     * @throws IllegalStateException If no supported angle unit is active.
+     */
     fun atan() {
         val value = computation.getValue()
 
@@ -256,6 +352,11 @@ class CalculatorFunctions(val state: CalculatorState,
         computation.setValue(result)
     }
 
+    /**
+     * Replaces the current value with its reciprocal.
+     *
+     * @throws IllegalArgumentException If the current value is zero.
+     */
     fun oneDivX() {
         val value = computation.getValue()
         if (value == 0.0)
@@ -265,12 +366,18 @@ class CalculatorFunctions(val state: CalculatorState,
         computation.setValue(result)
     }
 
+    /** Replaces the current value with its square. */
     fun xSquared() {
         val value = computation.getValue()
         val result = value * value
         computation.setValue(result)
     }
 
+    /**
+     * Replaces the current value with its square root.
+     *
+     * @throws IllegalArgumentException If the current value is not greater than zero.
+     */
     fun squareRootX() {
         val value = computation.getValue()
         if (value <= 0.0)
@@ -280,18 +387,25 @@ class CalculatorFunctions(val state: CalculatorState,
         computation.setValue(result)
     }
 
+    /** Replaces the current value with its arithmetic negation. */
     fun negate() {
         val value = computation.getValue()
         val result = -value
         computation.setValue(result)
     }
 
+    /** Replaces the current value with its real cube root. */
     fun thirdRootX() {
         val value = computation.getValue()
         val result = cbrt(value)
         computation.setValue(result)
     }
 
+    /**
+     * Replaces the current value with its factorial.
+     *
+     * @throws IllegalArgumentException If the value is not an integer or is outside `[0, 69]`.
+     */
     fun factorial() {
         val intValue = getIntFromDouble(computation.getValue())
 
@@ -302,84 +416,105 @@ class CalculatorFunctions(val state: CalculatorState,
         computation.setValue(result)
     }
 
+    /** Replaces the current value `x` with `e^x`. */
     fun exp() {
         val value = computation.getValue()
         val result = exp(value)
         computation.setValue(result)
     }
 
+    /** Replaces the current value `x` with `10^x`. */
     fun tenPowX() {
         val value = computation.getValue()
         val result = 10.0.pow(value)
         computation.setValue(result)
     }
 
+    /**
+     * Rounds the current value to a [Long], applies bitwise inversion, and stores the result.
+     */
     fun bitwiseNot() {
         val value = computation.getValue()
         val result = round(value).toLong().inv()
         computation.setValue(result.toDouble())
     }
 
+    /** Converts the current length from centimeters to inches. */
     fun convertCmToInch() {
         val value = computation.getValue()
         val result = value / 2.54
         computation.setValue(result)
     }
 
+    /** Converts the current volume from liters to US gallons. */
     fun convertLiterToGallon() {
         val value = computation.getValue()
         val result = value / 3.785411784
         computation.setValue(result)
     }
 
+    /** Converts the current mass from kilograms to pounds. */
     fun convertKgToPound() {
         val value = computation.getValue()
         val result = value / 0.45359237
         computation.setValue(result)
     }
 
+    /** Converts the current mass from grams to ounces. */
     fun convertGramToOunce() {
         val value = computation.getValue()
         val result = value / 28.349523125
         computation.setValue(result)
     }
 
+    /** Converts the current temperature from degrees Celsius to degrees Fahrenheit. */
     fun convertCelsiusToFahrenheit() {
         val value = computation.getValue()
         val result = value * 9.0 / 5.0 + 32.0
         computation.setValue(result)
     }
 
+    /** Converts the current length from inches to centimeters. */
     fun convertInchToCm() {
         val value = computation.getValue()
         val result = value * 2.54
         computation.setValue(result)
     }
 
+    /** Converts the current volume from US gallons to liters. */
     fun convertGallonToLiter() {
         val value = computation.getValue()
         val result = value * 3.785411784
         computation.setValue(result)
     }
 
+    /** Converts the current mass from pounds to kilograms. */
     fun convertPoundToKg() {
         val value = computation.getValue()
         val result = value * 0.45359237
         computation.setValue(result)
     }
 
+    /** Converts the current temperature from degrees Fahrenheit to degrees Celsius. */
     fun convertFahrenheitToCelsius() {
         val value = computation.getValue()
         val result = (value - 32.0) * 5.0 / 9.0
         computation.setValue(result)
     }
 
+    /** Converts the current mass from ounces to grams. */
     fun convertOunceToGram() {
         val value = computation.getValue()
         val result = value * 28.349523125
         computation.setValue(result)
     }
 
+    /**
+     * Replaces the current value with its percentage interpretation.
+     *
+     * For pending addition or subtraction, the percentage is relative to the previous operand.
+     * For all other operations, the current value is divided by 100.
+     */
     fun percent() {
         val value = computation.getValue()
         val op = computation.getLastOperation()
@@ -396,6 +531,12 @@ class CalculatorFunctions(val state: CalculatorState,
         computation.setValue(result)
     }
 
+    /**
+     * Converts a packed `degrees.minutesSeconds` value to decimal degrees.
+     *
+     * The first two digits after the decimal separator are interpreted as minutes and the next
+     * two digits as seconds.
+     */
     fun convertDegreesMinutesSecondsToDecimal() {
         var value = computation.getValue()
 

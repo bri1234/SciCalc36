@@ -21,18 +21,35 @@ package com.bri1234.ti36calculator
 import com.bri1234.ti36calculator.contracts.IStatistic
 import kotlin.math.sqrt
 
+/**
+ * Accumulates the values required for paired-variable statistics and linear regression.
+ *
+ * Samples may have a frequency greater than one. The class tracks the sums of `x`, `y`, their
+ * squares, and their products, allowing correlation and least-squares regression to be calculated.
+ */
 class Statistic2: IStatistic {
 
+    /** Total number of sample pairs, including pairs represented by frequencies. */
     override var count: Int = 0
         private set
+
+    /** Sum of all `x` values, including their frequencies. */
     override var sumX: Double = 0.0
         private set
+
+    /** Sum of all squared `x` values, including their frequencies. */
     override var sumX2: Double = 0.0
         private set
+
+    /** Sum of all `y` values, including their frequencies. */
     override var sumY: Double = 0.0
         private set
+
+    /** Sum of all squared `y` values, including their frequencies. */
     override var sumY2: Double = 0.0
         private set
+
+    /** Sum of all `x * y` products, including their frequencies. */
     override var sumXY: Double = 0.0
         private set
 
@@ -40,6 +57,7 @@ class Statistic2: IStatistic {
         clearStatistic()
     }
 
+    /** Resets the sample count and all accumulated sums to zero. */
     override fun clearStatistic() {
         count = 0
         sumX = 0.0
@@ -49,6 +67,14 @@ class Statistic2: IStatistic {
         sumXY = 0.0
     }
 
+    /**
+     * Adds the sample pair ([x], [y]) to the accumulated statistics [frequency] times.
+     *
+     * @param x The independent-variable sample value.
+     * @param y The dependent-variable sample value.
+     * @param frequency The positive number of occurrences represented by the pair.
+     * @throws IllegalArgumentException If [frequency] is not positive.
+     */
     fun add(x: Double, y: Double, frequency: Int = 1) {
         require(frequency > 0) { "Frequency must be positive" }
 
@@ -60,6 +86,15 @@ class Statistic2: IStatistic {
         sumXY += x * y * frequency
     }
 
+    /**
+     * Subtracts the contribution of the sample pair ([x], [y]) [frequency] times.
+     *
+     * @param x The independent-variable value whose contribution is removed.
+     * @param y The dependent-variable value whose contribution is removed.
+     * @param frequency The positive number of occurrences to remove.
+     * @throws IllegalArgumentException If [frequency] is not positive.
+     * @throws IllegalStateException If fewer than [frequency] sample pairs are currently counted.
+     */
     fun subtract(x: Double, y: Double, frequency: Int = 1) {
         require(frequency > 0) { "Frequency must be positive" }
         check(count >= frequency) { "Not enough data to subtract" }
@@ -72,6 +107,14 @@ class Statistic2: IStatistic {
         sumXY -= x * y * frequency
     }
 
+    /**
+     * Calculates the Pearson correlation coefficient for the accumulated sample pairs.
+     *
+     * @return The correlation coefficient in the range `[-1, 1]`, subject to floating-point
+     * precision.
+     * @throws IllegalStateException If no samples are stored or the coefficient is undefined
+     * because either variable has zero variance.
+     */
     override fun correlationCoefficient(): Double {
         check(count > 0) { "No data to calculate correlation coefficient" }
 
@@ -83,12 +126,25 @@ class Statistic2: IStatistic {
         return numerator / denominator
     }
 
+    /**
+     * Calculates the intercept of the least-squares regression line `y = intercept + slope * x`.
+     *
+     * @return The regression-line intercept.
+     * @throws IllegalStateException If no samples are stored or the regression slope is undefined.
+     */
     override fun intercept(): Double {
         check(count > 0) { "No data to calculate intercept" }
 
         return (sumY - slope() * sumX) / count
     }
 
+    /**
+     * Calculates the slope of the least-squares regression line for predicting `y` from `x`.
+     *
+     * @return The regression-line slope.
+     * @throws IllegalStateException If no samples are stored or all `x` values are equal, making
+     * the denominator zero.
+     */
     override fun slope(): Double {
         check(count > 0) { "No data to calculate slope" }
 
