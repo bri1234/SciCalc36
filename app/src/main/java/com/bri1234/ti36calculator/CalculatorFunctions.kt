@@ -358,19 +358,16 @@ class CalculatorFunctions(val state: CalculatorState,
      * @throws IllegalArgumentException If the current value is zero.
      */
     fun oneDivX() {
-        val value = computation.getDoubleValue()
-        if (value == 0.0)
-            throw IllegalArgumentException("1 / x: Input value must be not equal 0")
-
-        val result = 1.0 / value
-        computation.setDoubleValue(result)
+        val value = computation.getValue().clone()
+        value.reciprocal()
+        computation.setValue(value)
     }
 
     /** Replaces the current value with its square. */
     fun xSquared() {
-        val value = computation.getDoubleValue()
-        val result = value * value
-        computation.setDoubleValue(result)
+        val value = computation.getValue().clone()
+        value.sqr()
+        computation.setValue(value)
     }
 
     /**
@@ -389,9 +386,9 @@ class CalculatorFunctions(val state: CalculatorState,
 
     /** Replaces the current value with its arithmetic negation. */
     fun negate() {
-        val value = computation.getDoubleValue()
-        val result = -value
-        computation.setDoubleValue(result)
+        val value = computation.getValue().clone()
+        value.negate()
+        computation.setValue(value)
     }
 
     /** Replaces the current value with its real cube root. */
