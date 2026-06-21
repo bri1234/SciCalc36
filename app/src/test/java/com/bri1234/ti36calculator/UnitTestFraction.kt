@@ -150,4 +150,14 @@ class UnitTestFraction {
         assertThrows(ArithmeticException::class.java) { Fraction(3, 2).toInt() }
         assertThrows(ArithmeticException::class.java) { Fraction(-1, 2).toInt() }
     }
+
+    @Test
+    fun testConvertDoubleToFraction() {
+        assertEquals(Fraction(3, 4), convertDoubleToFraction(0.75))
+        assertEquals(Fraction(-5, 4), convertDoubleToFraction(-1.25))
+        assertEquals(Fraction(55, 24), convertDoubleToFraction(2.291666667))
+        assertEquals(null, convertDoubleToFraction(Double.NaN))
+        assertEquals(null, convertDoubleToFraction(Double.POSITIVE_INFINITY))
+        assertEquals(null, convertDoubleToFraction(Double.MAX_VALUE))
+    }
 }

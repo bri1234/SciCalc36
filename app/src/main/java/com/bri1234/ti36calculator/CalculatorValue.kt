@@ -316,4 +316,42 @@ class CalculatorValue() {
         setDouble(getDouble().toLong().toDouble())
     }
 
+    fun changePresentationToDecimal() {
+        _valueDouble = getDouble()
+        _presentation = Presentation.DECIMAL
+    }
+
+    fun changePresentationDecimalToFraction() {
+        if (isFraction)
+            return
+
+        val decimalValue = _valueDouble
+        if (!decimalValue.isFinite())
+            return
+
+        if (_valueFraction.toDouble() == decimalValue) {
+            _presentation = DEFAULT_FRACTION_PRESENTATION
+            return
+        }
+
+        val fraction = convertDoubleToFraction(decimalValue)
+        if (fraction != null) {
+            _valueFraction = fraction
+            _presentation = DEFAULT_FRACTION_PRESENTATION
+        }
+    }
+
+    fun changePresentationFractionFromImproperToMixed() {
+        if (!isFraction || _presentation == Presentation.FRACTION_MIXED)
+            return
+
+        _presentation = Presentation.FRACTION_MIXED
+    }
+
+    fun changePresentationFractionFromMixedToImproper() {
+        if (!isFraction || _presentation == Presentation.FRACTION_IMPROPER)
+            return
+
+        _presentation = Presentation.FRACTION_IMPROPER
+    }
 }

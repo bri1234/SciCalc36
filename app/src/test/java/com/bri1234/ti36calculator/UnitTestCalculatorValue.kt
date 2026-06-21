@@ -18,6 +18,7 @@
 
 package com.bri1234.ti36calculator
 
+import com.bri1234.ti36calculator.enums.Presentation
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotSame
@@ -77,5 +78,59 @@ class UnitTestCalculatorValue {
 
         fractionOriginal.negate()
         assertEquals(0.75, fractionCopy.getDouble(), 0.0)
+    }
+
+    @Test
+    fun testFractionPresentationChanges() {
+        val value = CalculatorValue(Fraction(3, 2))
+
+        assertEquals(Presentation.FRACTION_MIXED, value.presentation)
+
+        value.changePresentationFractionFromMixedToImproper()
+        assertEquals(Presentation.FRACTION_IMPROPER, value.presentation)
+
+        value.changePresentationFractionFromImproperToMixed()
+        assertEquals(Presentation.FRACTION_MIXED, value.presentation)
+
+        value.changePresentationToDecimal()
+        assertEquals(Presentation.DECIMAL, value.presentation)
+        assertEquals(1.5, value.getDouble(), 0.0)
+
+        value.changePresentationDecimalToFraction()
+        assertEquals(Presentation.FRACTION_MIXED, value.presentation)
+        assertEquals(Fraction(3, 2), value.getFraction())
+    }
+
+    @Test
+    fun testDecimalToFractionPresentation() {
+        val testValues = mapOf(
+            0.75 to Fraction(3, 4),
+            -1.25 to Fraction(-5, 4),
+            2.291666667 to Fraction(55, 24),
+        )
+
+        for ((decimal, fraction) in testValues) {
+            val value = CalculatorValue(decimal)
+            value.changePresentationDecimalToFraction()
+
+            assertEquals(Presentation.FRACTION_MIXED, value.presentation)
+            assertEquals(fraction, value.getFraction())
+        }
+    }
+
+    @Test
+    fun testInvalidDecimalRemainsDecimal() {
+        val values = listOf(
+            CalculatorValue(Double.NaN),
+            CalculatorValue(Double.POSITIVE_INFINITY),
+            CalculatorValue(Double.NEGATIVE_INFINITY),
+            CalculatorValue(Double.MAX_VALUE),
+        )
+
+        for (value in values) {
+            value.changePresentationDecimalToFraction()
+            assertEquals(Presentation.DECIMAL, value.presentation)
+            assertFalse(value.isFraction)
+        }
     }
 }

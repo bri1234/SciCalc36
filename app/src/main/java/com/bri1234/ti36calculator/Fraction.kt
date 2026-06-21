@@ -18,6 +18,8 @@
 
 package com.bri1234.ti36calculator
 
+import kotlin.math.abs
+
 /**
  * Components of a fraction represented as a mixed number.
  *
@@ -237,7 +239,7 @@ class Fraction(numerator: Int, denominator: Int = 1) : Comparable<Fraction> {
     fun toMixedFractionParts(): MixedFractionParts {
         val wholePart = numerator / denominator
         val remainder = numerator % denominator
-        val fractionalNumerator = if (wholePart == 0) remainder else Math.abs(remainder)
+        val fractionalNumerator = if (wholePart == 0) remainder else abs(remainder)
 
         return MixedFractionParts(wholePart, fractionalNumerator, denominator)
     }
@@ -331,4 +333,73 @@ private fun compareFractions(
         d2 = remainder2
         reverse = !reverse
     }
+}
+
+/**
+ * Converts a finite [Double] to an [Int]-backed fraction using continued fractions.
+ *
+ * The closest convergent within the supported tolerance is returned. If no such fraction can be
+ * represented by [Int] numerator and denominator values, `null` is returned.
+ */
+fun convertDoubleToFraction(value: Double): Fraction? {
+    if (!value.isFinite())
+        return null
+
+    val isNegative = value < 0.0
+    val absoluteValue = abs(value)
+    val numeratorLimit = if (isNegative) {
+        -(Int.MIN_VALUE.toLong())
+    } else {
+        Int.MAX_VALUE.toLong()
+    }
+    val denominatorLimit = Int.MAX_VALUE.toLong()
+    val tolerance = maxOf(
+        Math.ulp(absoluteValue) * 4.0,
+        minOf(1E-9, absoluteValue * 2E-9),
+    )
+
+    var previousNumerator = 0L
+    var currentNumerator = 1L
+    var previousDenominator = 1L
+    var currentDenominator = 0L
+    var continuedFractionValue = absoluteValue
+
+    repeat(64) {
+        val wholePart = kotlin.math.floor(continuedFractionValue).toLong()
+
+        if (wholePart < 0L ||
+            (currentNumerator != 0L &&
+                    wholePart > (numeratorLimit - previousNumerator) / currentNumerator) ||
+            (currentDenominator != 0L &&
+                    wholePart > (denominatorLimit - previousDenominator) / currentDenominator)) {
+            return null
+        }
+
+        val nextNumerator = wholePart * currentNumerator + previousNumerator
+        val nextDenominator = wholePart * currentDenominator + previousDenominator
+        if (nextNumerator > numeratorLimit ||
+            nextDenominator <= 0L ||
+            nextDenominator > denominatorLimit) {
+            return null
+        }
+
+        val approximation = nextNumerator.toDouble() / nextDenominator.toDouble()
+        if ((nextNumerator != 0L || absoluteValue == 0.0) &&
+            abs(approximation - absoluteValue) <= tolerance) {
+            val signedNumerator = if (isNegative) -nextNumerator else nextNumerator
+            return Fraction(signedNumerator.toInt(), nextDenominator.toInt())
+        }
+
+        val remainder = continuedFractionValue - wholePart
+        if (remainder == 0.0)
+            return null
+
+        previousNumerator = currentNumerator
+        currentNumerator = nextNumerator
+        previousDenominator = currentDenominator
+        currentDenominator = nextDenominator
+        continuedFractionValue = 1.0 / remainder
+    }
+
+    return null
 }

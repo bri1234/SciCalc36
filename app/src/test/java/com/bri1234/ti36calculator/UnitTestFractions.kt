@@ -23,6 +23,15 @@ import org.junit.Test
 class UnitTestFractions {
 
     @Test
+    fun testDecimalFractionPresentationToggle() {
+        val calc = CalculatorCore()
+
+        calc.testStep("AC/ON . 7 5 F<>D", "3;4", "", "DEG")
+        calc.testStep("F<>D", "0.75", "", "DEG")
+        calc.testStep("F<>D", "3;4", "", "DEG")
+    }
+
+    @Test
     fun testFractionsInput() {
         val calc = CalculatorCore()
 
@@ -53,6 +62,12 @@ class UnitTestFractions {
         calc.testStep("AC/ON 5 5 ab/c 2 4", "55;24", "", "DEG")
         calc.testStep("F<>D", "2.291666667", "", "DEG")
         calc.testStep("F<>D", "2_7;24", "", "DEG")
+
+        calc.testStep("AC/ON 0 . 3 3 3 3 3 3 3 3 3 3 3 3", "0.333333333", "", "DEG")
+        calc.testStep("F<>D", "1;3", "", "DEG")
+
+        calc.testStep("AC/ON 0 . 1 2 5", "0.125", "", "DEG")
+        calc.testStep("F<>D", "1;8", "", "DEG")
     }
 
     @Test

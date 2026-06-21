@@ -366,7 +366,7 @@ class CalculatorCore(
             CalculatorButton.FIVE -> selectNumberFormat(DisplayNumberFormat.FLOAT)
             CalculatorButton.SIX -> selectNumberFormat(DisplayNumberFormat.SCIENTIFIC)
             CalculatorButton.PLUS -> selectNumberFormat(DisplayNumberFormat.ENGINEERING)
-            CalculatorButton.A_B_C -> notImplemented("F <-> D")
+            CalculatorButton.A_B_C -> toggleFractionDecimalPresentation()
             CalculatorButton.ONE -> functions.convertInchToCm()
             CalculatorButton.TWO -> functions.convertGallonToLiter()
             CalculatorButton.THREE -> functions.convertPoundToKg()
@@ -727,6 +727,18 @@ class CalculatorCore(
      */
     private fun onResultChanged(value : CalculatorValue) {
         display.printValue(value)
+    }
+
+    /** Toggles the current value between decimal and fractional presentation. */
+    private fun toggleFractionDecimalPresentation() {
+        val value = computation.getValue().clone()
+
+        if (value.isFraction)
+            value.changePresentationToDecimal()
+        else
+            value.changePresentationDecimalToFraction()
+
+        computation.setValue(value)
     }
 
     /**
