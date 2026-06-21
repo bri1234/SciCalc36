@@ -27,6 +27,7 @@ import com.bri1234.ti36calculator.enums.CalculatorNumberMode
 import com.bri1234.ti36calculator.enums.CalculatorStatisticMode
 import com.bri1234.ti36calculator.enums.DisplayNumberFormat
 import com.bri1234.ti36calculator.enums.MemoryOperation
+import com.bri1234.ti36calculator.enums.Presentation
 import com.bri1234.ti36calculator.enums.RectangularPolarView
 import com.bri1234.ti36calculator.enums.DisplayIndicators
 
@@ -311,7 +312,7 @@ class CalculatorCore(
             CalculatorButton.FIVE -> statistic.printSlope()
             CalculatorButton.SIX -> statistic.printPredictedX()
             CalculatorButton.PLUS -> statistic.printPredictedY()
-            CalculatorButton.A_B_C -> notImplemented("D/C")
+            CalculatorButton.A_B_C -> toggleFractionPresentation()
             CalculatorButton.ONE -> functions.convertCmToInch()
             CalculatorButton.TWO -> functions.convertLiterToGallon()
             CalculatorButton.THREE -> functions.convertKgToPound()
@@ -737,6 +738,23 @@ class CalculatorCore(
             value.changePresentationToDecimal()
         else
             value.changePresentationDecimalToFraction()
+
+        computation.setValue(value)
+    }
+
+    /** Toggles a fraction between mixed and improper presentation. */
+    private fun toggleFractionPresentation() {
+        val value = computation.getValue().clone()
+        if (!value.isFraction)
+            return
+
+        when (value.presentation) {
+            Presentation.FRACTION_MIXED ->
+                value.changePresentationFractionFromMixedToImproper()
+            Presentation.FRACTION_IMPROPER ->
+                value.changePresentationFractionFromImproperToMixed()
+            Presentation.DECIMAL -> return
+        }
 
         computation.setValue(value)
     }

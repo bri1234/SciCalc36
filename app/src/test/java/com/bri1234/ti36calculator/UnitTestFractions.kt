@@ -32,6 +32,15 @@ class UnitTestFractions {
     }
 
     @Test
+    fun testMixedImproperPresentationToggle() {
+        val calc = CalculatorCore()
+
+        calc.testStep("AC/ON 7 . 5 F<>D", "7_1;2", "", "DEG")
+        calc.testStep("d/c", "15;2", "", "DEG")
+        calc.testStep("d/c", "7_1;2", "", "DEG")
+    }
+
+    @Test
     fun testFractionsInput() {
         val calc = CalculatorCore()
 
