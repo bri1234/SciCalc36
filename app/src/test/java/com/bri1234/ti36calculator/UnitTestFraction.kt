@@ -124,6 +124,15 @@ class UnitTestFraction {
         assertThrows(ArithmeticException::class.java) {
             Fraction(Int.MAX_VALUE, 2, 3)
         }
+        assertThrows(ArithmeticException::class.java) {
+            Fraction(Int.MAX_VALUE).multiply(Fraction(2))
+        }
+        assertThrows(ArithmeticException::class.java) {
+            Fraction(Int.MIN_VALUE).negate()
+        }
+        assertThrows(ArithmeticException::class.java) {
+            Fraction(Int.MIN_VALUE).reciprocal()
+        }
     }
 
     @Test

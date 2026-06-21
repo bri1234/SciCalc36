@@ -94,10 +94,10 @@ class UnitTestFractions {
         val calc = CalculatorCore()
 
         calc.testStep("AC/ON 1 ab/c 2", "1;2", "", "DEG")
-        calc.testStep("x^2", "0.25", "", "DEG")
+        calc.testStep("x^2", "1;4", "", "DEG")
 
         calc.testStep("AC/ON 2 ab/c 5", "2;5", "", "DEG")
-        calc.testStep("1/x", "2.5", "", "DEG")
+        calc.testStep("1/x", "2_1;2", "", "DEG")
 
         calc.testStep("AC/ON 2 ab/c 5", "2;5", "", "DEG")
         calc.testStep("y^x", "2;5", "", "DEG")
@@ -141,7 +141,46 @@ class UnitTestFractions {
         calc.testStep("- 3 ab/c 4", "3;4", "", "DEG")
         calc.testStep("=", "-1;4", "", "DEG")
 
-        // mit klammern
+    }
+
+    @Test
+    fun testFractionsParenthesesAndRepeat() {
+        val calc = CalculatorCore()
+
+        calc.testStep("AC/ON 2 * ( 1 ab/c 2 + 1 ab/c 4 ) =", "1_1;2", "", "DEG")
+
+        calc.testStep("AC/ON 1 ab/c 2 + 1 ab/c 4 =", "3;4", "", "DEG")
+        calc.testStep("=", "1", "", "DEG")
+        calc.testStep("=", "1_1;4", "", "DEG")
+    }
+
+    @Test
+    fun testFractionsInvalidInput() {
+        val calc = CalculatorCore()
+
+        calc.testStep("AC/ON 1 ab/c 0 =", "Error  ", "", "DEG")
+        calc.testStep("AC/ON 1 ab/c =", "Error  ", "", "DEG")
+        calc.testStep("AC/ON 1 ab/c 2 ab/c =", "Error  ", "", "DEG")
+    }
+
+    @Test
+    fun testFractionsBackspace() {
+        val calc = CalculatorCore()
+
+        calc.testStep("AC/ON 1 2 ab/c 3 4 ->", "12;3", "", "DEG")
+        calc.testStep("->", "12;", "", "DEG")
+        calc.testStep("->", "12", "", "DEG")
+
+        calc.testStep("AC/ON 1 ab/c 2 ab/c 3 ->", "1_2;", "", "DEG")
+        calc.testStep("->", "1;2", "", "DEG")
+    }
+
+    @Test
+    fun testNegativeFractionArithmetic() {
+        val calc = CalculatorCore()
+
+        calc.testStep("AC/ON 1 ab/c 2 +/- + 3 ab/c 4 =", "1;4", "", "DEG")
+        calc.testStep("AC/ON 1 ab/c 2 - 3 ab/c 4 =", "-1;4", "", "DEG")
     }
 
     @Test
@@ -165,6 +204,18 @@ class UnitTestFractions {
         calc.testStep("STO 2", "3;4", "", "DEG M")
         calc.testStep("RCL 1", "1;2", "", "DEG M")
         calc.testStep("RCL 2", "3;4", "", "DEG M")
+    }
+
+    @Test
+    fun testFractionsMemorySumAndExchange() {
+        val calc = CalculatorCore()
+
+        calc.testStep("AC/ON 1 ab/c 2 STO 1", "1;2", "", "DEG M")
+        calc.testStep("1 ab/c 4 SUM 1", "1;4", "", "DEG M")
+        calc.testStep("RCL 1", "3;4", "", "DEG M")
+
+        calc.testStep("1 ab/c 2 EXC 1", "3;4", "", "DEG M")
+        calc.testStep("RCL 1", "1;2", "", "DEG M")
     }
 
     @Test
