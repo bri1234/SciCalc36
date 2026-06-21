@@ -58,9 +58,9 @@ class UnitTestCalculatorValue {
     }
 
     @Test
-    fun testCopy() {
+    fun testClone() {
         val decimalOriginal = CalculatorValue(1.25)
-        val decimalCopy = decimalOriginal.copy()
+        val decimalCopy = decimalOriginal.clone()
 
         assertNotSame(decimalOriginal, decimalCopy)
         assertEquals(1.25, decimalCopy.getDouble(), 0.0)
@@ -69,7 +69,7 @@ class UnitTestCalculatorValue {
         assertEquals(1.25, decimalCopy.getDouble(), 0.0)
 
         val fractionOriginal = CalculatorValue(Fraction(3, 4))
-        val fractionCopy = fractionOriginal.copy()
+        val fractionCopy = fractionOriginal.clone()
 
         assertNotSame(fractionOriginal, fractionCopy)
         assertTrue(fractionCopy.isFraction)

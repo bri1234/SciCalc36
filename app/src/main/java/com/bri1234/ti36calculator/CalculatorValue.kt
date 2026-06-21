@@ -42,7 +42,7 @@ class CalculatorValue() {
      * @param value The decimal value to store.
      */
     constructor(value: Double) : this() {
-        _valueDouble = value
+        _valueDouble = if (value == -0.0) 0.0 else value
         _presentation = Presentation.DECIMAL
     }
 
@@ -65,7 +65,7 @@ class CalculatorValue() {
      *
      * @return A new [CalculatorValue] with the same value and presentation.
      */
-    fun copy(): CalculatorValue {
+    fun clone(): CalculatorValue {
         val result = CalculatorValue()
         result._valueDouble = _valueDouble
         result._valueFraction = _valueFraction
@@ -95,6 +95,9 @@ class CalculatorValue() {
     /** Returns whether the current value is stored and presented as a fraction. */
     val isFraction: Boolean get() = _presentation != Presentation.DECIMAL
 
+    /** Returns whether the current value is zero. */
+    val isZero: Boolean get() = if (isFraction) _valueFraction.isZero else _valueDouble == 0.0
+
     /** Resets the value to zero and the presentation to [Presentation.DECIMAL]. */
     fun clear() {
         _valueDouble = 0.0
@@ -121,7 +124,7 @@ class CalculatorValue() {
      * Calling this function also switches the presentation to [Presentation.DECIMAL].
      */
     fun setDouble(value: Double) {
-        _valueDouble = value
+        _valueDouble = if (value == -0.0) 0.0 else value
         _presentation = Presentation.DECIMAL
     }
 
@@ -146,7 +149,8 @@ class CalculatorValue() {
         if (isFraction) {
             _valueFraction = _valueFraction.negate()
         } else {
-            _valueDouble = -_valueDouble
+            if (_valueDouble != 0.0)
+                _valueDouble = -_valueDouble
         }
     }
 
@@ -297,4 +301,10 @@ class CalculatorValue() {
             }
         }
     }
+
+    /** Converts the current value to an integer by truncating any fractional part. */
+    fun convertToInt() {
+        setDouble(getDouble().toLong().toDouble())
+    }
+
 }

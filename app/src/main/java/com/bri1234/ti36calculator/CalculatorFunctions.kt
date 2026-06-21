@@ -178,12 +178,12 @@ class CalculatorFunctions(val state: CalculatorState,
      * @throws IllegalArgumentException If the current value is not greater than zero.
      */
     fun log() {
-        val value = computation.getValue()
+        val value = computation.getDoubleValue()
         if (value <= 0.0)
             throw IllegalArgumentException("log(): Input value must be greater than 0")
 
         val result = log10(value)
-        computation.setValue(result)
+        computation.setDoubleValue(result)
     }
 
     /**
@@ -192,12 +192,12 @@ class CalculatorFunctions(val state: CalculatorState,
      * @throws IllegalArgumentException If the current value is not greater than zero.
      */
     fun ln() {
-        val value = computation.getValue()
+        val value = computation.getDoubleValue()
         if (value <= 0.0)
             throw IllegalArgumentException("ln(): Input value must be greater than 0")
 
         val result = ln(value)
-        computation.setValue(result)
+        computation.setDoubleValue(result)
     }
 
     /**
@@ -208,7 +208,7 @@ class CalculatorFunctions(val state: CalculatorState,
      * @throws IllegalStateException If no supported angle unit is active.
      */
     fun sin() {
-        val value = computation.getValue()
+        val value = computation.getDoubleValue()
         val result = when {
             isFunctionHyp() -> sinh(value)
             isAngleDeg() -> sinDeg(value)
@@ -216,7 +216,7 @@ class CalculatorFunctions(val state: CalculatorState,
             isAngleGrad() -> sinGrad(value)
             else -> throw IllegalStateException("sin(): No angle unit label found")
         }
-        computation.setValue(result)
+        computation.setDoubleValue(result)
     }
 
     /**
@@ -228,10 +228,10 @@ class CalculatorFunctions(val state: CalculatorState,
      * @throws IllegalStateException If no supported angle unit is active.
      */
     fun asin() {
-        val value = computation.getValue()
+        val value = computation.getDoubleValue()
 
         if (isFunctionHyp()) {
-            computation.setValue(asinh(value))
+            computation.setDoubleValue(asinh(value))
             return
         }
 
@@ -246,7 +246,7 @@ class CalculatorFunctions(val state: CalculatorState,
             isAngleGrad() -> Math.toDegrees(r) / 0.9
             else -> throw IllegalStateException("asin(): No angle unit label found")
         }
-        computation.setValue(result)
+        computation.setDoubleValue(result)
     }
 
     /**
@@ -257,7 +257,7 @@ class CalculatorFunctions(val state: CalculatorState,
      * @throws IllegalStateException If no supported angle unit is active.
      */
     fun cos() {
-        val value = computation.getValue()
+        val value = computation.getDoubleValue()
         val result = when {
             isFunctionHyp() -> cosh(value)
             isAngleDeg() -> cosDeg(value)
@@ -265,7 +265,7 @@ class CalculatorFunctions(val state: CalculatorState,
             isAngleGrad() -> cosGrad(value)
             else -> throw IllegalStateException("cos(): No angle unit label found")
         }
-        computation.setValue(result)
+        computation.setDoubleValue(result)
     }
 
     /**
@@ -277,13 +277,13 @@ class CalculatorFunctions(val state: CalculatorState,
      * @throws IllegalStateException If no supported angle unit is active.
      */
     fun acos() {
-        val value = computation.getValue()
+        val value = computation.getDoubleValue()
 
         if (isFunctionHyp()) {
             if (value < 1.0)
                 throw IllegalArgumentException("acos(): Input value must be in the range [1, +inf)]")
 
-            computation.setValue(acosh(value))
+            computation.setDoubleValue(acosh(value))
             return
         }
 
@@ -298,7 +298,7 @@ class CalculatorFunctions(val state: CalculatorState,
             isAngleGrad() -> Math.toDegrees(r) / 0.9
             else -> throw IllegalStateException("acos(): No angle unit label found")
         }
-        computation.setValue(result)
+        computation.setDoubleValue(result)
     }
 
     /**
@@ -310,7 +310,7 @@ class CalculatorFunctions(val state: CalculatorState,
      * @throws IllegalStateException If no supported angle unit is active.
      */
     fun tan() {
-        val value = computation.getValue()
+        val value = computation.getDoubleValue()
         val result = when {
             isFunctionHyp() -> tanh(value)
             isAngleDeg() -> tanDeg(value)
@@ -318,7 +318,7 @@ class CalculatorFunctions(val state: CalculatorState,
             isAngleGrad() -> tanGrad(value)
             else -> throw IllegalStateException("tan(): No angle unit label found")
         }
-        computation.setValue(result)
+        computation.setDoubleValue(result)
     }
 
     /**
@@ -331,13 +331,13 @@ class CalculatorFunctions(val state: CalculatorState,
      * @throws IllegalStateException If no supported angle unit is active.
      */
     fun atan() {
-        val value = computation.getValue()
+        val value = computation.getDoubleValue()
 
         if (isFunctionHyp()) {
             if ((value <= -1.0) || (value >= 1.0))
                 throw IllegalArgumentException("atan(): Input value must be in the range (-1, 1)")
 
-            computation.setValue(atanh(value))
+            computation.setDoubleValue(atanh(value))
             return
         }
 
@@ -349,7 +349,7 @@ class CalculatorFunctions(val state: CalculatorState,
             isAngleGrad() -> Math.toDegrees(r) / 0.9
             else -> throw IllegalStateException("atan(): No angle unit label found")
         }
-        computation.setValue(result)
+        computation.setDoubleValue(result)
     }
 
     /**
@@ -358,19 +358,19 @@ class CalculatorFunctions(val state: CalculatorState,
      * @throws IllegalArgumentException If the current value is zero.
      */
     fun oneDivX() {
-        val value = computation.getValue()
+        val value = computation.getDoubleValue()
         if (value == 0.0)
             throw IllegalArgumentException("1 / x: Input value must be not equal 0")
 
         val result = 1.0 / value
-        computation.setValue(result)
+        computation.setDoubleValue(result)
     }
 
     /** Replaces the current value with its square. */
     fun xSquared() {
-        val value = computation.getValue()
+        val value = computation.getDoubleValue()
         val result = value * value
-        computation.setValue(result)
+        computation.setDoubleValue(result)
     }
 
     /**
@@ -379,26 +379,26 @@ class CalculatorFunctions(val state: CalculatorState,
      * @throws IllegalArgumentException If the current value is not greater than zero.
      */
     fun squareRootX() {
-        val value = computation.getValue()
+        val value = computation.getDoubleValue()
         if (value <= 0.0)
             throw IllegalArgumentException("sqrt(): Input value must be greater than 0")
 
         val result = sqrt(value)
-        computation.setValue(result)
+        computation.setDoubleValue(result)
     }
 
     /** Replaces the current value with its arithmetic negation. */
     fun negate() {
-        val value = computation.getValue()
+        val value = computation.getDoubleValue()
         val result = -value
-        computation.setValue(result)
+        computation.setDoubleValue(result)
     }
 
     /** Replaces the current value with its real cube root. */
     fun thirdRootX() {
-        val value = computation.getValue()
+        val value = computation.getDoubleValue()
         val result = cbrt(value)
-        computation.setValue(result)
+        computation.setDoubleValue(result)
     }
 
     /**
@@ -407,106 +407,106 @@ class CalculatorFunctions(val state: CalculatorState,
      * @throws IllegalArgumentException If the value is not an integer or is outside `[0, 69]`.
      */
     fun factorial() {
-        val intValue = getIntFromDouble(computation.getValue())
+        val intValue = getIntFromDouble(computation.getDoubleValue())
 
         if ((intValue < 0) || (intValue > 69))
             throw IllegalArgumentException("factorial(): Input value must be in the range [0, 69]")
 
         val result = mathUtilsFactorial(intValue)
-        computation.setValue(result)
+        computation.setDoubleValue(result)
     }
 
     /** Replaces the current value `x` with `e^x`. */
     fun exp() {
-        val value = computation.getValue()
+        val value = computation.getDoubleValue()
         val result = exp(value)
-        computation.setValue(result)
+        computation.setDoubleValue(result)
     }
 
     /** Replaces the current value `x` with `10^x`. */
     fun tenPowX() {
-        val value = computation.getValue()
+        val value = computation.getDoubleValue()
         val result = 10.0.pow(value)
-        computation.setValue(result)
+        computation.setDoubleValue(result)
     }
 
     /**
      * Rounds the current value to a [Long], applies bitwise inversion, and stores the result.
      */
     fun bitwiseNot() {
-        val value = computation.getValue()
+        val value = computation.getDoubleValue()
         val result = round(value).toLong().inv()
-        computation.setValue(result.toDouble())
+        computation.setDoubleValue(result.toDouble())
     }
 
     /** Converts the current length from centimeters to inches. */
     fun convertCmToInch() {
-        val value = computation.getValue()
+        val value = computation.getDoubleValue()
         val result = value / 2.54
-        computation.setValue(result)
+        computation.setDoubleValue(result)
     }
 
     /** Converts the current volume from liters to US gallons. */
     fun convertLiterToGallon() {
-        val value = computation.getValue()
+        val value = computation.getDoubleValue()
         val result = value / 3.785411784
-        computation.setValue(result)
+        computation.setDoubleValue(result)
     }
 
     /** Converts the current mass from kilograms to pounds. */
     fun convertKgToPound() {
-        val value = computation.getValue()
+        val value = computation.getDoubleValue()
         val result = value / 0.45359237
-        computation.setValue(result)
+        computation.setDoubleValue(result)
     }
 
     /** Converts the current mass from grams to ounces. */
     fun convertGramToOunce() {
-        val value = computation.getValue()
+        val value = computation.getDoubleValue()
         val result = value / 28.349523125
-        computation.setValue(result)
+        computation.setDoubleValue(result)
     }
 
     /** Converts the current temperature from degrees Celsius to degrees Fahrenheit. */
     fun convertCelsiusToFahrenheit() {
-        val value = computation.getValue()
+        val value = computation.getDoubleValue()
         val result = value * 9.0 / 5.0 + 32.0
-        computation.setValue(result)
+        computation.setDoubleValue(result)
     }
 
     /** Converts the current length from inches to centimeters. */
     fun convertInchToCm() {
-        val value = computation.getValue()
+        val value = computation.getDoubleValue()
         val result = value * 2.54
-        computation.setValue(result)
+        computation.setDoubleValue(result)
     }
 
     /** Converts the current volume from US gallons to liters. */
     fun convertGallonToLiter() {
-        val value = computation.getValue()
+        val value = computation.getDoubleValue()
         val result = value * 3.785411784
-        computation.setValue(result)
+        computation.setDoubleValue(result)
     }
 
     /** Converts the current mass from pounds to kilograms. */
     fun convertPoundToKg() {
-        val value = computation.getValue()
+        val value = computation.getDoubleValue()
         val result = value * 0.45359237
-        computation.setValue(result)
+        computation.setDoubleValue(result)
     }
 
     /** Converts the current temperature from degrees Fahrenheit to degrees Celsius. */
     fun convertFahrenheitToCelsius() {
-        val value = computation.getValue()
+        val value = computation.getDoubleValue()
         val result = (value - 32.0) * 5.0 / 9.0
-        computation.setValue(result)
+        computation.setDoubleValue(result)
     }
 
     /** Converts the current mass from ounces to grams. */
     fun convertOunceToGram() {
-        val value = computation.getValue()
+        val value = computation.getDoubleValue()
         val result = value * 28.349523125
-        computation.setValue(result)
+        computation.setDoubleValue(result)
     }
 
     /**
@@ -516,7 +516,7 @@ class CalculatorFunctions(val state: CalculatorState,
      * For all other operations, the current value is divided by 100.
      */
     fun percent() {
-        val value = computation.getValue()
+        val value = computation.getDoubleValue()
         val op = computation.getLastOperation()
 
         val result = when (op) {
@@ -528,7 +528,7 @@ class CalculatorFunctions(val state: CalculatorState,
             else -> value / 100.0
         }
 
-        computation.setValue(result)
+        computation.setDoubleValue(result)
     }
 
     /**
@@ -538,7 +538,7 @@ class CalculatorFunctions(val state: CalculatorState,
      * two digits as seconds.
      */
     fun convertDegreesMinutesSecondsToDecimal() {
-        var value = computation.getValue()
+        var value = computation.getDoubleValue()
 
         val degrees = floor(value)
         value -= degrees
@@ -549,6 +549,6 @@ class CalculatorFunctions(val state: CalculatorState,
         val seconds = value
 
         val result = degrees + minutes / 60.0 + seconds / 3600.0
-        computation.setValue(result)
+        computation.setDoubleValue(result)
     }
 }

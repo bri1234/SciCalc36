@@ -165,30 +165,37 @@ class CalculatorNumericDisplay(val state: CalculatorState)  {
      * Handles special cases for NaN and Infinity.
      * @param value The double value to print on the display.
      */
-    fun printValue(value: Double) {
+    fun printValue(value: CalculatorValue) {
 
-        if (value.isNaN()) {
+        if (value.isFraction) {
+            // TODO: fraction display mode
+            return
+        }
+
+        val doubleVal = value.getDouble()
+
+        if (doubleVal.isNaN()) {
             printNan()
             return
         }
 
-        if (value.isInfinite()) {
-            printInf(value > 0)
+        if (doubleVal.isInfinite()) {
+            printInf(doubleVal > 0)
             return
         }
 
-        if ((abs(value) >= 1e100) || ((abs(value) <= 1e-100) && (value != 0.0)))
+        if ((abs(doubleVal) >= 1e100) || ((abs(doubleVal) <= 1e-100) && (doubleVal != 0.0)))
             throw IllegalArgumentException("Value is out of range for display")
 
         when (state.calculatorNumberMode) {
-            CalculatorNumberMode.HEXADECIMAL -> printValueHex(value)
-            CalculatorNumberMode.OCTAL -> printValueOct(value)
-            CalculatorNumberMode.BINARY -> printValueBin(value)
+            CalculatorNumberMode.HEXADECIMAL -> printValueHex(doubleVal)
+            CalculatorNumberMode.OCTAL -> printValueOct(doubleVal)
+            CalculatorNumberMode.BINARY -> printValueBin(doubleVal)
             else -> {
                 when (displayNumberFormat) {
-                    DisplayNumberFormat.FLOAT -> printValueFloat(value)
-                    DisplayNumberFormat.SCIENTIFIC -> printValueScientific(value)
-                    DisplayNumberFormat.ENGINEERING -> printValueEngineering(value)
+                    DisplayNumberFormat.FLOAT -> printValueFloat(doubleVal)
+                    DisplayNumberFormat.SCIENTIFIC -> printValueScientific(doubleVal)
+                    DisplayNumberFormat.ENGINEERING -> printValueEngineering(doubleVal)
                 }
             }
         }

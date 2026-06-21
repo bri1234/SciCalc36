@@ -42,7 +42,7 @@ class CalculatorComputation(
     private val state: CalculatorState,
 ) {
 
-    val onResultChanged: ObserverSubject<Double> = ObserverSubject()
+    val onResultChanged: ObserverSubject<CalculatorValue> = ObserverSubject()
 
     private val registerArray: Array<CalculatorValue> = Array(REGISTER_COUNT) { CalculatorValue() }
     private var registerIndex: Int = 0
@@ -77,7 +77,7 @@ class CalculatorComputation(
      * Returns the current top-of-stack register value.
      * @return The value stored in the current register slot.
      */
-    fun getValue() : Double {
+    fun getValue() : CalculatorValue {
         if (registerIndex < operationIndex) {
             check(operationIndex >= 1 && registerIndex == operationIndex - 1)
 
@@ -85,7 +85,15 @@ class CalculatorComputation(
             registerArray[registerIndex].copy(registerArray[registerIndex - 1])
         }
 
-        return registerArray[registerIndex].getDouble()
+        return registerArray[registerIndex]
+    }
+
+    /**
+     * Returns the current top-of-stack register value.
+     * @return The value stored in the current register slot.
+     */
+    fun getDoubleValue() : Double {
+        return getValue().getDouble()
     }
 
     /**
@@ -97,16 +105,12 @@ class CalculatorComputation(
         return if (registerIndex == 0) registerArray[0].getDouble() else registerArray[registerIndex - 1].getDouble()
     }
 
-    private fun removeSignIfZero(value: Double): Double {
-        return if (value == -0.0) 0.0 else value
-    }
-
-    private fun getIntValueIfHexOctBinMode(value: Double): Double {
-        return when (state.calculatorNumberMode) {
+    private fun convertToIntValueIfHexOctBinMode(value: CalculatorValue) {
+        when (state.calculatorNumberMode) {
             CalculatorNumberMode.HEXADECIMAL,
             CalculatorNumberMode.OCTAL,
-            CalculatorNumberMode.BINARY -> value.toLong().toDouble()
-            else -> value
+            CalculatorNumberMode.BINARY -> value.convertToInt()
+            else -> { }
         }
     }
 
@@ -114,26 +118,67 @@ class CalculatorComputation(
      * Sets the current top-of-stack register to [newValue].
      * @param newValue The value to store in the current register.
      */
-    fun setValue(newValue: Double, updateDisplay: Boolean = true) {
-        val newVal = getIntValueIfHexOctBinMode(removeSignIfZero(newValue))
+    fun setValue(newValue: CalculatorValue, updateDisplay: Boolean = true) {
+        val newVal = newValue.clone()
+        convertToIntValueIfHexOctBinMode(newVal)
 
-        registerArray[registerIndex].setDouble(newVal)
+        registerArray[registerIndex] = newVal
 
         if (updateDisplay)
             onResultChanged(newVal)
     }
 
     /**
+     * Sets the current top-of-stack register to [newValue].
+     * @param newValue The value to store in the current register.
+     */
+    fun setDoubleValue(newValue: Double, updateDisplay: Boolean = true) {
+        setValue(CalculatorValue(newValue), updateDisplay)
+    }
+
+    /**
      * Returns the top two register values as a pair, with the current register as the first element
      * and the previous register as the second.
      */
-    fun getTwoValues(): Pair<Double, Double> {
+    fun getTwoValues(): Pair<CalculatorValue, CalculatorValue> {
 
         return if (registerIndex == 0) {
-            Pair(registerArray[0].getDouble(), registerArray[1].getDouble())
+            Pair(registerArray[0], registerArray[1])
         } else {
-            Pair(registerArray[registerIndex].getDouble(), registerArray[registerIndex - 1].getDouble())
+            Pair(registerArray[registerIndex], registerArray[registerIndex - 1])
         }
+    }
+
+    /**
+     * Returns the top two register values as a pair, with the current register as the first element
+     * and the previous register as the second.
+     */
+    fun getTwoDoubleValues(): Pair<Double, Double> {
+        val (a, b) = getTwoValues()
+        return Pair(a.getDouble(), b.getDouble())
+    }
+
+    /**
+     * Sets the top two register values to [first] and [second], with [first] being the current register
+     * and [second] being the previous register.
+     */
+    fun setTwoValues(first: CalculatorValue, second: CalculatorValue, updateDisplay: Boolean = true) {
+        val firstVal = first.clone()
+        val secondVal = second.clone()
+
+        convertToIntValueIfHexOctBinMode(firstVal)
+        convertToIntValueIfHexOctBinMode(secondVal)
+
+        if (registerIndex == 0) {
+            registerArray[0] = firstVal
+            registerArray[1] = secondVal
+        } else {
+            registerArray[registerIndex] = firstVal
+            registerArray[registerIndex - 1] = secondVal
+        }
+
+        if (updateDisplay)
+            onResultChanged(firstVal)
     }
 
     /**
@@ -141,19 +186,7 @@ class CalculatorComputation(
      * and [second] being the previous register.
      */
     fun setTwoValues(first: Double, second: Double, updateDisplay: Boolean = true) {
-        val firstVal = getIntValueIfHexOctBinMode(removeSignIfZero(first))
-        val secondVal = getIntValueIfHexOctBinMode(removeSignIfZero(second))
-
-        if (registerIndex == 0) {
-            registerArray[0].setDouble(firstVal)
-            registerArray[1].setDouble(secondVal)
-        } else {
-            registerArray[registerIndex].setDouble(firstVal)
-            registerArray[registerIndex - 1].setDouble(secondVal)
-        }
-
-        if (updateDisplay)
-            onResultChanged(firstVal)
+        setTwoValues(CalculatorValue(first), CalculatorValue(second), updateDisplay)
     }
 
     /**
@@ -219,7 +252,7 @@ class CalculatorComputation(
      * @throws IllegalArgumentException for unsupported operations.
      */
     private fun calculate(operation: Operation, left: CalculatorValue, right: CalculatorValue): CalculatorValue {
-        val result = left.copy()
+        val result = left.clone()
 
         when (operation) {
             Operation.ADDITION -> result.add(right)
@@ -254,8 +287,8 @@ class CalculatorComputation(
      */
     private fun calculateStackAtIndex(idx : Int): CalculatorValue {
 
-        val leftValue = registerArray[idx].copy()
-        val rightValue = registerArray[idx + 1].copy()
+        val leftValue = registerArray[idx].clone()
+        val rightValue = registerArray[idx + 1].clone()
 
         val result = calculate(operationArray[idx], leftValue, rightValue)
 
@@ -300,7 +333,7 @@ class CalculatorComputation(
                 if ((operationArray[idx].order <= operationArray[idx + 1].order)
                     || (forceEvaluation && (idx == operationIndex - 1))) {
 
-                    lastLeftOperand = calculateStackAtIndex(idx).copy()
+                    lastLeftOperand = calculateStackAtIndex(idx).clone()
 
                     done = false
                     break
@@ -318,7 +351,7 @@ class CalculatorComputation(
 
         }
 
-        onResultChanged(registerArray[registerIndex].getDouble())
+        onResultChanged(registerArray[registerIndex])
         return lastLeftOperand
     }
 
@@ -395,14 +428,14 @@ class CalculatorComputation(
 
         parenthesesArray[operationIndex]++
 
-        onResultChanged(registerArray[registerIndex].getDouble())
+        onResultChanged(registerArray[registerIndex])
     }
 
     fun rightParentheses() {
         if (parenthesesArray[operationIndex] > 0) {
             parenthesesArray[operationIndex]--
             clearRepeatOperationIfNoPendingExpression()
-            onResultChanged(registerArray[registerIndex].getDouble())
+            onResultChanged(registerArray[registerIndex])
             return
         }
 

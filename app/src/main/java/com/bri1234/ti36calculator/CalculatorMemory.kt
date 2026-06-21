@@ -38,7 +38,7 @@ class CalculatorMemory(val computation: CalculatorComputation) {
      */
     val onContentChanged: ObserverSubject<Boolean> = ObserverSubject()
 
-    private val memoryArray = DoubleArray(10)
+    private val memoryArray = Array(10) { CalculatorValue() }
 
     /**
      * Performs [operation] on the selected [memoryCell].
@@ -55,14 +55,14 @@ class CalculatorMemory(val computation: CalculatorComputation) {
         require(memoryCell in 0..9)
 
         when (operation) {
-            MemoryOperation.STORE -> memoryArray[memoryCell] = computation.getValue()
+            MemoryOperation.STORE -> memoryArray[memoryCell] = computation.getValue().clone()
             MemoryOperation.RECALL -> computation.setValue(memoryArray[memoryCell])
             MemoryOperation.EXCHANGE -> {
                 val tmp = memoryArray[memoryCell]
-                memoryArray[memoryCell] = computation.getValue()
+                memoryArray[memoryCell] = computation.getValue().clone()
                 computation.setValue(tmp)
             }
-            MemoryOperation.SUM -> memoryArray[memoryCell] += computation.getValue()
+            MemoryOperation.SUM -> memoryArray[memoryCell].add(computation.getValue())
             MemoryOperation.NONE -> {}
         }
 
@@ -75,12 +75,15 @@ class CalculatorMemory(val computation: CalculatorComputation) {
      * @return `true` if at least one cell is non-zero, otherwise `false`.
      */
     fun hasNonZeroMemory(): Boolean {
-        return memoryArray.any { it != 0.0 }
+        return memoryArray.any { !it.isZero }
     }
 
     /** Clears all memory cells to zero and notifies observers of the empty memory state. */
     fun reset() {
-        memoryArray.fill(0.0)
+        for (mem in memoryArray) {
+            mem.clear()
+        }
+
         onContentChanged(hasNonZeroMemory())
     }
 }

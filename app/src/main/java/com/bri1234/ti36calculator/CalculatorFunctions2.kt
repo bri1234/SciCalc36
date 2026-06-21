@@ -61,14 +61,14 @@ class CalculatorFunctions2(val state: CalculatorState,
      * @throws IllegalStateException If either operand is negative or `n < r`.
      */
     fun nCr() {
-        val (rd, nd) = computation.getTwoValues()
+        val (rd, nd) = computation.getTwoDoubleValues()
         val n = getIntFromDouble(nd)
         val r = getIntFromDouble(rd)
 
         check(n >= 0 && r >= 0 && n >= r) { "nCr is only defined for non-negative integers with n >= r" }
 
         val result = factorial(n) / (factorial(r) * factorial(n - r))
-        computation.setValue(result)
+        computation.setDoubleValue(result)
     }
 
     /**
@@ -81,14 +81,14 @@ class CalculatorFunctions2(val state: CalculatorState,
      * @throws IllegalStateException If either operand is negative or `n < r`.
      */
     fun nPr() {
-        val (rd, nd) = computation.getTwoValues()
+        val (rd, nd) = computation.getTwoDoubleValues()
         val n = getIntFromDouble(nd)
         val r = getIntFromDouble(rd)
 
         check(n >= 0 && r >= 0 && n >= r) { "nPr is only defined for non-negative integers with n >= r" }
 
         val result = factorial(n) / factorial(n - r)
-        computation.setValue(result)
+        computation.setDoubleValue(result)
     }
 
     /**
@@ -101,7 +101,7 @@ class CalculatorFunctions2(val state: CalculatorState,
      * @throws IllegalStateException If no supported angle unit is active.
      */
     fun rectangularToPolar() {
-        val (y, x) = computation.getTwoValues()
+        val (y, x) = computation.getTwoDoubleValues()
 
         val r = hypot(x, y)
         val rad = atan2(y, x)
@@ -127,7 +127,7 @@ class CalculatorFunctions2(val state: CalculatorState,
      * @throws IllegalStateException If no supported angle unit is active.
      */
     fun polarToRectangular() {
-        val (phi, r) = computation.getTwoValues()
+        val (phi, r) = computation.getTwoDoubleValues()
 
         val rad = when {
             isAngleRad() -> phi

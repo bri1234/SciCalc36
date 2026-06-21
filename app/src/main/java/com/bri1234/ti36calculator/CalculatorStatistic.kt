@@ -93,19 +93,19 @@ class CalculatorStatistic(val state: CalculatorState,
     fun addValue(frequency: Int = 1) {
         val count = when (state.calculatorStatisticMode) {
             CalculatorStatisticMode.STAT1 -> {
-                val x = computation.getValue()
+                val x = computation.getDoubleValue()
                 statistic1.add(x, frequency)
                 statistic1.count
             }
             CalculatorStatisticMode.STAT2 -> {
-                val (y, x) = computation.getTwoValues()
+                val (y, x) = computation.getTwoDoubleValues()
                 statistic2.add(x, y, frequency)
                 statistic2.count
             }
             else -> throw IllegalStateException("statisticAddValue called while statistic mode is off")
         }
 
-        computation.setValue(count.toDouble())
+        computation.setDoubleValue(count.toDouble())
     }
 
     /**
@@ -122,19 +122,19 @@ class CalculatorStatistic(val state: CalculatorState,
     fun subtractValue(frequency: Int = 1) {
         val count = when (state.calculatorStatisticMode) {
             CalculatorStatisticMode.STAT1 -> {
-                val x = computation.getValue()
+                val x = computation.getDoubleValue()
                 statistic1.subtract(x, frequency)
                 statistic1.count
             }
             CalculatorStatisticMode.STAT2 -> {
-                val (y, x) = computation.getTwoValues()
+                val (y, x) = computation.getTwoDoubleValues()
                 statistic2.subtract(x, y, frequency)
                 statistic2.count
             }
             else -> throw IllegalStateException("statisticSubtractValue called while statistic mode is off")
         }
 
-        computation.setValue(count.toDouble())
+        computation.setDoubleValue(count.toDouble())
     }
 
     /**
@@ -144,7 +144,7 @@ class CalculatorStatistic(val state: CalculatorState,
      */
     fun printSumX() {
         check(state.calculatorStatisticMode != CalculatorStatisticMode.OFF)
-        computation.setValue(currentStatistic.sumX)
+        computation.setDoubleValue(currentStatistic.sumX)
     }
 
     /**
@@ -154,7 +154,7 @@ class CalculatorStatistic(val state: CalculatorState,
      */
     fun printSumX2() {
         check(state.calculatorStatisticMode != CalculatorStatisticMode.OFF)
-        computation.setValue(currentStatistic.sumX2)
+        computation.setDoubleValue(currentStatistic.sumX2)
     }
 
     /**
@@ -165,7 +165,7 @@ class CalculatorStatistic(val state: CalculatorState,
      */
     fun printSumY() {
         check(state.calculatorStatisticMode != CalculatorStatisticMode.OFF)
-        computation.setValue(currentStatistic.sumY)
+        computation.setDoubleValue(currentStatistic.sumY)
     }
 
     /**
@@ -176,7 +176,7 @@ class CalculatorStatistic(val state: CalculatorState,
      */
     fun printSumY2() {
         check(state.calculatorStatisticMode != CalculatorStatisticMode.OFF)
-        computation.setValue(currentStatistic.sumY2)
+        computation.setDoubleValue(currentStatistic.sumY2)
     }
 
     /**
@@ -187,7 +187,7 @@ class CalculatorStatistic(val state: CalculatorState,
      */
     fun printSumXY() {
         check(state.calculatorStatisticMode != CalculatorStatisticMode.OFF)
-        computation.setValue(currentStatistic.sumXY)
+        computation.setDoubleValue(currentStatistic.sumXY)
     }
 
     /**
@@ -197,7 +197,7 @@ class CalculatorStatistic(val state: CalculatorState,
      */
     fun printCount() {
         check(state.calculatorStatisticMode != CalculatorStatisticMode.OFF)
-        computation.setValue(currentStatistic.count.toDouble())
+        computation.setDoubleValue(currentStatistic.count.toDouble())
     }
 
     /**
@@ -209,7 +209,7 @@ class CalculatorStatistic(val state: CalculatorState,
         check(state.calculatorStatisticMode != CalculatorStatisticMode.OFF)
         check(currentStatistic.count > 0)
 
-        computation.setValue(currentStatistic.sumX / currentStatistic.count)
+        computation.setDoubleValue(currentStatistic.sumX / currentStatistic.count)
     }
 
     /**
@@ -222,7 +222,7 @@ class CalculatorStatistic(val state: CalculatorState,
         check(state.calculatorStatisticMode != CalculatorStatisticMode.OFF)
         check(currentStatistic.count > 0)
 
-        computation.setValue(currentStatistic.sumY / currentStatistic.count)
+        computation.setDoubleValue(currentStatistic.sumY / currentStatistic.count)
     }
 
     /**
@@ -236,7 +236,7 @@ class CalculatorStatistic(val state: CalculatorState,
 
         val meanX = currentStatistic.sumX / currentStatistic.count
         val varianceX = currentStatistic.sumX2 / currentStatistic.count - (meanX * meanX)
-        computation.setValue(sqrt(varianceX))
+        computation.setDoubleValue(sqrt(varianceX))
     }
 
     /**
@@ -251,7 +251,7 @@ class CalculatorStatistic(val state: CalculatorState,
 
         val meanY = currentStatistic.sumY / currentStatistic.count
         val varianceY = currentStatistic.sumY2 / currentStatistic.count - (meanY * meanY)
-        computation.setValue(sqrt(varianceY))
+        computation.setDoubleValue(sqrt(varianceY))
     }
 
     /**
@@ -265,7 +265,7 @@ class CalculatorStatistic(val state: CalculatorState,
 
         val meanX = currentStatistic.sumX / currentStatistic.count
         val varianceX = (currentStatistic.sumX2 - (currentStatistic.sumX * meanX)) / (currentStatistic.count - 1)
-        computation.setValue(sqrt(varianceX))
+        computation.setDoubleValue(sqrt(varianceX))
     }
 
     /**
@@ -280,7 +280,7 @@ class CalculatorStatistic(val state: CalculatorState,
 
         val meanY = currentStatistic.sumY / currentStatistic.count
         val varianceY = (currentStatistic.sumY2 - (currentStatistic.sumY * meanY)) / (currentStatistic.count - 1)
-        computation.setValue(sqrt(varianceY))
+        computation.setDoubleValue(sqrt(varianceY))
     }
 
     /**
@@ -291,7 +291,7 @@ class CalculatorStatistic(val state: CalculatorState,
      */
     fun printCorrelationCoefficient() {
         check(state.calculatorStatisticMode == CalculatorStatisticMode.STAT2)
-        computation.setValue(currentStatistic.correlationCoefficient())
+        computation.setDoubleValue(currentStatistic.correlationCoefficient())
     }
 
     /**
@@ -302,7 +302,7 @@ class CalculatorStatistic(val state: CalculatorState,
      */
     fun printIntercept() {
         check(state.calculatorStatisticMode == CalculatorStatisticMode.STAT2)
-        computation.setValue(currentStatistic.intercept())
+        computation.setDoubleValue(currentStatistic.intercept())
     }
 
     /**
@@ -313,7 +313,7 @@ class CalculatorStatistic(val state: CalculatorState,
      */
     fun printSlope() {
         check(state.calculatorStatisticMode == CalculatorStatisticMode.STAT2)
-        computation.setValue(currentStatistic.slope())
+        computation.setDoubleValue(currentStatistic.slope())
     }
 
     /**
@@ -325,9 +325,9 @@ class CalculatorStatistic(val state: CalculatorState,
     fun printPredictedX() {
         check(state.calculatorStatisticMode == CalculatorStatisticMode.STAT2)
 
-        val y = computation.getValue()
+        val y = computation.getDoubleValue()
         val predictedX = (y - currentStatistic.intercept()) / currentStatistic.slope()
-        computation.setValue(predictedX)
+        computation.setDoubleValue(predictedX)
     }
 
     /**
@@ -339,8 +339,8 @@ class CalculatorStatistic(val state: CalculatorState,
     fun printPredictedY() {
         check(state.calculatorStatisticMode == CalculatorStatisticMode.STAT2)
         
-        val x = computation.getValue()
+        val x = computation.getDoubleValue()
         val predictedY = currentStatistic.intercept() + currentStatistic.slope() * x
-        computation.setValue(predictedY)
+        computation.setDoubleValue(predictedY)
     }
 }

@@ -122,7 +122,7 @@ class CalculatorCore(
         if (forceClearPendingOperations || !input.isEditMode)
             computation.reset()
 
-        computation.setValue(0.0)
+        computation.setDoubleValue(0.0)
         input.reset()
     }
 
@@ -557,7 +557,7 @@ class CalculatorCore(
                 CalculatorButton.DIVIDE -> 6.6743015E-11 // gravitational constant in m^3/(kg*s^2)
                 else -> throw IllegalArgumentException("Invalid button for constant mode")
             }
-            computation.setValue(constant)
+            computation.setDoubleValue(constant)
             return true
 
         } catch (_: Exception) {
@@ -566,8 +566,8 @@ class CalculatorCore(
     }
 
     fun pi() {
-        computation.getValue()
-        computation.setValue(Math.PI)
+        computation.getDoubleValue()
+        computation.setDoubleValue(Math.PI)
     }
 
     /**
@@ -674,8 +674,8 @@ class CalculatorCore(
             CalculatorNumberMode.HEXADECIMAL,
             CalculatorNumberMode.OCTAL,
             CalculatorNumberMode.BINARY -> {
-                val intValue = computation.getValue().toLong()
-                computation.setValue(intValue.toDouble())
+                val intValue = computation.getDoubleValue().toLong()
+                computation.setDoubleValue(intValue.toDouble())
             }
             else -> { }
         }
@@ -707,7 +707,7 @@ class CalculatorCore(
             return
 
         val inputValue = display.convertDisplayValueToNumeric()
-        computation.setValue(inputValue, false)
+        computation.setDoubleValue(inputValue, false)
     }
 
     /** Called when edit mode begins; signals the computation to accept a new number. */
@@ -725,7 +725,7 @@ class CalculatorCore(
      *
      * @param value The new result value to display.
      */
-    private fun onResultChanged(value : Double) {
+    private fun onResultChanged(value : CalculatorValue) {
         display.printValue(value)
     }
 
@@ -733,7 +733,7 @@ class CalculatorCore(
      * Displays the current value on the display in degrees, minutes, and seconds format.
      */
     private fun viewCurrentValueAsDegreesMinutesSeconds() {
-        val currentValue = computation.getValue()
+        val currentValue = computation.getDoubleValue()
         display.viewValueAsDegreesMinutesSeconds(currentValue)
     }
 
@@ -747,24 +747,24 @@ class CalculatorCore(
 
             CalculatorAngleUnit.DEG -> {
                 if (convert) {
-                    val value = computation.getValue()
-                    computation.setValue(value * Math.PI / 180)
+                    val value = computation.getDoubleValue()
+                    computation.setDoubleValue(value * Math.PI / 180)
                 }
                 CalculatorAngleUnit.RAD
             }
 
             CalculatorAngleUnit.RAD -> {
                 if (convert) {
-                    val value = computation.getValue()
-                    computation.setValue(value * 200 / Math.PI)
+                    val value = computation.getDoubleValue()
+                    computation.setDoubleValue(value * 200 / Math.PI)
                 }
                 CalculatorAngleUnit.GRAD
             }
 
             CalculatorAngleUnit.GRAD -> {
                 if (convert) {
-                    val value = computation.getValue()
-                    computation.setValue(value * 180 / 200)
+                    val value = computation.getDoubleValue()
+                    computation.setDoubleValue(value * 180 / 200)
                 }
                 CalculatorAngleUnit.DEG
             }
