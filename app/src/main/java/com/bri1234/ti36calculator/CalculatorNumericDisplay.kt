@@ -20,6 +20,7 @@ package com.bri1234.ti36calculator
 
 import com.bri1234.ti36calculator.enums.CalculatorNumberMode
 import com.bri1234.ti36calculator.enums.DisplayNumberFormat
+import com.bri1234.ti36calculator.enums.Presentation
 import com.bri1234.ti36calculator.enums.RectangularPolarView
 import com.bri1234.ti36calculator.utils.ObserverSubject
 import java.util.Locale
@@ -167,8 +168,8 @@ class CalculatorNumericDisplay(val state: CalculatorState)  {
      */
     fun printValue(value: CalculatorValue) {
 
-        if (value.isFraction) {
-            // TODO: fraction display mode
+        if (value.isFraction && printFraction(value)) {
+            onPrint(Unit)
             return
         }
 
@@ -176,11 +177,13 @@ class CalculatorNumericDisplay(val state: CalculatorState)  {
 
         if (doubleVal.isNaN()) {
             printNan()
+            onPrint(Unit)
             return
         }
 
         if (doubleVal.isInfinite()) {
             printInf(doubleVal > 0)
+            onPrint(Unit)
             return
         }
 
@@ -201,6 +204,50 @@ class CalculatorNumericDisplay(val state: CalculatorState)  {
         }
 
         onPrint(Unit)
+    }
+
+    /**
+     * Prints [value] as a mixed fraction when it fits into the fraction display.
+     *
+     * @return `true` when the fraction was printed, or `false` when decimal fallback is required.
+     */
+    private fun printFraction(value: CalculatorValue): Boolean {
+        if (!value.isFraction)
+            return false
+
+        val fraction = value.getFraction()
+        val fractionString = when (value.presentation) {
+            Presentation.FRACTION_MIXED -> {
+                val parts = fraction.toMixedFractionParts()
+
+                when {
+                    parts.numerator == 0 -> parts.wholePart.toString()
+                    parts.wholePart == 0 -> "${parts.numerator};${parts.denominator}"
+                    else -> "${parts.wholePart}_${parts.numerator};${parts.denominator}"
+                }
+            }
+
+            Presentation.FRACTION_IMPROPER -> {
+                if (fraction.isInteger) {
+                    fraction.numerator.toString()
+                } else {
+                    "${fraction.numerator};${fraction.denominator}"
+                }
+            }
+
+            Presentation.DECIMAL -> return false
+        }
+
+        if (fractionString.length > NUM_MANTISSA_DIGITS)
+            return false
+
+        fractionString.padStart(NUM_MANTISSA_DIGITS, ' ')
+            .toCharArray()
+            .copyInto(displayMantissa)
+        displayDecimalPointPos = -1
+        displayExponent.fill(' ')
+
+        return true
     }
 
     /** Prints a double value in binary format with radix 2 and 10 bits for the integer part.

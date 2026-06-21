@@ -95,6 +95,15 @@ class CalculatorValue() {
     /** Returns whether the current value is stored and presented as a fraction. */
     val isFraction: Boolean get() = _presentation != Presentation.DECIMAL
 
+    /** Returns the exact fraction value. */
+    fun getFraction(): Fraction {
+        check(isFraction) { "Value is not a fraction" }
+        return _valueFraction
+    }
+
+    /** Returns the current display presentation. */
+    val presentation: Presentation get() = _presentation
+
     /** Returns whether the current value is zero. */
     val isZero: Boolean get() = if (isFraction) _valueFraction.isZero else _valueDouble == 0.0
 
