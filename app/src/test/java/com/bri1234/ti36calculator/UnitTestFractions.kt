@@ -93,6 +93,9 @@ class UnitTestFractions {
         calc.testStep("AC/ON 1 ab/c 2 SCI F<>D", "5.", "-01", "DEG")
 
         calc.testStep("AC/ON 1 ab/c 2 = + 5 =", "5_1;2", "", "DEG")
+
+        calc.testStep("AC/ON 1 . ab/c", "1.", "", "DEG")
+        calc.testStep("AC/ON 1 . 5 ab/c", "1.5", "", "DEG")
     }
 
     @Test

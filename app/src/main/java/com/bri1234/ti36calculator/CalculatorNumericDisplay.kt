@@ -21,7 +21,6 @@ package com.bri1234.ti36calculator
 import com.bri1234.ti36calculator.enums.CalculatorNumberMode
 import com.bri1234.ti36calculator.enums.DisplayNumberFormat
 import com.bri1234.ti36calculator.enums.Presentation
-import com.bri1234.ti36calculator.enums.RectangularPolarView
 import com.bri1234.ti36calculator.utils.ObserverSubject
 import java.util.Locale
 import kotlin.math.floor
@@ -78,27 +77,78 @@ class CalculatorNumericDisplay(val state: CalculatorState)  {
      * Sets the display to show all segments lit up, which is typically used for testing or demonstration purposes.
      * This method fills the mantissa with '8's, sets the decimal point position to 1, and fills the exponent with '8's.
      */
-//    fun displayViewAllSegments() {
-//        "-8888888888".toCharArray().copyInto(displayMantissa)
-//        displayDecimalPointPos = 1
-//        "-88".toCharArray().copyInto(displayExponent)
-//    }
+    fun displayViewAllSegments() {
+        "-8888888888".toCharArray().copyInto(displayMantissa)
+        displayDecimalPointPos = 1
+        "-88".toCharArray().copyInto(displayExponent)
+    }
 
-    /**
-     * Converts the current display value (mantissa and exponent) into a numeric double value.
-     * @return The numeric value represented by the current display state.
-     */
+    /** Converts the current display contents into a calculator value. */
     fun convertDisplayValueToNumeric(): CalculatorValue {
-        val v = when (state.calculatorNumberMode) {
+        if (state.calculatorNumberMode == CalculatorNumberMode.DECIMAL) {
+            val value = parseFractionInput()
+            if (value != null)
+                return value
+        }
+
+        val doubleValue = when (state.calculatorNumberMode) {
             CalculatorNumberMode.HEXADECIMAL -> parseIntegerInput(16, NUM_HEX_BITS)
             CalculatorNumberMode.OCTAL -> parseIntegerInput(8, NUM_OCT_BITS)
             CalculatorNumberMode.BINARY -> parseIntegerInput(2, NUM_BIN_BITS)
             CalculatorNumberMode.DECIMAL -> parseDecimalInput()
         }
 
-        // TODO: parse fraction display value
+        return CalculatorValue(doubleValue)
+    }
 
-        return CalculatorValue(v)
+    /** Parses an entered simple or mixed fraction, or returns `null` for decimal input. */
+    private fun parseFractionInput(): CalculatorValue? {
+        val input = displayMantissa.concatToString().trim()
+        if (';' !in input && '_' !in input)
+            return null
+
+        require(displayDecimalPointPos == -1 && displayExponent.all { it == ' ' }) {
+            "Fraction input must not contain a decimal point or exponent"
+        }
+
+        val isNegative = input.startsWith('-')
+        val unsignedInput = input.removePrefix("-")
+        val fraction: Fraction
+        val presentation: Presentation
+
+        if ('_' in unsignedInput) {
+            val mixedParts = unsignedInput.split('_', limit = 2)
+            require(mixedParts.size == 2 && mixedParts.all { it.isNotEmpty() }) {
+                "Invalid mixed fraction input: $input"
+            }
+
+            val fractionParts = mixedParts[1].split(';', limit = 2)
+            require(fractionParts.size == 2 && fractionParts.all { it.isNotEmpty() }) {
+                "Invalid mixed fraction input: $input"
+            }
+
+            fraction = Fraction(
+                mixedParts[0].toInt(),
+                fractionParts[0].toInt(),
+                fractionParts[1].toInt(),
+            )
+            presentation = Presentation.FRACTION_MIXED
+        } else {
+            val fractionParts = unsignedInput.split(';', limit = 2)
+            require(fractionParts.size == 2 && fractionParts.all { it.isNotEmpty() }) {
+                "Invalid fraction input: $input"
+            }
+
+            fraction = Fraction(fractionParts[0].toInt(), fractionParts[1].toInt())
+            presentation = Presentation.FRACTION_IMPROPER
+        }
+
+        val signedFraction = if (isNegative) fraction.negate() else fraction
+        val result = CalculatorValue(signedFraction)
+        if (presentation == Presentation.FRACTION_IMPROPER)
+            result.changePresentationFractionFromMixedToImproper()
+
+        return result
     }
 
     private fun parseDecimalInput(): Double {

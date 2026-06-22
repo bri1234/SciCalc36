@@ -126,18 +126,30 @@ class CalculatorInput(val state: CalculatorState,
             DigitInputMode.EXPONENT,
             DigitInputMode.FREQUENCY -> { return }
             DigitInputMode.MANTISSA -> {
+                if (display.displayDecimalPointPos != -1)
+                    return
+
+                if (!digitInputModeMantissa(';'))
+                    return
+
                 digitInputMode = DigitInputMode.FRACTION
-                // TODO: input _
             }
             DigitInputMode.FRACTION -> {
+                val separatorIndex = display.displayMantissa.indexOf(';')
+                if (separatorIndex == -1 ||
+                    (separatorIndex + 1..<NUM_MANTISSA_DIGITS)
+                        .none { display.displayMantissa[it].isDigit() } ||
+                    inputPositionMantissa < 1) {
+                    return
+                }
+
+                display.displayMantissa[separatorIndex] = '_'
+                check(digitInputModeMantissa(';'))
                 digitInputMode = DigitInputMode.FRACTION_MIXED
-                // TODO: input ;
             }
 
-            DigitInputMode.FRACTION_MIXED -> { }
+            DigitInputMode.FRACTION_MIXED -> { return }
         }
-
-        onEditInputChanged(Unit)
     }
 
     /**
@@ -212,8 +224,12 @@ class CalculatorInput(val state: CalculatorState,
      * @param digitCh The digit character to input (0-9).
      */
     private fun digitInputModeFraction(digitCh: Char) : Boolean {
-        // TODO: to be implemented ...
-        return true
+        require(digitCh.isDigit()) { "Invalid digit for fraction input: $digitCh" }
+
+        if (display.displayMantissa.count { it.isDigit() } >= 8)
+            return false
+
+        return digitInputModeMantissa(digitCh)
     }
 
     /**
@@ -221,8 +237,12 @@ class CalculatorInput(val state: CalculatorState,
      * @param digitCh The digit character to input (0-9).
      */
     private fun digitInputModeFractionMixed(digitCh: Char) : Boolean {
-        // TODO: to be implemented ...
-        return true
+        require(digitCh.isDigit()) { "Invalid digit for mixed fraction input: $digitCh" }
+
+        if (display.displayMantissa.count { it.isDigit() } >= 8)
+            return false
+
+        return digitInputModeMantissa(digitCh)
     }
 
     /**
