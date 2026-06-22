@@ -257,7 +257,7 @@ class CalculatorCore(
             CalculatorButton.FIVE -> input.inputDigit(5)
             CalculatorButton.SIX -> input.inputDigit(6)
             CalculatorButton.PLUS -> computation.addition()
-            CalculatorButton.A_B_C -> notImplemented("A_B_C")
+            CalculatorButton.A_B_C -> input.inputFractionKey()
             CalculatorButton.ONE -> input.inputDigit(1)
             CalculatorButton.TWO -> input.inputDigit(2)
             CalculatorButton.THREE -> input.inputDigit(3)
@@ -708,7 +708,7 @@ class CalculatorCore(
             return
 
         val inputValue = display.convertDisplayValueToNumeric()
-        computation.setDoubleValue(inputValue, false)
+        computation.setValue(inputValue, false)
     }
 
     /** Called when edit mode begins; signals the computation to accept a new number. */
@@ -867,13 +867,6 @@ class CalculatorCore(
 
     private fun noOperation() {
         // do nothing
-    }
-
-    /**
-     * Displays a "not implemented" message on the display.
-     */
-    private fun notImplemented(functionName: String) {
-        logger.info("function $functionName is not implemented")
     }
 
     /**

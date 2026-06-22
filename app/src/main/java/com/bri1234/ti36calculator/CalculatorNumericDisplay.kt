@@ -88,13 +88,17 @@ class CalculatorNumericDisplay(val state: CalculatorState)  {
      * Converts the current display value (mantissa and exponent) into a numeric double value.
      * @return The numeric value represented by the current display state.
      */
-    fun convertDisplayValueToNumeric(): Double {
-        return when (state.calculatorNumberMode) {
+    fun convertDisplayValueToNumeric(): CalculatorValue {
+        val v = when (state.calculatorNumberMode) {
             CalculatorNumberMode.HEXADECIMAL -> parseIntegerInput(16, NUM_HEX_BITS)
             CalculatorNumberMode.OCTAL -> parseIntegerInput(8, NUM_OCT_BITS)
             CalculatorNumberMode.BINARY -> parseIntegerInput(2, NUM_BIN_BITS)
             CalculatorNumberMode.DECIMAL -> parseDecimalInput()
         }
+
+        // TODO: parse fraction display value
+
+        return CalculatorValue(v)
     }
 
     private fun parseDecimalInput(): Double {

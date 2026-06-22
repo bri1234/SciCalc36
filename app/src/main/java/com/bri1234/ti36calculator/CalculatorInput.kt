@@ -25,7 +25,9 @@ import java.util.Locale
 private enum class DigitInputMode {
     MANTISSA,
     EXPONENT,
-    FREQUENCY
+    FREQUENCY,
+    FRACTION,
+    FRACTION_MIXED
 }
 
 class CalculatorInput(val state: CalculatorState,
@@ -97,11 +99,45 @@ class CalculatorInput(val state: CalculatorState,
             DigitInputMode.MANTISSA -> digitInputModeMantissa(digitCh)
             DigitInputMode.EXPONENT -> digitInputModeExponent(digitCh)
             DigitInputMode.FREQUENCY -> digitInputModeFrequency(digitCh)
+            DigitInputMode.FRACTION -> digitInputModeFraction(digitCh)
+            DigitInputMode.FRACTION_MIXED -> digitInputModeFractionMixed(digitCh)
         }
 
         if (inputHasChanged) {
             onEditInputChanged(Unit)
         }
+    }
+
+    /**
+     * Fraction key pressed.
+     */
+    fun inputFractionKey() {
+        when (state.calculatorNumberMode) {
+            CalculatorNumberMode.HEXADECIMAL,
+            CalculatorNumberMode.OCTAL,
+            CalculatorNumberMode.BINARY -> { return }
+            else -> { }
+        }
+
+        if (!isEditMode)
+            return
+
+        when (digitInputMode) {
+            DigitInputMode.EXPONENT,
+            DigitInputMode.FREQUENCY -> { return }
+            DigitInputMode.MANTISSA -> {
+                digitInputMode = DigitInputMode.FRACTION
+                // TODO: input _
+            }
+            DigitInputMode.FRACTION -> {
+                digitInputMode = DigitInputMode.FRACTION_MIXED
+                // TODO: input ;
+            }
+
+            DigitInputMode.FRACTION_MIXED -> { }
+        }
+
+        onEditInputChanged(Unit)
     }
 
     /**
@@ -168,6 +204,24 @@ class CalculatorInput(val state: CalculatorState,
         display.displayMantissa[o + 3] = display.displayMantissa[o + 4]
         display.displayMantissa[o + 4] = digitCh
 
+        return true
+    }
+
+    /**
+     * Inputs a digit in fraction input mode.
+     * @param digitCh The digit character to input (0-9).
+     */
+    private fun digitInputModeFraction(digitCh: Char) : Boolean {
+        // TODO: to be implemented ...
+        return true
+    }
+
+    /**
+     * Inputs a digit in fraction mixed input mode: 5_7;9 (fraction with whole part, nominator, and denominator).
+     * @param digitCh The digit character to input (0-9).
+     */
+    private fun digitInputModeFractionMixed(digitCh: Char) : Boolean {
+        // TODO: to be implemented ...
         return true
     }
 
@@ -240,6 +294,12 @@ class CalculatorInput(val state: CalculatorState,
                     else -> error("Invalid state: plus/minus can only be toggled on a space or a minus sign")
                 }
             }
+            DigitInputMode.FRACTION -> {
+                // TODO: to be implemented ...
+            }
+            DigitInputMode.FRACTION_MIXED -> {
+                // TODO: to be implemented ...
+            }
             else -> {
                 throw IllegalStateException("Plus/minus input is not supported in frequency input mode")
             }
@@ -252,6 +312,8 @@ class CalculatorInput(val state: CalculatorState,
      * Removes the last entered digit from the mantissa, shifting the remaining digits to the right.
      */
     fun inputBack() {
+        // TODO: implement backspace for fraction input modes
+
         if (!isEditMode || (digitInputMode != DigitInputMode.MANTISSA))
             return
 
