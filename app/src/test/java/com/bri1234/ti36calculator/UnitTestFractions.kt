@@ -283,4 +283,54 @@ class UnitTestFractions {
 
     }
 
+    @Test
+    fun testIntegerLeftFractionArithmetic() {
+        val calc = CalculatorCore()
+
+        calc.testStep("AC/ON 3 + 1 ab/c 2 =", "3_1;2", "", "DEG")
+        calc.testStep("AC/ON 3 - 1 ab/c 2 =", "2_1;2", "", "DEG")
+        calc.testStep("AC/ON 3 * 1 ab/c 2 =", "1_1;2", "", "DEG")
+        calc.testStep("AC/ON 3 / 1 ab/c 2 =", "6", "", "DEG")
+    }
+
+    @Test
+    fun testMixedAndNegativeFractionArithmetic() {
+        val calc = CalculatorCore()
+
+        calc.testStep(
+            "AC/ON 1 ab/c 1 ab/c 2 * 2 ab/c 1 ab/c 3 +/- =",
+            "-3_1;2",
+            "",
+            "DEG",
+        )
+        calc.testStep(
+            "AC/ON 1 ab/c 1 ab/c 2 +/- / 2 ab/c 1 ab/c 4 =",
+            "-2;3",
+            "",
+            "DEG",
+        )
+        calc.testStep("AC/ON 1 ab/c 2 / 0 =", "Error  ", "", "DEG")
+    }
+
+    @Test
+    fun testFractionRootsAndDecimalCombination() {
+        val calc = CalculatorCore()
+
+        calc.testStep("AC/ON 1 ab/c 4 sqrt", "0.5", "", "DEG")
+        calc.testStep("AC/ON 8 ab/c 2 7 cbrt", "0.666666667", "", "DEG")
+        calc.testStep("AC/ON 1 ab/c 1 6 yrootx 2 =", "0.25", "", "DEG")
+
+        calc.testStep("AC/ON 0 . 5 + 1 ab/c 3 =", "0.833333333", "", "DEG")
+        calc.testStep("AC/ON 0 . 5 * 1 ab/c 2 =", "0.25", "", "DEG")
+    }
+
+    @Test
+    fun testFractionPresentationToggleClearsRepeatOperation() {
+        val calc = CalculatorCore()
+
+        calc.testStep("AC/ON 1 2 ab/c 7 * 9 =", "15_3;7", "", "DEG")
+        calc.testStep("d/c =", "108;7", "", "DEG")
+        calc.testStep("=", "108;7", "", "DEG")
+    }
+
 }

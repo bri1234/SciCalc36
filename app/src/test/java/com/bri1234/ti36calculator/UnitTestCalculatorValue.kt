@@ -22,6 +22,7 @@ import com.bri1234.ti36calculator.enums.Presentation
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotSame
+import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -131,6 +132,46 @@ class UnitTestCalculatorValue {
             value.changePresentationDecimalToFraction()
             assertEquals(Presentation.DECIMAL, value.presentation)
             assertFalse(value.isFraction)
+        }
+    }
+
+    @Test
+    fun testArithmeticWithFractionsAndIntegers() {
+        val add = CalculatorValue(3.0)
+        add.add(CalculatorValue(Fraction(1, 2)))
+        assertEquals(Fraction(7, 2), add.getFraction())
+
+        val subtract = CalculatorValue(3.0)
+        subtract.subtract(CalculatorValue(Fraction(1, 2)))
+        assertEquals(Fraction(5, 2), subtract.getFraction())
+
+        val multiply = CalculatorValue(3.0)
+        multiply.multiply(CalculatorValue(Fraction(1, 2)))
+        assertEquals(Fraction(3, 2), multiply.getFraction())
+
+        val divide = CalculatorValue(3.0)
+        divide.divide(CalculatorValue(Fraction(1, 2)))
+        assertEquals(Fraction(6), divide.getFraction())
+
+        val decimal = CalculatorValue(0.5)
+        decimal.add(CalculatorValue(Fraction(1, 3)))
+        assertFalse(decimal.isFraction)
+        assertEquals(5.0 / 6.0, decimal.getDouble(), 1e-15)
+    }
+
+    @Test
+    fun testFractionArithmeticOverflow() {
+        assertThrows(ArithmeticException::class.java) {
+            CalculatorValue(Fraction(Int.MAX_VALUE)).add(CalculatorValue(Fraction(1)))
+        }
+        assertThrows(ArithmeticException::class.java) {
+            CalculatorValue(Fraction(Int.MIN_VALUE)).subtract(CalculatorValue(Fraction(1)))
+        }
+        assertThrows(ArithmeticException::class.java) {
+            CalculatorValue(Fraction(Int.MAX_VALUE)).multiply(CalculatorValue(Fraction(2)))
+        }
+        assertThrows(ArithmeticException::class.java) {
+            CalculatorValue(Fraction(Int.MIN_VALUE)).divide(CalculatorValue(Fraction(-1)))
         }
     }
 }
