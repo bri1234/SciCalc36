@@ -82,7 +82,7 @@ class UnitTestFractions {
         calc.testStep("AC/ON 1 3 ab/c /", "Error  ", "", "DEG")
 
         calc.testStep("AC/ON 1 3 ab/c .", "13;", "", "DEG")
-        calc.testStep("AC/ON 1 ab/c 2 ab/c .", "1;2", "", "DEG")
+        calc.testStep("AC/ON 1 ab/c 2 ab/c .", "1_2;", "", "DEG")
 
         calc.testStep("AC/ON 1 ab/c 2 ab/c 3 ab/c 4", "1_2;34", "", "DEG")
         calc.testStep("AC/ON 1 ab/c 2 ab/c 3 ab/c 4", "1_2;34", "", "DEG")

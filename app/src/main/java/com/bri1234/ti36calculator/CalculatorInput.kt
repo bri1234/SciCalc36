@@ -300,7 +300,9 @@ class CalculatorInput(val state: CalculatorState,
             return
 
         when (digitInputMode) {
-            DigitInputMode.MANTISSA -> {
+            DigitInputMode.MANTISSA,
+            DigitInputMode.FRACTION,
+            DigitInputMode.FRACTION_MIXED -> {
                 when (display.displayMantissa[inputPositionMantissa]) {
                     ' ' -> display.displayMantissa[inputPositionMantissa] = '-'
                     '-' -> display.displayMantissa[inputPositionMantissa] = ' '
@@ -314,15 +316,15 @@ class CalculatorInput(val state: CalculatorState,
                     else -> error("Invalid state: plus/minus can only be toggled on a space or a minus sign")
                 }
             }
-            DigitInputMode.FRACTION -> {
-                // TODO: to be implemented ...
-            }
-            DigitInputMode.FRACTION_MIXED -> {
-                // TODO: to be implemented ...
-            }
             else -> {
                 throw IllegalStateException("Plus/minus input is not supported in frequency input mode")
             }
+        }
+
+        if ((digitInputMode == DigitInputMode.FRACTION ||
+                    digitInputMode == DigitInputMode.FRACTION_MIXED) &&
+            display.displayMantissa.last() == ';') {
+            return
         }
 
         onEditInputChanged(Unit)
@@ -332,9 +334,16 @@ class CalculatorInput(val state: CalculatorState,
      * Removes the last entered digit from the mantissa, shifting the remaining digits to the right.
      */
     fun inputBack() {
-        // TODO: implement backspace for fraction input modes
+        if (!isEditMode)
+            return
 
-        if (!isEditMode || (digitInputMode != DigitInputMode.MANTISSA))
+        if (digitInputMode == DigitInputMode.FRACTION ||
+            digitInputMode == DigitInputMode.FRACTION_MIXED) {
+            inputBackFraction()
+            return
+        }
+
+        if (digitInputMode != DigitInputMode.MANTISSA)
             return
 
         if (inputPositionMantissa >= NUM_MANTISSA_DIGITS - 1)
@@ -372,6 +381,50 @@ class CalculatorInput(val state: CalculatorState,
             display.displayMantissa[inputPositionMantissa] = '-'
 
         onEditInputChanged(Unit)
+    }
+
+    /** Removes the last character from a simple or mixed fraction input. */
+    private fun inputBackFraction() {
+        if (inputPositionMantissa >= NUM_MANTISSA_DIGITS - 1)
+            return
+
+        val wasMixedInput = digitInputMode == DigitInputMode.FRACTION_MIXED
+        val removesSeparator = display.displayMantissa.last() == ';'
+
+        if (wasMixedInput && removesSeparator) {
+            val mixedSeparatorIndex = display.displayMantissa.indexOf('_')
+            check(mixedSeparatorIndex != -1)
+            display.displayMantissa[mixedSeparatorIndex] = ';'
+        }
+
+        val hasMinus = display.displayMantissa[inputPositionMantissa] == '-'
+        if (hasMinus)
+            display.displayMantissa[inputPositionMantissa] = ' '
+
+        for (idx in NUM_MANTISSA_DIGITS - 1 downTo inputPositionMantissa + 1)
+            display.displayMantissa[idx] = display.displayMantissa[idx - 1]
+
+        inputPositionMantissa++
+        display.displayMantissa[inputPositionMantissa] = ' '
+
+        if (hasMinus)
+            display.displayMantissa[inputPositionMantissa] = '-'
+
+        if (removesSeparator) {
+            digitInputMode = if (wasMixedInput) {
+                DigitInputMode.FRACTION
+            } else {
+                DigitInputMode.MANTISSA
+            }
+        }
+
+        val isIncompleteFraction =
+            (digitInputMode == DigitInputMode.FRACTION ||
+                    digitInputMode == DigitInputMode.FRACTION_MIXED) &&
+                    display.displayMantissa.last() == ';'
+
+        if (!isIncompleteFraction)
+            onEditInputChanged(Unit)
     }
 
     /**
