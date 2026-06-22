@@ -451,6 +451,11 @@ class CalculatorComputation(
         }
     }
 
+    /** Clears a stored repeat operation without modifying a pending expression. */
+    fun clearRepeatOperation() {
+        clearRepeatOperationIfNoPendingExpression()
+    }
+
     fun addition() = operation(Operation.ADDITION)
     fun subtraction() = operation(Operation.SUBTRACTION)
     fun multiplication() = operation(Operation.MULTIPLICATION)

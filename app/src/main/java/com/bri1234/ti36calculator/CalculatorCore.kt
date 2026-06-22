@@ -203,6 +203,7 @@ class CalculatorCore(
 
         } catch (e: Exception) {
             logger.error("Error during button press", e)
+            state.calculatorFunction = CalculatorFunction.FIRST
             isErrorState = true
             display.printError()
         }
@@ -799,6 +800,7 @@ class CalculatorCore(
         else
             value.changePresentationDecimalToFraction()
 
+        computation.clearRepeatOperation()
         computation.setValue(value)
     }
 
@@ -816,6 +818,7 @@ class CalculatorCore(
             Presentation.DECIMAL -> return
         }
 
+        computation.clearRepeatOperation()
         computation.setValue(value)
     }
 
