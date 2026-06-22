@@ -78,6 +78,11 @@ class CalculatorInput(val state: CalculatorState,
         onEditModeEnd(Unit)
     }
 
+    /** Returns whether a simple or mixed fraction is currently being entered. */
+    fun isFractionEditMode(): Boolean =
+        isEditMode && (digitInputMode == DigitInputMode.FRACTION ||
+                digitInputMode == DigitInputMode.FRACTION_MIXED)
+
     /**
      * Inputs a digit into the mantissa or exponent, depending on the current edit mode.
      * @param digit The digit to input (0-9).

@@ -161,6 +161,8 @@ class CalculatorCore(
         }
 
         try {
+            completeFractionInputIfRequired(button)
+
             when (button) {
                 CalculatorButton.AC_ON -> buttonPressedAcOn()
                 CalculatorButton.SECOND -> buttonPressedSecond()
@@ -206,6 +208,64 @@ class CalculatorCore(
         }
 
         if (BuildConfig.DEBUG) computation.printInfo()
+    }
+
+    /**
+     * Validates and commits a fraction before an action consumes the current input.
+     * Input keys and function-prefix keys leave the fraction edit mode unchanged.
+     */
+    private fun completeFractionInputIfRequired(button: CalculatorButton) {
+        if (!input.isFractionEditMode() || !buttonCompletesFractionInput(button))
+            return
+
+        val value = display.convertDisplayValueToNumeric()
+
+        // d/c toggles the presentation entered by the user. All other actions start with the
+        // calculator's normal mixed-fraction result presentation.
+        val isFractionPresentationToggle =
+            state.calculatorFunction == CalculatorFunction.SECOND &&
+                    button == CalculatorButton.A_B_C
+        if (!isFractionPresentationToggle)
+            value.changePresentationFractionFromImproperToMixed()
+
+        computation.setValue(value, false)
+        input.endEditMode()
+    }
+
+    /** Returns whether [button] ends the current fraction entry. */
+    private fun buttonCompletesFractionInput(button: CalculatorButton): Boolean {
+        if (button == CalculatorButton.AC_ON ||
+            button == CalculatorButton.SECOND ||
+            button == CalculatorButton.THIRD ||
+            (button == CalculatorButton.CE_C &&
+                    state.calculatorFunction == CalculatorFunction.FIRST)) {
+            return false
+        }
+
+        if (currentInputState != CalculatorInputState.NONE)
+            return true
+
+        if (state.calculatorFunction != CalculatorFunction.FIRST)
+            return true
+
+        return button !in setOf(
+            CalculatorButton.HYP,
+            CalculatorButton.EE,
+            CalculatorButton.A_B_C,
+            CalculatorButton.BACK,
+            CalculatorButton.DOT,
+            CalculatorButton.PLUS_MINUS,
+            CalculatorButton.ZERO,
+            CalculatorButton.ONE,
+            CalculatorButton.TWO,
+            CalculatorButton.THREE,
+            CalculatorButton.FOUR,
+            CalculatorButton.FIVE,
+            CalculatorButton.SIX,
+            CalculatorButton.SEVEN,
+            CalculatorButton.EIGHT,
+            CalculatorButton.NINE,
+        )
     }
 
     /** Handles the button presses for the current function mode.

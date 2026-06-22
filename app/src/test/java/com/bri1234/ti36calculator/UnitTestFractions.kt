@@ -67,14 +67,19 @@ class UnitTestFractions {
         calc.testStep("ab/c", "5", "07", "DEG")
 
         calc.testStep("AC/ON 1 3 ab/c 4 DEC", "3_1;4", "", "DEG")
-        calc.testStep("AC/ON 1 3 ab/c 4 HEX", "3", "", "DEG")
-        calc.testStep("AC/ON 1 3 ab/c 4 OCT", "3", "", "DEG")
-        calc.testStep("AC/ON 1 3 ab/c 4 BIN", "11", "", "DEG")
+        calc.testStep("AC/ON 1 3 ab/c 4 HEX", "3", "", "HEX")
+        calc.testStep("AC/ON 1 3 ab/c 4 OCT", "3", "", "OCT")
+        calc.testStep("AC/ON 1 3 ab/c 4 BIN", "11", "", "BIN")
 
         calc.testStep("AC/ON 1 3 ab/c DEC", "Error  ", "", "DEG")
         calc.testStep("AC/ON 1 3 ab/c HEX", "Error  ", "", "DEG")
         calc.testStep("AC/ON 1 3 ab/c OCT", "Error  ", "", "DEG")
         calc.testStep("AC/ON 1 3 ab/c BIN", "Error  ", "", "DEG")
+
+        calc.testStep("AC/ON 1 3 ab/c 2 ab/c DEC", "Error  ", "", "DEG")
+        calc.testStep("AC/ON 1 3 ab/c 2 ab/c HEX", "Error  ", "", "DEG")
+        calc.testStep("AC/ON 1 3 ab/c 2 ab/c OCT", "Error  ", "", "DEG")
+        calc.testStep("AC/ON 1 3 ab/c 2 ab/c BIN", "Error  ", "", "DEG")
 
         calc.testStep("AC/ON 1 3 ab/c +", "Error  ", "", "DEG")
         calc.testStep("AC/ON 1 3 ab/c -", "Error  ", "", "DEG")
