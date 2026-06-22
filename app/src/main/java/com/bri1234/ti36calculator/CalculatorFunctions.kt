@@ -413,17 +413,31 @@ class CalculatorFunctions(val state: CalculatorState,
         computation.setDoubleValue(result)
     }
 
-    /** Replaces the current value `x` with `e^x`. */
+    /**
+     * Replaces the current value `x` with `e^x`.
+     *
+     * @throws ArithmeticException If the result overflows to a non-finite value.
+     */
     fun exp() {
         val value = computation.getDoubleValue()
         val result = exp(value)
+        if (!result.isFinite())
+            throw ArithmeticException("exp(): Result is not finite")
+
         computation.setDoubleValue(result)
     }
 
-    /** Replaces the current value `x` with `10^x`. */
+    /**
+     * Replaces the current value `x` with `10^x`.
+     *
+     * @throws ArithmeticException If the result overflows to a non-finite value.
+     */
     fun tenPowX() {
         val value = computation.getDoubleValue()
         val result = 10.0.pow(value)
+        if (!result.isFinite())
+            throw ArithmeticException("tenPowX(): Result is not finite")
+
         computation.setDoubleValue(result)
     }
 

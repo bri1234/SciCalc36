@@ -51,4 +51,13 @@ class UnitTestHyperbolic {
         calc.testStep("+ 2 =", "76.20321058", "", "GRAD")
 
     }
+
+    @Test
+    fun testHyperbolicDomainBoundaries() {
+        val calc = CalculatorCore()
+
+        calc.testStep("AC/ON 0 . 5 hyp acos", "Error  ", "", "DEG HYP")
+        calc.testStep("AC/ON 1 hyp atan", "Error  ", "", "DEG HYP")
+        calc.testStep("AC/ON 1 +/- hyp atan", "Error  ", "", "DEG HYP")
+    }
 }

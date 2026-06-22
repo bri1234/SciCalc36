@@ -39,4 +39,12 @@ class UnitTestLogarithm {
         calc.testStep("+ 1 =", "2.999705661", "", "DEG")
 
     }
+
+    @Test
+    fun testExponentialOverflow() {
+        val calc = CalculatorCore()
+
+        calc.testStep("AC/ON 1 0 0 0 e^x", "Error  ", "", "DEG")
+        calc.testStep("AC/ON 3 0 9 10^x", "Error  ", "", "DEG")
+    }
 }

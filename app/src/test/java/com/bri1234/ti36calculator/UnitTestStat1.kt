@@ -23,6 +23,14 @@ import org.junit.Test
 class UnitTestStat1 {
 
     @Test
+    fun testStat1DegenerateData() {
+        val calc = CalculatorCore()
+
+        calc.testStep("AC/ON STAT1 x_", "Error  ", "", "DEG STAT")
+        calc.testStep("AC/ON STAT1 4 S+ Sxn-1", "Error  ", "", "DEG STAT")
+    }
+
+    @Test
     fun testStat1() {
         val calc = CalculatorCore()
 

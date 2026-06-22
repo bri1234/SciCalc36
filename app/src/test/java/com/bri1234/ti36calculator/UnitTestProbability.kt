@@ -31,5 +31,20 @@ class UnitTestProbability {
 
         calc.testStep("AC/ON 4 x!", "24.", "", "DEG")
         calc.testStep("AC/ON 5 2 x!", "8.065817517", "67", "DEG")
+
+        calc.testStep("AC/ON 1 0 ab/c 2 x!", "120.", "", "DEG")
+        calc.testStep("AC/ON 1 1 ab/c 2 x!", "Error  ", "", "DEG")
+    }
+
+    @Test
+    fun testProbabilityInvalidInputs() {
+        val calc = CalculatorCore()
+
+        calc.testStep("AC/ON 2 . 5 x!", "Error  ", "", "DEG")
+        calc.testStep("AC/ON 7 0 x!", "Error  ", "", "DEG")
+        calc.testStep("AC/ON 2 x<>y 3 nCr", "Error  ", "", "DEG")
+        calc.testStep("AC/ON 2 x<>y 3 nPr", "Error  ", "", "DEG")
+        calc.testStep("AC/ON 2 . 5 x<>y 1 nCr", "Error  ", "", "DEG")
+        calc.testStep("AC/ON 2 x<>y 1 . 5 nPr", "Error  ", "", "DEG")
     }
 }

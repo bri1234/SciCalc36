@@ -23,6 +23,17 @@ import org.junit.Test
 class UnitTestStat2 {
 
     @Test
+    fun testStat2DegenerateData() {
+        val calc = CalculatorCore()
+
+        calc.testStep("AC/ON STAT2 COR", "Error  ", "", "DEG STAT")
+        calc.testStep("AC/ON STAT2 SLP", "Error  ", "", "DEG STAT")
+        calc.testStep("AC/ON STAT2 ITC", "Error  ", "", "DEG STAT")
+        calc.testStep("AC/ON STAT2 2 x<>y 3 S+ 2 x<>y 4 S+ COR", "Error  ", "", "DEG STAT")
+        calc.testStep("AC/ON STAT2 2 x<>y 3 S+ 2 x<>y 4 S+ SLP", "Error  ", "", "DEG STAT")
+    }
+
+    @Test
     fun testStat2() {
         val calc = CalculatorCore()
 
@@ -188,4 +199,3 @@ class UnitTestStat2 {
 
     }
 }
-

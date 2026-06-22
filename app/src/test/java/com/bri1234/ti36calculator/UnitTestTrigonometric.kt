@@ -116,4 +116,12 @@ class UnitTestTrigonometric {
         calc.testStep("4 2 . 5 +/- tan atan", "-42.5", "", "GRAD")
 
     }
+
+    @Test
+    fun testTangentSingularitiesInAllAngleUnits() {
+        val calc = CalculatorCore()
+
+        calc.testStep("AC/ON DRG PI / 2 = tan", "Error  ", "", "RAD")
+        calc.testStep("AC/ON DRG DRG 1 0 0 tan", "Error  ", "", "GRAD")
+    }
 }
