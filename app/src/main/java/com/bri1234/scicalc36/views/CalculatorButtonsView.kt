@@ -36,6 +36,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -85,6 +86,7 @@ private fun CalculatorButton(
                     text = buttonProperties.text1st,
                     fontSize = 18.sp,
                     color = buttonProperties.test1stColor,
+                    fontWeight = if (buttonProperties.text1stIsBold) FontWeight.Bold else FontWeight.Normal,
                     maxLines = 1
                 )
             }
@@ -208,6 +210,7 @@ private fun SimpleCalculatorButton(
                     text = buttonProperties.text1st,
                     fontSize = 18.sp,
                     color = buttonProperties.test1stColor,
+                    fontWeight = if (buttonProperties.text1stIsBold) FontWeight.Bold else FontWeight.Normal,
                     maxLines = 1
                 )
             }

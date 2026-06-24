@@ -46,6 +46,7 @@ import com.bri1234.scicalc36.views.TEXT_4TH_COLOR
  * @property test2ndColor The color of the second mode text.
  * @property test3rdColor The color of the third mode text.
  * @property test4thColor The color of the fourth mode text.
+ * @property text1stIsBold Whether the first-mode button text should be rendered in bold.
  * @property rowSpan The number of rows this button spans in the grid (default is 1).
  * @property columnSpan The number of columns this button spans in the grid (default is 1).
  */
@@ -62,6 +63,7 @@ data class CalculatorButtonProperties (
     val test2ndColor : Color = TEXT_2ND_COLOR,
     val test3rdColor : Color = TEXT_3RD_COLOR,
     val test4thColor : Color = TEXT_4TH_COLOR,
+    val text1stIsBold : Boolean = false,
     override val rowSpan : Int = 1,
     override val columnSpan : Int = 1,
     ) : IGridCellInfo
@@ -112,7 +114,7 @@ val CALCULATOR_BUTTON_LIST = listOf(
     CalculatorButtonProperties(2, 3, CalculatorButton.SQRT_X, "\u221Ax", "\u03C3xn-1", "C", "R",
         BUTTON_COLOR_1,),
     CalculatorButtonProperties(2, 4, CalculatorButton.DIVIDE, "\u00F7", "\u03C3xn", "\u03C0", "G",
-        BUTTON_COLOR_2,),
+        BUTTON_COLOR_2, text1stIsBold = true),
 
     // Row 4
     CalculatorButtonProperties(3, 0, CalculatorButton.SUM_PLUS, "\u2211+", "\u2211-", "STAT 2", "",
@@ -123,62 +125,63 @@ val CALCULATOR_BUTTON_LIST = listOf(
     CalculatorButtonProperties(3, 3, CalculatorButton.RIGHT_PARENTHESES, ")", "\u03C3yn-1", "OCT", "",
         BUTTON_COLOR_1,),
     CalculatorButtonProperties(3, 4, CalculatorButton.MULTIPLY, "\u00D7", "\u03C3yn", "BIN", "",
-        BUTTON_COLOR_2,),
+        BUTTON_COLOR_2, text1stIsBold = true),
 
     // Row 5
     CalculatorButtonProperties(4, 0, CalculatorButton.STORE, "STO", "\u2211x", "AND", "",
         BUTTON_COLOR_1,),
     CalculatorButtonProperties(4, 1, CalculatorButton.SEVEN, "7", "\u2211x\u00B2", "OR", "",
         BUTTON_COLOR_3,
-        TEXT_1ST_COLOR_2,),
+        TEXT_1ST_COLOR_2,
+        text1stIsBold = true),
     CalculatorButtonProperties(4, 2, CalculatorButton.EIGHT, "8", "\u2211y", "XOR", "",
         BUTTON_COLOR_3,
-        TEXT_1ST_COLOR_2,),
+        TEXT_1ST_COLOR_2,
+        text1stIsBold = true),
     CalculatorButtonProperties(4, 3, CalculatorButton.NINE, "9", "\u2211y\u00B2", "XNOR", "",
         BUTTON_COLOR_3,
-        TEXT_1ST_COLOR_2,),
+        TEXT_1ST_COLOR_2,
+        text1stIsBold = true),
     CalculatorButtonProperties(4, 4, CalculatorButton.MINUS, "\u2212", "\u2211xy", "NOT", "",
-        BUTTON_COLOR_2,),
+        BUTTON_COLOR_2, text1stIsBold = true),
 
     // Row 6
     CalculatorButtonProperties(5, 0, CalculatorButton.RECALL, "RCL", "SUM", "EXC", "",
         BUTTON_COLOR_1,),
     CalculatorButtonProperties(5, 1, CalculatorButton.FOUR, "4", "ITC", "COR", "",
         BUTTON_COLOR_3,
-        TEXT_1ST_COLOR_2,),
+        TEXT_1ST_COLOR_2,
+        text1stIsBold = true),
     CalculatorButtonProperties(5, 2, CalculatorButton.FIVE, "5", "SLP", "FLO", "",
         BUTTON_COLOR_3,
-        TEXT_1ST_COLOR_2,),
+        TEXT_1ST_COLOR_2,
+        text1stIsBold = true),
     CalculatorButtonProperties(5, 3, CalculatorButton.SIX, "6", "x'", "SCI", "",
         BUTTON_COLOR_3,
-        TEXT_1ST_COLOR_2,),
-    CalculatorButtonProperties(5, 4, CalculatorButton.PLUS, "+", "y'", "ENG", "", BUTTON_COLOR_2,),
+        TEXT_1ST_COLOR_2,
+        text1stIsBold = true),
+    CalculatorButtonProperties(5, 4, CalculatorButton.PLUS, "+", "y'", "ENG", "",
+        BUTTON_COLOR_2, text1stIsBold = true),
 
     // Row 7
     CalculatorButtonProperties(6, 0, CalculatorButton.A_B_C, "a b/c", "d/c", "F <> D", "",
         BUTTON_COLOR_1,),
     CalculatorButtonProperties(6, 1, CalculatorButton.ONE, "1", "\u25B6in", "\u25B6cm", "",
-        BUTTON_COLOR_3,
-        TEXT_1ST_COLOR_2,),
+        BUTTON_COLOR_3, TEXT_1ST_COLOR_2, text1stIsBold = true),
     CalculatorButtonProperties(6, 2, CalculatorButton.TWO, "2", "\u25B6gal", "\u25B6l", "",
-        BUTTON_COLOR_3,
-        TEXT_1ST_COLOR_2,),
+        BUTTON_COLOR_3, TEXT_1ST_COLOR_2, text1stIsBold = true),
     CalculatorButtonProperties(6, 3, CalculatorButton.THREE, "3", "\u25B6lb", "\u25B6kg", "",
-        BUTTON_COLOR_3,
-        TEXT_1ST_COLOR_2,),
+        BUTTON_COLOR_3, TEXT_1ST_COLOR_2, text1stIsBold = true),
     CalculatorButtonProperties(6, 4, CalculatorButton.EQUAL, "=", "\u25B6DD", "\u25B6DMS", "",
-        BUTTON_COLOR_2, rowSpan = 2),
+        BUTTON_COLOR_2, text1stIsBold = true, rowSpan = 2),
 
     // Row 8
     CalculatorButtonProperties(7, 0, CalculatorButton.BACK, "\u2794", "nPr", "nCr", "",
         BUTTON_COLOR_1,),
     CalculatorButtonProperties(7, 1, CalculatorButton.ZERO, "0", "\u25B6\u00B0F", "\u25B6\u00B0C", "",
-        BUTTON_COLOR_3,
-        TEXT_1ST_COLOR_2,),
+        BUTTON_COLOR_3, TEXT_1ST_COLOR_2, text1stIsBold = true),
     CalculatorButtonProperties(7, 2, CalculatorButton.DOT, "\u2022", "\u25B6oz", "\u25B6g", "",
-        BUTTON_COLOR_3,
-        TEXT_1ST_COLOR_2,),
+        BUTTON_COLOR_3, TEXT_1ST_COLOR_2, text1stIsBold = true),
     CalculatorButtonProperties(7, 3, CalculatorButton.PLUS_MINUS, "+/-", "P\u25B6R", "R\u25B6P", "",
-        BUTTON_COLOR_3,
-        TEXT_1ST_COLOR_2,),
+        BUTTON_COLOR_3, TEXT_1ST_COLOR_2, text1stIsBold = true),
 )
