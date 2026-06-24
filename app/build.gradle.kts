@@ -4,13 +4,13 @@ plugins {
 }
 
 android {
-    namespace = "com.bri1234.ti36calculator"
+    namespace = "com.bri1234.scicalc36"
     compileSdk {
         version = release(36)
     }
 
     defaultConfig {
-        applicationId = "com.example.ti36calculator"
+        applicationId = "com.bri1234.scicalc36"
         minSdk = 26
         targetSdk = 36
         versionCode = 1

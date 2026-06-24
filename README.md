@@ -1,2 +1,4 @@
-# Ti36Calculator
-A calculator app that works like an old TI-36X calculator.
+# SciCalc 36
+
+A classic-style scientific calculator inspired by traditional handheld calculator workflows.
+
