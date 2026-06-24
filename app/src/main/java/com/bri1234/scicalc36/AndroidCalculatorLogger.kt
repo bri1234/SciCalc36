@@ -21,7 +21,7 @@ package com.bri1234.scicalc36
 import android.util.Log
 
 object AndroidCalculatorLogger : CalculatorLogger {
-    private const val TAG = "Ti36Simulator"
+    private const val TAG = "SciCalc36"
 
     override fun info(message: String) {
         Log.i(TAG, message)

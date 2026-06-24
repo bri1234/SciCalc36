@@ -19,5 +19,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Ti36Calculator"
+rootProject.name = "SciCalc36"
 include(":app")

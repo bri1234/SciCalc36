@@ -28,7 +28,7 @@ import kotlin.math.hypot
 import kotlin.math.sin
 
 /**
- * This class implements the two parameter functions of the TI-36 calculator.
+ * This class implements the two parameter functions of the SciCalc 36 calculator.
  *
  * @property state The calculator mode state used for angle conversions and coordinate views.
  * @property computation The computation stack that supplies operands and receives results.

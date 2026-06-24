@@ -43,3 +43,4 @@ replay_pid*
 local.properties
 
 *~
+/app/release/app-release.aab

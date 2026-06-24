@@ -27,7 +27,7 @@ import com.bri1234.scicalc36.utils.getIntFromDouble
 import kotlin.math.*
 
 /**
- * This class implements the one parameter functions of the TI-36 calculator.
+ * This class implements the one parameter functions of the SciCalc 36 calculator.
  *
  * @property state The calculator mode state used to select angle and hyperbolic behavior.
  * @property computation The computation stack whose current value is read and replaced.

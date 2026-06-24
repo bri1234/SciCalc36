@@ -36,7 +36,7 @@ private const val NUM_OCT_BITS = 30
 private const val NUM_BIN_BITS = 10
 
 /**
- * Class representing the numeric display of the TI-36 calculator. It manages the mantissa, exponent,
+ * Class representing the numeric display of the SciCalc 36 calculator. It manages the mantissa, exponent,
  * and decimal point position, and provides methods to print values in various formats.
  */
 class CalculatorNumericDisplay(val state: CalculatorState)  {
@@ -55,7 +55,7 @@ class CalculatorNumericDisplay(val state: CalculatorState)  {
     var numberOfDigitsAfterDecimalPoint: Int = -1
 
     /** The current number format for displaying values. The default is FLOAT, which is the
-     * standard format for the TI-36.
+     * standard format for SciCalc 36.
      */
     private var displayNumberFormat: DisplayNumberFormat = DisplayNumberFormat.FLOAT
 
@@ -428,7 +428,7 @@ class CalculatorNumericDisplay(val state: CalculatorState)  {
         exponentStr.toCharArray().copyInto(displayExponent)
     }
 
-    /** Prints a double value in float format, which is the default format for the TI-36.
+    /** Prints a double value in float format, which is the default format for SciCalc 36.
      * It uses fixed-point notation for values that are not too large or too small, and switches to
      * scientific notation for values that are outside the range of 1E-7 to 1E10. */
     private fun printValueFloat(value: Double) {
@@ -505,7 +505,7 @@ class CalculatorNumericDisplay(val state: CalculatorState)  {
 
     /**
      * Sets the number format for displaying values.
-     * The TI-36 supports FLOAT, SCIENTIFIC, ENGINEERING, OCTAL, HEXADECIMAL, and BINARY formats.
+     * SciCalc 36 supports FLOAT, SCIENTIFIC, ENGINEERING, OCTAL, HEXADECIMAL, and BINARY formats.
      */
     fun setNumberFormat(numberFormat: DisplayNumberFormat) {
         displayNumberFormat = numberFormat

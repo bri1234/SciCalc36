@@ -41,7 +41,7 @@ Next features to implement:
 */
 
 /**
- * A simulator class for the TI-36 calculator.
+ * A simulator class for the SciCalc 36 calculator.
  */
 class CalculatorCore(
     private val logger: CalculatorLogger = NoOpCalculatorLogger,

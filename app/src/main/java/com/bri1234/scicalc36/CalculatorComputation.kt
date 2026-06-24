@@ -35,7 +35,7 @@ private enum class StackEvaluationMode {
 }
 
 /**
- * Manages the computation stack for the TI-36 calculator, including registers and operations.
+ * Manages the computation stack for the SciCalc 36 calculator, including registers and operations.
  * It supports basic arithmetic, exponentiation, roots, and bitwise operations.
  */
 class CalculatorComputation(

@@ -51,7 +51,7 @@ private val LightColorScheme = lightColorScheme(
 )
 
 @Composable
-fun Ti36CalculatorTheme(
+fun SciCalc36Theme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
     dynamicColor: Boolean = true,

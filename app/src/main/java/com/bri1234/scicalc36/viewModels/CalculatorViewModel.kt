@@ -27,7 +27,7 @@ import com.bri1234.scicalc36.CalculatorDisplayData
 import com.bri1234.scicalc36.CalculatorCore
 
 /**
- * ViewModel for the TI-36 calculator app.
+ * ViewModel for the SciCalc 36 calculator app.
  * Manages the state of the calculator display and handles button presses.
  */
 class CalculatorViewModel(

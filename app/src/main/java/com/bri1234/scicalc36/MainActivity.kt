@@ -26,7 +26,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.ui.Modifier
-import com.bri1234.scicalc36.ui.theme.Ti36CalculatorTheme
+import com.bri1234.scicalc36.ui.theme.SciCalc36Theme
 import com.bri1234.scicalc36.viewModels.CalculatorViewModel
 import com.bri1234.scicalc36.views.CASE_COLOR
 import com.bri1234.scicalc36.views.CalculatorView
@@ -36,7 +36,7 @@ class MainActivity : ComponentActivity() {
     val calculatorViewModel = CalculatorViewModel()
 
     /**
-     * The main activity of the TI-36 calculator app.
+     * The main activity of the SciCalc 36 calculator app.
      * It sets up the UI using Jetpack Compose and displays the calculator buttons in a grid layout.
      */
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -44,7 +44,7 @@ class MainActivity : ComponentActivity() {
 
         enableEdgeToEdge()
         setContent {
-            Ti36CalculatorTheme {
+            SciCalc36Theme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = CASE_COLOR
