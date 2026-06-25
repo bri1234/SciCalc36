@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://gnu.org>.
+ * along with this program.  If not, see <https://gnu.org>.
  */
 
 package com.bri1234.scicalc36

@@ -13,35 +13,46 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://gnu.org>.
+ * along with this program.  If not, see <https://gnu.org>.
  */
 
 package com.bri1234.scicalc36.views
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.bri1234.scicalc36.CALCULATOR_BUTTON_LIST
 import com.bri1234.scicalc36.CALCULATOR_SPECIAL_BUTTON_LIST
+import com.bri1234.scicalc36.R
 import com.bri1234.scicalc36.enums.CalculatorButton
 
 /**
@@ -152,21 +163,16 @@ fun CalculatorButtonsView(
     modifier: Modifier = Modifier,
     onButtonPressed: (CalculatorButton) -> Unit
 ) {
+    var showAboutDialog by remember { mutableStateOf(false) }
+
     Column (modifier = modifier) {
-        GridLayout(
-            columns = 5,
-            rows = 1,
-            modifier = Modifier.fillMaxWidth().heightIn(30.dp, 40.dp),
-            gridCellInfos = CALCULATOR_SPECIAL_BUTTON_LIST,
-        ) {
-            CALCULATOR_SPECIAL_BUTTON_LIST.forEach { buttonProperties ->
-                SimpleCalculatorButton(
-                    buttonProperties = buttonProperties,
-                    Modifier.padding(4.dp, 0.dp, 4.dp, 0.dp),
-                    onButtonPressed = onButtonPressed
-                )
-            }
-        }
+        CalculatorTopButtonRow(
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(30.dp, 40.dp),
+            onInfoPressed = { showAboutDialog = true },
+            onButtonPressed = onButtonPressed
+        )
 
         GridLayout(
             columns = 5,
@@ -182,6 +188,69 @@ fun CalculatorButtonsView(
                 )
             }
         }
+    }
+
+    if (showAboutDialog) {
+        AboutDialog(onDismiss = { showAboutDialog = false })
+    }
+}
+
+@Composable
+private fun CalculatorTopButtonRow(
+    modifier: Modifier,
+    onInfoPressed: () -> Unit,
+    onButtonPressed: (CalculatorButton) -> Unit
+) {
+    val appName = stringResource(R.string.app_name)
+
+    Row(
+        modifier = modifier,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Row(
+            modifier = Modifier
+                .weight(4f)
+                .fillMaxHeight()
+                .padding(start = 4.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = appName,
+                color = TEXT_3RD_COLOR,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+                maxLines = 1
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Surface(
+                onClick = onInfoPressed,
+                modifier = Modifier.size(28.dp),
+                shape = CircleShape,
+                color = BUTTON_COLOR_1,
+                contentColor = TEXT_1ST_COLOR_1
+            ) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "i",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Center
+                    )
+                }
+            }
+        }
+
+        SimpleCalculatorButton(
+            buttonProperties = CALCULATOR_SPECIAL_BUTTON_LIST.first(),
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxHeight()
+                .padding(4.dp, 0.dp, 4.dp, 0.dp),
+            onButtonPressed = onButtonPressed
+        )
     }
 }
 
