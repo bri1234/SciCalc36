@@ -1,6 +1,7 @@
 # SciCalc 36
 
-A classic-style scientific calculator inspired by traditional handheld calculator workflows.
+| [![SciCalc 36](SciCalc36-thumb.png)](SciCalc36.png) | A classic-style scientific calculator inspired by traditional handheld calculator workflows. |
+| --- | --- |
 
 ## Basic operations
 
