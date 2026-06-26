@@ -40,6 +40,7 @@ import com.bri1234.scicalc36.R
 fun AboutDialog(onDismiss: () -> Unit) {
     val appName = stringResource(R.string.app_name)
     val projectUrl = "https://github.com/bri1234/SciCalc36"
+    val manualUrl = "https://www.aaabbb.de/SciCalc36/index.html"
     val uriHandler = LocalUriHandler.current
 
     AlertDialog(
@@ -59,7 +60,14 @@ fun AboutDialog(onDismiss: () -> Unit) {
                 )
                 Spacer(modifier = Modifier.height(12.dp))
                 Text(
-                    text = "Project page and manual: $projectUrl",
+                    text = "Manual: $manualUrl",
+                    modifier = Modifier.clickable { uriHandler.openUri(projectUrl) },
+                    color = MaterialTheme.colorScheme.primary,
+                    textDecoration = TextDecoration.Underline
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+                Text(
+                    text = "Project page: $projectUrl",
                     modifier = Modifier.clickable { uriHandler.openUri(projectUrl) },
                     color = MaterialTheme.colorScheme.primary,
                     textDecoration = TextDecoration.Underline
