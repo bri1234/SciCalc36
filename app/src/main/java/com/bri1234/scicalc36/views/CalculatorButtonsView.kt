@@ -54,6 +54,16 @@ import com.bri1234.scicalc36.CALCULATOR_BUTTON_LIST
 import com.bri1234.scicalc36.CALCULATOR_SPECIAL_BUTTON_LIST
 import com.bri1234.scicalc36.R
 import com.bri1234.scicalc36.enums.CalculatorButton
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.TextUnit
+
+/** Used to scale the font size to the current font scale, so that the text size remains
+ * consistent across different font scales. */
+@Composable
+private fun fixedSp(value: Float): TextUnit {
+    val fontScale = LocalDensity.current.fontScale
+    return (value / fontScale * 1.1).sp
+}
 
 /**
  * Displays a single calculator button with its properties.
@@ -77,7 +87,7 @@ private fun CalculatorButton(
 
         Button(
             onClick = { onButtonPressed(buttonProperties.button) },
-            modifier = modifier, // Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxWidth().weight(1f),
             shape = RoundedCornerShape(5.dp),
             colors = ButtonDefaults.buttonColors(containerColor = buttonProperties.buttonColor),
             contentPadding = PaddingValues(2.dp)
@@ -88,17 +98,21 @@ private fun CalculatorButton(
             ) {
                 Text(
                     text = buttonProperties.text2nd,
-                    fontSize = 16.sp,
+                    fontSize = fixedSp(16f),
+                    lineHeight = fixedSp(16f),
                     color = buttonProperties.test2ndColor,
-                    maxLines = 1
+                    maxLines = 1,
+                    softWrap = false
                 )
                 HorizontalDivider(modifier = Modifier.fillMaxWidth())
                 Text(
                     text = buttonProperties.text1st,
-                    fontSize = 18.sp,
+                    fontSize = fixedSp(18f),
+                    lineHeight = fixedSp(18f),
                     color = buttonProperties.test1stColor,
+                    maxLines = 1,
+                    softWrap = false,
                     fontWeight = if (buttonProperties.text1stIsBold) FontWeight.Bold else FontWeight.Normal,
-                    maxLines = 1
                 )
             }
         }
@@ -117,9 +131,11 @@ private fun CalculatorButtonHeading(buttonProperties: com.bri1234.scicalc36.Calc
         ) {
             Text(
                 text = buttonProperties.text3rd,
-                fontSize = 16.sp,
+                fontSize = fixedSp(16f),
+                lineHeight = fixedSp(16f),
                 color = buttonProperties.test3rdColor,
-                maxLines = 1
+                maxLines = 1,
+                softWrap = false,
             )
         }
 
@@ -133,22 +149,22 @@ private fun CalculatorButtonHeading(buttonProperties: com.bri1234.scicalc36.Calc
     ) {
         Text(
             text = buttonProperties.text3rd,
-            fontSize = 16.sp,
+            fontSize = fixedSp(16f),
+            lineHeight = fixedSp(16f),
             color = buttonProperties.test3rdColor,
-            modifier = Modifier
-                .weight(1f)
-                .padding(start = 5.dp),
-            maxLines = 1
+            maxLines = 1,
+            softWrap = false,
+            modifier = Modifier.weight(1f).padding(start = 5.dp),
         )
         Spacer(modifier = Modifier.width(3.dp))
         Text(
             text = buttonProperties.text4th,
-            fontSize = 16.sp,
+            fontSize = fixedSp(16f),
+            lineHeight = fixedSp(16f),
             color = buttonProperties.test4thColor,
-            modifier = Modifier
-                .weight(1f)
-                .padding(end = 5.dp),
             maxLines = 1,
+            softWrap = false,
+            modifier = Modifier.weight(1f).padding(end = 5.dp),
             textAlign = TextAlign.End
         )
     }
@@ -266,7 +282,7 @@ private fun SimpleCalculatorButton(
     ) {
         Button(
             onClick = { onButtonPressed(buttonProperties.button) },
-            modifier = modifier,
+            modifier = Modifier.fillMaxSize(),
             shape = RoundedCornerShape(5.dp),
             colors = ButtonDefaults.buttonColors(containerColor = buttonProperties.buttonColor),
             contentPadding = PaddingValues(2.dp)
@@ -277,10 +293,12 @@ private fun SimpleCalculatorButton(
             ) {
                 Text(
                     text = buttonProperties.text1st,
-                    fontSize = 18.sp,
+                    fontSize = fixedSp(18f),
+                    lineHeight = fixedSp(18f),
                     color = buttonProperties.test1stColor,
+                    maxLines = 1,
+                    softWrap = false,
                     fontWeight = if (buttonProperties.text1stIsBold) FontWeight.Bold else FontWeight.Normal,
-                    maxLines = 1
                 )
             }
         }
