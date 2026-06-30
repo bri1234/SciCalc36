@@ -375,8 +375,11 @@ class CalculatorComputation(
         require(operationIndex < OPERATION_COUNT - 1)
         require(registerIndex < REGISTER_COUNT - 1)
 
-        if (operationIndex > registerIndex)
+        if (operationIndex > registerIndex) {
+            operationArray[operationIndex - 1] = operation
+            onResultChanged(registerArray[registerIndex])
             return
+        }
 
         operationArray[operationIndex] = operation
         operationIndex++

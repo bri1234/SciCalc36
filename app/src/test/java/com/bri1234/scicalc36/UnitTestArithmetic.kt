@@ -39,6 +39,21 @@ class UnitTestArithmetic {
         calc.testStep("2 / 3 * 3 =", "2.", "", "DEG")
         calc.testStep("1 / 3 * 3 =", "1.", "", "DEG")
 
+        calc.testStep("AC/ON ( - 9 )", "-9.", "", "DEG")
+
+        calc.testStep("AC/ON 1 + ( - 9 )", "-9.", "", "DEG")
+        calc.testStep("=", "-8.", "", "DEG")
+        calc.testStep("=", "-17.", "", "DEG")
+
+        calc.testStep("AC/ON 3 / ( - 6 ) =", "-0.5", "", "DEG")
+        calc.testStep("AC/ON 3 * ( - 9 ) =", "-27.", "", "DEG")
+
+        calc.testStep("AC/ON 5 + - 3 =", "2.", "", "DEG")
+        calc.testStep("AC/ON 5 - * 3 =", "15.", "", "DEG")
+        calc.testStep("AC/ON 5 * / 4 =", "1.25", "", "DEG")
+        calc.testStep("AC/ON 5 - + 3 =", "8.", "", "DEG")
+
+        calc.testStep("AC/ON 5 * ( 6 + - 2 ) =", "20.", "", "DEG")
     }
 
     @Test
