@@ -70,11 +70,15 @@ private fun fixedSp(value: Float): TextUnit {
  * The button has two lines of text: text1st and text2nd.
  * @param buttonProperties The properties of the calculator button, including text and colors.
  * @param modifier The modifier to be applied to the button layout.
+ * @param topRowWeight The height weight for text2nd.
+ * @param bottomRowWeight The height weight for text1st.
  */
 @Composable
 private fun CalculatorButton(
     buttonProperties : com.bri1234.scicalc36.CalculatorButtonProperties,
     modifier: Modifier,
+    topRowWeight: Float = 2.9f,
+    bottomRowWeight: Float = 3.7f,
     onButtonPressed: (CalculatorButton) -> Unit
 ) {
     Button(
@@ -85,27 +89,41 @@ private fun CalculatorButton(
         contentPadding = PaddingValues(2.dp)
     ) {
         Column(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(
-                text = buttonProperties.text2nd,
-                fontSize = fixedSp(16f),
-                lineHeight = fixedSp(16f),
-                color = buttonProperties.test2ndColor,
-                maxLines = 1,
-                softWrap = false
-            )
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(topRowWeight),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = buttonProperties.text2nd,
+                    fontSize = fixedSp(16f),
+                    lineHeight = fixedSp(16f),
+                    color = buttonProperties.test2ndColor,
+                    maxLines = 1,
+                    softWrap = false
+                )
+            }
             HorizontalDivider(modifier = Modifier.fillMaxWidth())
-            Text(
-                text = buttonProperties.text1st,
-                fontSize = fixedSp(18f),
-                lineHeight = fixedSp(18f),
-                color = buttonProperties.test1stColor,
-                maxLines = 1,
-                softWrap = false,
-                fontWeight = if (buttonProperties.text1stIsBold) FontWeight.Bold else FontWeight.Normal,
-            )
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(bottomRowWeight),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = buttonProperties.text1st,
+                    fontSize = fixedSp(18f),
+                    lineHeight = fixedSp(18f),
+                    color = buttonProperties.test1stColor,
+                    maxLines = 1,
+                    softWrap = false,
+                    fontWeight = if (buttonProperties.text1stIsBold) FontWeight.Bold else FontWeight.Normal,
+                )
+            }
         }
     }
 }
