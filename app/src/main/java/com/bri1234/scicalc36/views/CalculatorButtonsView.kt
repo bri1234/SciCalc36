@@ -18,8 +18,8 @@
 
 package com.bri1234.scicalc36.views
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -48,6 +48,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.bri1234.scicalc36.CALCULATOR_BUTTON_LIST
@@ -57,12 +58,14 @@ import com.bri1234.scicalc36.enums.CalculatorButton
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.TextUnit
 
-/** Used to scale the font size to the current font scale, so that the text size remains
- * consistent across different font scales. */
 @Composable
-private fun fixedSp(value: Float): TextUnit {
-    val fontScale = LocalDensity.current.fontScale
-    return (value / fontScale * 1.1).sp
+private fun rowHeightSp(rowHeight: Dp, heightFraction: Float, maxValue: Float): TextUnit {
+    val density = LocalDensity.current
+    val fontScale = density.fontScale
+    val heightBasedValue = with(density) { (rowHeight * heightFraction).toSp().value }
+    val maxScaledValue = maxValue / fontScale * 1.1f
+
+    return minOf(heightBasedValue, maxScaledValue).sp
 }
 
 /**
@@ -92,32 +95,36 @@ private fun CalculatorButton(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Box(
+            BoxWithConstraints(
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(topRowWeight),
                 contentAlignment = Alignment.Center
             ) {
+                val textSize = rowHeightSp(maxHeight, 0.75f, 16f)
+
                 Text(
                     text = buttonProperties.text2nd,
-                    fontSize = fixedSp(16f),
-                    lineHeight = fixedSp(16f),
+                    fontSize = textSize,
+                    lineHeight = textSize,
                     color = buttonProperties.test2ndColor,
                     maxLines = 1,
                     softWrap = false
                 )
             }
             HorizontalDivider(modifier = Modifier.fillMaxWidth())
-            Box(
+            BoxWithConstraints(
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(bottomRowWeight),
                 contentAlignment = Alignment.Center
             ) {
+                val textSize = rowHeightSp(maxHeight, 0.75f, 18f)
+
                 Text(
                     text = buttonProperties.text1st,
-                    fontSize = fixedSp(18f),
-                    lineHeight = fixedSp(18f),
+                    fontSize = textSize,
+                    lineHeight = textSize,
                     color = buttonProperties.test1stColor,
                     maxLines = 1,
                     softWrap = false,
@@ -136,15 +143,16 @@ private fun CalculatorButtonHeading(
 
     if (buttonProperties.text4th.isEmpty()) {
         // center text3 if text4 is empty
-        Row(
+        BoxWithConstraints(
             modifier = modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
+            contentAlignment = Alignment.Center
         ) {
+            val textSize = rowHeightSp(maxHeight, 0.75f, 16f)
+
             Text(
                 text = buttonProperties.text3rd,
-                fontSize = fixedSp(16f),
-                lineHeight = fixedSp(16f),
+                fontSize = textSize,
+                lineHeight = textSize,
                 color = buttonProperties.test3rdColor,
                 maxLines = 1,
                 softWrap = false,
@@ -155,30 +163,36 @@ private fun CalculatorButtonHeading(
     }
 
     // align text3 left and text4 right
-    Row(
+    BoxWithConstraints(
         modifier = modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(
-            text = buttonProperties.text3rd,
-            fontSize = fixedSp(16f),
-            lineHeight = fixedSp(16f),
-            color = buttonProperties.test3rdColor,
-            maxLines = 1,
-            softWrap = false,
-            modifier = Modifier.weight(1f).padding(start = 5.dp),
-        )
-        Spacer(modifier = Modifier.width(3.dp))
-        Text(
-            text = buttonProperties.text4th,
-            fontSize = fixedSp(16f),
-            lineHeight = fixedSp(16f),
-            color = buttonProperties.test4thColor,
-            maxLines = 1,
-            softWrap = false,
-            modifier = Modifier.weight(1f).padding(end = 5.dp),
-            textAlign = TextAlign.End
-        )
+        val textSize = rowHeightSp(maxHeight, 0.75f, 16f)
+
+        Row(
+            modifier = Modifier.fillMaxSize(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = buttonProperties.text3rd,
+                fontSize = textSize,
+                lineHeight = textSize,
+                color = buttonProperties.test3rdColor,
+                maxLines = 1,
+                softWrap = false,
+                modifier = Modifier.weight(1f).padding(start = 5.dp),
+            )
+            Spacer(modifier = Modifier.width(3.dp))
+            Text(
+                text = buttonProperties.text4th,
+                fontSize = textSize,
+                lineHeight = textSize,
+                color = buttonProperties.test4thColor,
+                maxLines = 1,
+                softWrap = false,
+                modifier = Modifier.weight(1f).padding(end = 5.dp),
+                textAlign = TextAlign.End
+            )
+        }
     }
 }
 
@@ -314,14 +328,16 @@ private fun SimpleCalculatorButton(
             colors = ButtonDefaults.buttonColors(containerColor = buttonProperties.buttonColor),
             contentPadding = PaddingValues(2.dp)
         ) {
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally
+            BoxWithConstraints(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
             ) {
+                val textSize = rowHeightSp(maxHeight, 0.75f, 18f)
+
                 Text(
                     text = buttonProperties.text1st,
-                    fontSize = fixedSp(18f),
-                    lineHeight = fixedSp(18f),
+                    fontSize = textSize,
+                    lineHeight = textSize,
                     color = buttonProperties.test1stColor,
                     maxLines = 1,
                     softWrap = false,
