@@ -68,8 +68,6 @@ private fun fixedSp(value: Float): TextUnit {
 /**
  * Displays a single calculator button with its properties.
  * The button has two lines of text: text1st and text2nd.
- * Above the button, there are two additional lines of text: text3rd and text4th.
- * If text4th is empty, text3rd is centered. Otherwise, text3rd is left-aligned and text4th is right-aligned.
  * @param buttonProperties The properties of the calculator button, including text and colors.
  * @param modifier The modifier to be applied to the button layout.
  */
@@ -79,53 +77,49 @@ private fun CalculatorButton(
     modifier: Modifier,
     onButtonPressed: (CalculatorButton) -> Unit
 ) {
-    Column(
+    Button(
+        onClick = { onButtonPressed(buttonProperties.button) },
         modifier = modifier,
-        horizontalAlignment = Alignment.CenterHorizontally
+        shape = RoundedCornerShape(5.dp),
+        colors = ButtonDefaults.buttonColors(containerColor = buttonProperties.buttonColor),
+        contentPadding = PaddingValues(2.dp)
     ) {
-        CalculatorButtonHeading(buttonProperties)
-
-        Button(
-            onClick = { onButtonPressed(buttonProperties.button) },
-            modifier = Modifier.fillMaxWidth().weight(1f),
-            shape = RoundedCornerShape(5.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = buttonProperties.buttonColor),
-            contentPadding = PaddingValues(2.dp)
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = buttonProperties.text2nd,
-                    fontSize = fixedSp(16f),
-                    lineHeight = fixedSp(16f),
-                    color = buttonProperties.test2ndColor,
-                    maxLines = 1,
-                    softWrap = false
-                )
-                HorizontalDivider(modifier = Modifier.fillMaxWidth())
-                Text(
-                    text = buttonProperties.text1st,
-                    fontSize = fixedSp(18f),
-                    lineHeight = fixedSp(18f),
-                    color = buttonProperties.test1stColor,
-                    maxLines = 1,
-                    softWrap = false,
-                    fontWeight = if (buttonProperties.text1stIsBold) FontWeight.Bold else FontWeight.Normal,
-                )
-            }
+            Text(
+                text = buttonProperties.text2nd,
+                fontSize = fixedSp(16f),
+                lineHeight = fixedSp(16f),
+                color = buttonProperties.test2ndColor,
+                maxLines = 1,
+                softWrap = false
+            )
+            HorizontalDivider(modifier = Modifier.fillMaxWidth())
+            Text(
+                text = buttonProperties.text1st,
+                fontSize = fixedSp(18f),
+                lineHeight = fixedSp(18f),
+                color = buttonProperties.test1stColor,
+                maxLines = 1,
+                softWrap = false,
+                fontWeight = if (buttonProperties.text1stIsBold) FontWeight.Bold else FontWeight.Normal,
+            )
         }
     }
 }
 
 @Composable
-private fun CalculatorButtonHeading(buttonProperties: com.bri1234.scicalc36.CalculatorButtonProperties) {
+private fun CalculatorButtonHeading(
+    buttonProperties: com.bri1234.scicalc36.CalculatorButtonProperties,
+    modifier: Modifier = Modifier
+) {
 
     if (buttonProperties.text4th.isEmpty()) {
         // center text3 if text4 is empty
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -144,7 +138,7 @@ private fun CalculatorButtonHeading(buttonProperties: com.bri1234.scicalc36.Calc
 
     // align text3 left and text4 right
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
@@ -190,20 +184,35 @@ fun CalculatorButtonsView(
             onButtonPressed = onButtonPressed
         )
 
-        GridLayout(
+        TwoRowGridLayout(
             columns = 5,
             rows = 8,
-            modifier = Modifier.fillMaxSize(),
-            gridCellInfos = CALCULATOR_BUTTON_LIST,
-        ) {
-            CALCULATOR_BUTTON_LIST.forEach { buttonProperties ->
-                CalculatorButton(
-                    buttonProperties = buttonProperties,
-                    Modifier.padding(4.dp).fillMaxSize(),
-                    onButtonPressed = onButtonPressed
+            topRowWeight = 3f,
+            bottomRowWeight = 7f,
+            items = CALCULATOR_BUTTON_LIST.map { buttonProperties ->
+                TwoRowGridLayoutItem(
+                    x = buttonProperties.column,
+                    y = buttonProperties.row,
+                    rowSpan = buttonProperties.rowSpan,
+                    columnSpan = buttonProperties.columnSpan,
+                    topContent = {
+                        CalculatorButtonHeading(
+                            buttonProperties = buttonProperties,
+                            modifier = Modifier.padding(horizontal = 4.dp).fillMaxSize()
+                        )
+                    },
+                    bottomContent = {
+                        CalculatorButton(
+                            buttonProperties = buttonProperties,
+                            modifier = Modifier
+                                .padding(start = 4.dp, end = 4.dp, bottom = 4.dp)
+                                .fillMaxSize(),
+                            onButtonPressed = onButtonPressed
+                        )
+                    }
                 )
             }
-        }
+        ).Content(modifier = Modifier.fillMaxSize())
     }
 
     if (showAboutDialog) {
